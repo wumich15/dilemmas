@@ -78,6 +78,8 @@ test("singleplayer shows one catalog dilemma at a time and moves on", async () =
   const texts = new Set(catalog.map((entry) => entry.text));
 
   await page.click("#btn-singleplayer");
+  assert.equal(await page.$eval("#view-single-setup", (node) => node.hidden), false);
+  await page.click("#btn-single-free");
   assert.equal(await page.$eval("#view-single", (node) => node.hidden), false);
   const first = await text("#single-dilemma");
   assert.ok(texts.has(first), "dilemma comes from the catalog");
@@ -94,6 +96,20 @@ test("singleplayer shows one catalog dilemma at a time and moves on", async () =
   assert.equal(seen.length, 2);
   const byId = new Map(catalog.map((entry) => [entry.id, entry.text]));
   assert.deepEqual(seen.map((id) => byId.get(id)), [first, second]);
+});
+
+test("singleplayer multiple-choice shows catalog options", async () => {
+  await page.click("#view-single [data-back]");
+  await page.click("#btn-singleplayer");
+  await page.click("#btn-single-choice");
+  const first = await text("#single-dilemma");
+  const catalog = JSON.parse(await readFile(new URL("../dilemmas.json", import.meta.url), "utf8"));
+  const entry = catalog.find((item) => item.text === first);
+  const labels = await page.$$eval("#single-options label", (nodes) => nodes.map((node) => node.textContent.trim()));
+  assert.deepEqual(labels, entry.options);
+  await page.click("#single-options input");
+  await page.click("#single-form button");
+  assert.notEqual(await text("#single-dilemma"), first);
 });
 
 test("rooms need Firebase, and the sign-in view is reachable", async () => {
@@ -114,6 +130,8 @@ test("rooms need Firebase, and the sign-in view is reachable", async () => {
   await page.click("#btn-auth");
   assert.equal(await page.$eval("#view-auth", (node) => node.hidden), false);
   assert.equal(await page.$eval("#auth-signed-out", (node) => node.hidden), false);
+  assert.equal(await page.$eval("#btn-email-link", (node) => node.textContent.trim()), "Email me a sign-in link");
+  assert.equal(await page.$eval("#btn-email-complete", (node) => node.hidden), true);
   await page.click("#view-auth [data-back]");
   assert.equal(await page.$eval("#view-home", (node) => node.hidden), false);
 });

@@ -3,7 +3,7 @@ import {
   db, doc, collection, getDoc, getDocs, setDoc, updateDoc, deleteDoc,
   onSnapshot, serverTimestamp, writeBatch, runTransaction, increment,
 } from "./firebase.js";
-import { textFor } from "./catalog.js";
+import { textFor, optionsFor } from "./catalog.js";
 import { pickCandidates, chooseDilemmaIds, shuffle } from "./selection.js";
 
 const CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -27,8 +27,10 @@ export const roundRef = (code, n) => doc(db, "rooms", code, "rounds", String(n))
 const sub = (code, n, name) => collection(db, "rooms", code, "rounds", String(n), name);
 export const answersRef = (code, n) => sub(code, n, "answers");
 export const votesRef = (code, n) => sub(code, n, "votes");
+export const choicesRef = (code, n) => sub(code, n, "choices");
 export const submittedRef = (code, n) => sub(code, n, "submitted");
 const authorRef = (code, n, uid) => doc(db, "rooms", code, "rounds", String(n), "authors", uid);
+const choiceRef = (code, n, uid) => doc(db, "rooms", code, "rounds", String(n), "choices", uid);
 export const poolRef = (code) => collection(db, "rooms", code, "pool");
 export const contribRef = (code) => collection(db, "rooms", code, "contrib");
 
@@ -36,7 +38,7 @@ export function playerName(user) {
   return user.displayName || (user.email || "player").split("@")[0];
 }
 
-export async function createRoom(user) {
+export async function createRoom(user, mode = "free-response", anonymous = true) {
   for (let attempt = 0; attempt < 5; attempt += 1) {
     const code = randomCode();
     const existing = await getDoc(roomRef(code));
@@ -48,6 +50,8 @@ export async function createRoom(user) {
       currentRound: 0,
       candidates: [],
       dilemmaIds: [],
+      mode,
+      anonymous,
       createdAt: serverTimestamp(),
     });
     await addPlayer(code, user);
@@ -80,11 +84,16 @@ export async function setTotalRounds(code, totalRounds) {
   await updateDoc(roomRef(code), { totalRounds });
 }
 
+export async function setGameSettings(code, mode, anonymous) {
+  await updateDoc(roomRef(code), { mode, anonymous });
+}
+
 function startRound(code, room, n) {
   const dilemmaId = room.dilemmaIds[n - 1];
   return setDoc(roundRef(code, n), {
     dilemmaId,
     dilemma: textFor(dilemmaId),
+    options: optionsFor(dilemmaId),
     phase: "answer",
     order: [],
   });
@@ -141,16 +150,31 @@ export async function myResponseId(code, n, uid) {
   return snap.exists() ? snap.data().responseId : null;
 }
 
-export async function submitAnswer(code, n, uid, text) {
+export async function myChoice(code, n, uid) {
+  const snap = await getDoc(choiceRef(code, n, uid));
+  return snap.exists() ? snap.data().optionIndex : null;
+}
+
+export async function submitAnswer(code, n, uid, text, author = null) {
   const existing = await myResponseId(code, n, uid);
   if (existing) return existing;
   const responseId = randomId();
   const batch = writeBatch(db);
   batch.set(authorRef(code, n, uid), { responseId });
-  batch.set(doc(answersRef(code, n), responseId), { text });
+  batch.set(doc(answersRef(code, n), responseId), { text, author });
   batch.set(doc(submittedRef(code, n), uid), { at: serverTimestamp() });
   await batch.commit();
   return responseId;
+}
+
+export async function submitChoice(code, n, uid, optionIndex) {
+  const existing = await myChoice(code, n, uid);
+  if (existing !== null && existing !== undefined) return existing;
+  const batch = writeBatch(db);
+  batch.set(choiceRef(code, n, uid), { optionIndex });
+  batch.set(doc(submittedRef(code, n), uid), { at: serverTimestamp() });
+  await batch.commit();
+  return optionIndex;
 }
 
 export async function castVote(code, n, uid, responseId) {

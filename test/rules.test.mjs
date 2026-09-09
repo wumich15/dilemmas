@@ -33,10 +33,11 @@ const answer = (db, n, id) => doc(db, "rooms", CODE, "rounds", String(n), "answe
 const author = (db, n, uid) => doc(db, "rooms", CODE, "rounds", String(n), "authors", uid);
 const submitted = (db, n, uid) => doc(db, "rooms", CODE, "rounds", String(n), "submitted", uid);
 const vote = (db, n, uid) => doc(db, "rooms", CODE, "rounds", String(n), "votes", uid);
+const choice = (db, n, uid) => doc(db, "rooms", CODE, "rounds", String(n), "choices", uid);
 
 const newRoom = (overrides = {}) => ({
   hostUid: "alice", status: "lobby", totalRounds: 3, currentRound: 0,
-  candidates: [], dilemmaIds: [], ...overrides,
+  candidates: [], dilemmaIds: [], mode: "free-response", anonymous: true, ...overrides,
 });
 const newPlayer = (name) => ({ name, score: 0, roundScores: {} });
 
@@ -54,7 +55,7 @@ async function seedAnswer(uid, responseId, text) {
   await env.withSecurityRulesDisabled(async (context) => {
     const db = context.firestore();
     await setDoc(author(db, 1, uid), { responseId });
-    await setDoc(answer(db, 1, responseId), { text });
+    await setDoc(answer(db, 1, responseId), { text, author: null });
     await setDoc(submitted(db, 1, uid), { at: new Date() });
   });
 }
@@ -84,6 +85,8 @@ test("only the host sets the round count, and it must be a positive number", asy
   await assertFails(updateDoc(room(alice), { totalRounds: 0 }));
   await assertFails(updateDoc(room(bob), { totalRounds: 5 }));
   await assertFails(updateDoc(room(alice), { hostUid: "bob" }));
+  await assertSucceeds(updateDoc(room(alice), { mode: "multiple-choice", anonymous: false }));
+  await assertFails(updateDoc(room(alice), { mode: "unknown" }));
 });
 
 test("dilemma history is private to its owner", async () => {
@@ -113,7 +116,7 @@ test("responses stay unreadable until the answering phase is over", async () => 
 
   const batch = writeBatch(alice);
   batch.set(author(alice, 1, "alice"), { responseId: "r-alice" });
-  batch.set(answer(alice, 1, "r-alice"), { text: "mine" });
+  batch.set(answer(alice, 1, "r-alice"), { text: "mine", author: null });
   batch.set(submitted(alice, 1, "alice"), { at: new Date() });
   await assertSucceeds(batch.commit());
 
@@ -124,9 +127,24 @@ test("responses stay unreadable until the answering phase is over", async () => 
 
   const second = writeBatch(alice);
   second.set(author(alice, 1, "alice"), { responseId: "r-alice-2" });
-  second.set(answer(alice, 1, "r-alice-2"), { text: "again" });
+  second.set(answer(alice, 1, "r-alice-2"), { text: "again", author: null });
   second.set(submitted(alice, 1, "alice"), { at: new Date() });
   await assertFails(second.commit()); // one response per player per round
+});
+
+test("multiple-choice selections stay private until results", async () => {
+  await seedRoom({ status: "playing", currentRound: 1, mode: "multiple-choice" },
+    { dilemmaId: "wikipedia-0001", dilemma: "text", options: ["one", "two", "three"], phase: "answer", order: [] });
+
+  const batch = writeBatch(alice);
+  batch.set(choice(alice, 1, "alice"), { optionIndex: 1 });
+  batch.set(submitted(alice, 1, "alice"), { at: new Date() });
+  await assertSucceeds(batch.commit());
+  await assertFails(getDoc(choice(bob, 1, "alice")));
+  await assertFails(getDocs(collection(bob, "rooms", CODE, "rounds", "1", "choices")));
+  await assertSucceeds(getDocs(collection(bob, "rooms", CODE, "rounds", "1", "submitted")));
+  await assertSucceeds(updateDoc(round(alice, 1), { phase: "results" }));
+  await assertSucceeds(getDoc(choice(bob, 1, "alice")));
 });
 
 test("response ownership is readable only by its author", async () => {

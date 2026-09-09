@@ -19,7 +19,8 @@ Build a minimal website for a moral dilemma game. Focus only on the playable MVP
 
 - Use Firebase as the backend.
 - Support email/password sign up, sign in, and sign out with Firebase Authentication.
-- Use Cloud Firestore for rooms, players, rounds, responses, votes, and scores, with live updates for multiplayer.
+- Also support passwordless email-link sign in. Send a link using the app's current URL, remember only the pending email address in local storage, and complete sign-in when the link returns to the app. If the email is not remembered, ask the user to enter it before completing the link. Clear the remembered address after success or an invalid or expired link.
+- Use Cloud Firestore for rooms, players, rounds, responses, multiple-choice selections, votes, and scores, with live updates for multiplayer.
 - Protect room data and player actions with Firebase Security Rules. Players must not be able to edit other players' responses, votes, or scores.
 - Keep response ownership private from other players while retaining it internally for scoring.
 
@@ -29,16 +30,20 @@ Build a minimal website for a moral dilemma game. Focus only on the playable MVP
 - Let other players join using a short room code.
 - Show the players waiting in the room.
 - Let the host choose a positive number of rounds before starting, and show that count to everyone.
+- When creating a room, let the host choose **Free response** or **Multiple-choice**, and **Anonymous on** or **Anonymous off** for free-response authors. The host may adjust these settings while the room is still in the lobby.
 - Require at least two players to start multiplayer.
 
 ## 4. Implement the multiplayer round
 
-1. Show the same placeholder dilemma to everyone, along with the current round and total rounds.
-2. Each player types and submits one response. Keep responses hidden until everyone has submitted.
-3. Reveal every response anonymously in a numbered list. Shuffle the order once per round and show that same order to everyone.
-4. Each player votes for the answer they think is **best**. Allow one vote per player, with no self-voting.
-5. After everyone has voted, show anonymous results and update the scores.
-6. Let the host advance to the next round. After the final round, show the final scoreboard.
+- Before starting a game, let the host choose **Free response** or **Multiple-choice**.
+- When creating a multiplayer room, let the host choose **Anonymous on** or **Anonymous off**. In free-response mode, anonymous on hides response authors; anonymous off may show the submitting player's display name after the response phase. Multiple-choice results are always aggregate percentages.
+
+1. Show the same dilemma to everyone, along with the current round and total rounds.
+2. In free-response mode, each player types and submits one response. Keep responses hidden until everyone has submitted.
+3. In free-response mode, reveal every response in a numbered list. Shuffle the order once per round and show that same order to everyone. Respect the room's anonymous setting when displaying authors.
+4. In free-response mode, each player votes for the answer they think is **best**. Allow one vote per player, with no self-voting.
+5. In multiple-choice mode, show the dilemma's catalog options. Each player selects exactly one option; after all selections are submitted, show each option's percentage of players. Do not run response voting or points scoring in this mode.
+6. Let the host advance to the next round. After the final round, show the final scoreboard for free response or a completion view for multiple-choice.
 
 ### Points per round
 
@@ -60,10 +65,10 @@ Build a minimal website for a moral dilemma game. Focus only on the playable MVP
 
 ## 6. Use the dilemma catalog
 
-- Load dilemmas from `dilemmas.json`. Each entry has a stable `id`, unique `theme`, prompt `text`, and source metadata.
+- Load dilemmas from `dilemmas.json`. Each entry has a stable `id`, unique `theme`, prompt `text`, a contextual `options` array for multiple-choice, and source metadata.
 - Keep every catalog entry traceable to its cited source. Paraphrase source material rather than copying it verbatim.
 - Keep the catalog replaceable. Do not add runtime scraping, content generation, or external content integrations yet.
-- The current catalog contains 64 source-backed entries, including a 24-entry college-focused pack. Keep college entries grounded in reputable documented cases and preserve the source URL when adding or revising them.
+- The current catalog contains 53 source-backed entries, including a 14-entry ordinary student-life pack. Keep these entries grounded in reputable university or public-interest guidance and preserve the source URL when adding or revising them.
 
 ## 7. Track dilemmas per user
 
@@ -79,5 +84,5 @@ Build a minimal website for a moral dilemma game. Focus only on the playable MVP
 
 - The singleplayer behavior, voting restrictions, and tie rule above are provisional MVP defaults.
 - Do not add timers, chat, matchmaking, elaborate profiles, global leaderboards, or other extra features.
-- Verify sign up/sign in, room creation/joining, synchronized rounds, anonymous responses, voting, scoring for both player-count ranges and ties, the host's round count, the final scoreboard, private per-user history, and repeat avoidance for both singleplayer and multiplayer.
+- Verify password sign up/sign in, email-link send and completion, room creation/joining, synchronized rounds in both modes, anonymous on/off behavior, free-response voting and scoring for both player-count ranges and ties, multiple-choice percentages, the host's round count, the final scoreboard/completion view, private per-user history, and repeat avoidance for both singleplayer and multiplayer.
 - Keep this project focused on completing that flow before expanding scope.

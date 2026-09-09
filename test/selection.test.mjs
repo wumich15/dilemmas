@@ -12,6 +12,9 @@ test("the catalog has stable ids, text, and source metadata", () => {
   for (const entry of CATALOG) {
     assert.equal(typeof entry.id, "string");
     assert.ok(entry.text.length > 0);
+    assert.ok(Array.isArray(entry.options));
+    assert.ok(entry.options.length >= 2);
+    assert.equal(new Set(entry.options).size, entry.options.length);
     assert.equal(typeof entry.source.url, "string");
   }
   const sourced = CATALOG.filter((entry) => entry.source && typeof entry.source.url === "string");

@@ -8,10 +8,14 @@
       "firebase.json",
       "firestore.rules",
       "**/.*",
+      "**/.*/**",
+      ".git/**",
+      ".firebase/**",
       "node_modules/**",
       "test/**",
       "tools/**",
-      "package*.json"
+      "package*.json",
+      "**/*.md"
     ]
   },
   "emulators": {

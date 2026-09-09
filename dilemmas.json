@@ -7,7 +7,12 @@
       "type": "wikipedia",
       "title": "Trolley problem",
       "url": "https://en.wikipedia.org/wiki/Trolley_problem"
-    }
+    },
+    "options": [
+      "Pull the lever",
+      "Do not pull the lever",
+      "Try to warn the people instead"
+    ]
   },
   {
     "id": "sourced-0002",
@@ -17,7 +22,12 @@
       "type": "wikipedia",
       "title": "Trolley problem",
       "url": "https://en.wikipedia.org/wiki/Trolley_problem"
-    }
+    },
+    "options": [
+      "Push the stranger",
+      "Do not push",
+      "Look for another way even if the five may die"
+    ]
   },
   {
     "id": "sourced-0003",
@@ -27,7 +37,12 @@
       "type": "wikipedia",
       "title": "Heinz dilemma",
       "url": "https://en.wikipedia.org/wiki/Heinz_dilemma"
-    }
+    },
+    "options": [
+      "Steal the medicine",
+      "Do not steal it",
+      "Take it and accept punishment afterward"
+    ]
   },
   {
     "id": "sourced-0004",
@@ -37,7 +52,12 @@
       "type": "wikipedia",
       "title": "Prisoner's dilemma",
       "url": "https://en.wikipedia.org/wiki/Prisoner%27s_dilemma"
-    }
+    },
+    "options": [
+      "Stay silent",
+      "Testify against the partner",
+      "Refuse to choose without communication"
+    ]
   },
   {
     "id": "sourced-0005",
@@ -47,7 +67,12 @@
       "type": "wikipedia",
       "title": "Experience machine",
       "url": "https://en.wikipedia.org/wiki/Experience_machine"
-    }
+    },
+    "options": [
+      "Connect to the machine",
+      "Stay in ordinary life",
+      "Connect temporarily if leaving remains possible"
+    ]
   },
   {
     "id": "sourced-0006",
@@ -57,7 +82,12 @@
       "type": "wikipedia",
       "title": "Plank of Carneades",
       "url": "https://en.wikipedia.org/wiki/Plank_of_Carneades"
-    }
+    },
+    "options": [
+      "Push the other person away",
+      "Share the plank and risk both lives",
+      "Refuse to push and accept the likely outcome"
+    ]
   },
   {
     "id": "sourced-0007",
@@ -67,7 +97,12 @@
       "type": "wikipedia",
       "title": "Ticking time bomb scenario",
       "url": "https://en.wikipedia.org/wiki/Ticking_time_bomb_scenario"
-    }
+    },
+    "options": [
+      "Use torture",
+      "Refuse torture",
+      "Use urgent questioning but no physical abuse"
+    ]
   },
   {
     "id": "sourced-0008",
@@ -77,7 +112,12 @@
       "type": "wikipedia",
       "title": "Famine, Affluence, and Morality",
       "url": "https://en.wikipedia.org/wiki/Famine,_Affluence,_and_Morality"
-    }
+    },
+    "options": [
+      "Save the nearby child",
+      "Give the money to distant relief",
+      "Split the sacrifice between both efforts"
+    ]
   },
   {
     "id": "sourced-0009",
@@ -87,7 +127,12 @@
       "type": "wikipedia",
       "title": "Tragedy of the commons",
       "url": "https://en.wikipedia.org/wiki/Tragedy_of_the_commons"
-    }
+    },
+    "options": [
+      "Add another animal",
+      "Choose restraint",
+      "Support a rule that limits everyone equally"
+    ]
   },
   {
     "id": "sourced-0010",
@@ -97,7 +142,12 @@
       "type": "wikipedia",
       "title": "Ultimatum game",
       "url": "https://en.wikipedia.org/wiki/Ultimatum_game"
-    }
+    },
+    "options": [
+      "Accept the $2",
+      "Reject the offer",
+      "Accept but explain that it is unfair"
+    ]
   },
   {
     "id": "sourced-0011",
@@ -107,7 +157,13 @@
       "type": "wikipedia",
       "title": "Original position",
       "url": "https://en.wikipedia.org/wiki/Original_position"
-    }
+    },
+    "options": [
+      "Choose equal outcomes",
+      "Allow unequal rewards with a safety net",
+      "Maximize total prosperity",
+      "Choose the rules you would want if vulnerable"
+    ]
   },
   {
     "id": "sourced-0012",
@@ -117,7 +173,13 @@
       "type": "wikipedia",
       "title": "Lifeboat ethics",
       "url": "https://en.wikipedia.org/wiki/Lifeboat_ethics"
-    }
+    },
+    "options": [
+      "Use a lottery",
+      "Prioritize those in greatest need",
+      "Prioritize those most able to help keep the boat afloat",
+      "Keep the boat closed"
+    ]
   },
   {
     "id": "sourced-0013",
@@ -127,7 +189,12 @@
       "type": "wikipedia",
       "title": "Milgram experiment",
       "url": "https://en.wikipedia.org/wiki/Milgram_experiment"
-    }
+    },
+    "options": [
+      "Continue as instructed",
+      "Refuse immediately",
+      "Ask for independent confirmation before continuing"
+    ]
   },
   {
     "id": "sourced-0014",
@@ -137,7 +204,13 @@
       "type": "wikipedia",
       "title": "Ring of Gyges",
       "url": "https://en.wikipedia.org/wiki/Ring_of_Gyges"
-    }
+    },
+    "options": [
+      "Use it for personal gain",
+      "Use it only to expose wrongdoing",
+      "Never use it to affect others",
+      "Use it secretly to rescue someone"
+    ]
   },
   {
     "id": "sourced-0015",
@@ -147,7 +220,12 @@
       "type": "wikipedia",
       "title": "Principle of double effect",
       "url": "https://en.wikipedia.org/wiki/Principle_of_double_effect"
-    }
+    },
+    "options": [
+      "Authorize the raid",
+      "Cancel the raid",
+      "Delay for a more precise weapon"
+    ]
   },
   {
     "id": "sourced-0016",
@@ -157,7 +235,12 @@
       "type": "wikipedia",
       "title": "Non-identity problem",
       "url": "https://en.wikipedia.org/wiki/Non-identity_problem"
-    }
+    },
+    "options": [
+      "Have the child now",
+      "Wait for the healthier-child option",
+      "Leave the choice to chance"
+    ]
   },
   {
     "id": "sourced-0017",
@@ -167,7 +250,12 @@
       "type": "wikipedia",
       "title": "Sophie's Choice",
       "url": "https://en.wikipedia.org/wiki/Sophie%27s_Choice"
-    }
+    },
+    "options": [
+      "Choose one child",
+      "Refuse to choose",
+      "Try to deceive or resist the authority"
+    ]
   },
   {
     "id": "sourced-0018",
@@ -177,7 +265,13 @@
       "type": "wikipedia",
       "title": "The Ones Who Walk Away from Omelas",
       "url": "https://en.wikipedia.org/wiki/The_Ones_Who_Walk_Away_from_Omelas"
-    }
+    },
+    "options": [
+      "Accept the bargain",
+      "Leave the city",
+      "Work to end the bargain even if everyone suffers",
+      "Stay and secretly help the child"
+    ]
   },
   {
     "id": "sourced-0019",
@@ -187,7 +281,12 @@
       "type": "wikipedia",
       "title": "Dirty hands",
       "url": "https://en.wikipedia.org/wiki/Dirty_hands"
-    }
+    },
+    "options": [
+      "Authorize the secret operation",
+      "Refuse and keep the promise",
+      "Authorize it only with later public accountability"
+    ]
   },
   {
     "id": "sourced-0020",
@@ -197,7 +296,12 @@
       "type": "wikipedia",
       "title": "Repugnant conclusion",
       "url": "https://en.wikipedia.org/wiki/Repugnant_conclusion"
-    }
+    },
+    "options": [
+      "Choose the larger population",
+      "Choose the smaller population with better lives",
+      "Reject the comparison as morally inadequate"
+    ]
   },
   {
     "id": "sourced-0021",
@@ -207,7 +311,13 @@
       "type": "ethics_unwrapped",
       "title": "AI & Accountability: Who’s at the Wheel?",
       "url": "https://ethicsunwrapped.utexas.edu/case-study/a-i-accountability-whos-at-the-wheel"
-    }
+    },
+    "options": [
+      "Hold the safety driver responsible",
+      "Hold the company and developers responsible",
+      "Hold the regulator responsible",
+      "Treat it as shared responsibility"
+    ]
   },
   {
     "id": "sourced-0022",
@@ -217,7 +327,13 @@
       "type": "ethics_unwrapped",
       "title": "Ethical Use of Home DNA Testing",
       "url": "https://ethicsunwrapped.utexas.edu/case-study/ethical-use-of-home-dna-testing"
-    }
+    },
+    "options": [
+      "Allow the law-enforcement search",
+      "Require the customer's permission",
+      "Allow searches only with a court order",
+      "Ban the use of relatives' matches"
+    ]
   },
   {
     "id": "sourced-0023",
@@ -227,7 +343,13 @@
       "type": "ethics_unwrapped",
       "title": "Digital Downloads",
       "url": "https://ethicsunwrapped.utexas.edu/case-study/digital-downloads"
-    }
+    },
+    "options": [
+      "Download the music",
+      "Pay for an authorized copy",
+      "Use the service only if artists are compensated",
+      "Do not use it"
+    ]
   },
   {
     "id": "sourced-0024",
@@ -237,7 +359,13 @@
       "type": "ethics_unwrapped",
       "title": "Daraprim Price Hike",
       "url": "https://ethicsunwrapped.utexas.edu/video/daraprim-price-hike"
-    }
+    },
+    "options": [
+      "Keep the price",
+      "Lower the price",
+      "Keep the price but fund patient assistance",
+      "Ask regulators to intervene"
+    ]
   },
   {
     "id": "sourced-0025",
@@ -247,7 +375,13 @@
       "type": "ethics_unwrapped",
       "title": "EpiPen: Out of Reach",
       "url": "https://ethicsunwrapped.utexas.edu/video/epipen-out-of-reach"
-    }
+    },
+    "options": [
+      "Keep the current price",
+      "Lower the price",
+      "Use subsidies or discounts for schools and families",
+      "Leave access to public policy"
+    ]
   },
   {
     "id": "sourced-0026",
@@ -257,7 +391,13 @@
       "type": "ethics_unwrapped",
       "title": "Theranos’ Bad Blood",
       "url": "https://ethicsunwrapped.utexas.edu/video/theranos-bad-blood"
-    }
+    },
+    "options": [
+      "Disclose the doubts immediately",
+      "Continue while gathering more evidence",
+      "Stop patient testing until validated",
+      "Keep the claims private to protect the company"
+    ]
   },
   {
     "id": "sourced-0027",
@@ -267,7 +407,13 @@
       "type": "ethics_unwrapped",
       "title": "Equifax’s Breach of Trust",
       "url": "https://ethicsunwrapped.utexas.edu/video/equifaxs-breach-of-trust"
-    }
+    },
+    "options": [
+      "Disclose immediately",
+      "Wait until the scope is confirmed",
+      "Notify affected people first and explain later",
+      "Offer protection without public disclosure"
+    ]
   },
   {
     "id": "sourced-0028",
@@ -277,7 +423,13 @@
       "type": "ethics_unwrapped",
       "title": "Volkswagen’s Emissions Evasion",
       "url": "https://ethicsunwrapped.utexas.edu/video/volkswagens-emissions-evasion"
-    }
+    },
+    "options": [
+      "Disclose and recall the vehicles",
+      "Keep selling while fixing the software",
+      "Argue that passing the test is sufficient",
+      "Ask regulators for a new test"
+    ]
   },
   {
     "id": "sourced-0029",
@@ -287,7 +439,13 @@
       "type": "ethics_unwrapped",
       "title": "Armstrong’s Doping Downfall",
       "url": "https://ethicsunwrapped.utexas.edu/video/armstrongs-doping-downfall"
-    }
+    },
+    "options": [
+      "Use the drugs",
+      "Compete clean even at a disadvantage",
+      "Disclose the widespread use and seek a new standard",
+      "Leave the sport"
+    ]
   },
   {
     "id": "sourced-0030",
@@ -297,7 +455,13 @@
       "type": "ethics_unwrapped",
       "title": "Full Disclosure: Manipulating Donors",
       "url": "https://ethicsunwrapped.utexas.edu/case-study/full-disclosure-manipulating-donors"
-    }
+    },
+    "options": [
+      "Correct the donor and return the gift",
+      "Keep the gift and say nothing",
+      "Keep it only after making the misunderstanding clear",
+      "Ask an independent board to decide"
+    ]
   },
   {
     "id": "sourced-0031",
@@ -307,7 +471,13 @@
       "type": "ethics_unwrapped",
       "title": "Edward Snowden: Traitor or Hero?",
       "url": "https://ethicsunwrapped.utexas.edu/case-study/edward-snowden-traitor-hero"
-    }
+    },
+    "options": [
+      "Release the documents",
+      "Use internal channels only",
+      "Release a limited set after redaction",
+      "Keep the material classified"
+    ]
   },
   {
     "id": "sourced-0032",
@@ -317,7 +487,13 @@
       "type": "ethics_unwrapped",
       "title": "Ebola & American Intervention",
       "url": "https://ethicsunwrapped.utexas.edu/case-study/ebola-american-intervention"
-    }
+    },
+    "options": [
+      "Send military support",
+      "Use only civilian responders",
+      "Send logistics support under local civilian leadership",
+      "Wait for local authorities to request help"
+    ]
   },
   {
     "id": "sourced-0033",
@@ -327,7 +503,13 @@
       "type": "ethics_unwrapped",
       "title": "Prenatal Diagnosis & Parental Choice",
       "url": "https://ethicsunwrapped.utexas.edu/case-study/prenatal-diagnosis-parental-choice"
-    }
+    },
+    "options": [
+      "Continue the pregnancy",
+      "End the pregnancy",
+      "Seek more information and support before deciding",
+      "Let the decision turn on the parents' capacity and wishes"
+    ]
   },
   {
     "id": "sourced-0034",
@@ -337,7 +519,13 @@
       "type": "ethics_unwrapped",
       "title": "Freedom vs. Duty in Clinical Social Work",
       "url": "https://ethicsunwrapped.utexas.edu/case-study/freedom-vs-duty-in-clinical-social-work"
-    }
+    },
+    "options": [
+      "Provide the service",
+      "Arrange a prompt transfer",
+      "Refuse the service",
+      "Ask the client what transfer would preserve access"
+    ]
   },
   {
     "id": "sourced-0035",
@@ -347,7 +535,13 @@
       "type": "ethics_unwrapped",
       "title": "Research Conflicts at UT Austin",
       "url": "https://ethicsunwrapped.utexas.edu/video/research-conflicts-at-ut-austin"
-    }
+    },
+    "options": [
+      "Publish with full disclosure",
+      "Withdraw the study",
+      "Commission independent review",
+      "Publish only after separating the professor from the analysis"
+    ]
   },
   {
     "id": "sourced-0036",
@@ -357,7 +551,13 @@
       "type": "ethics_unwrapped",
       "title": "Covering Yourself? Journalists and the Bowl Championship",
       "url": "https://ethicsunwrapped.utexas.edu/case-study/covering-journalists-bowl-championship-series"
-    }
+    },
+    "options": [
+      "Publish the poll as news",
+      "Disclose the conflict",
+      "Stop covering the poll",
+      "Separate the polling and reporting teams"
+    ]
   },
   {
     "id": "sourced-0037",
@@ -367,7 +567,13 @@
       "type": "ethics_unwrapped",
       "title": "Covering Female Athletes",
       "url": "https://ethicsunwrapped.utexas.edu/case-study/covering-female-athletes"
-    }
+    },
+    "options": [
+      "Use the marketable image",
+      "Use an athletic-action image",
+      "Let the athlete approve the cover",
+      "Publish the profile without a cover portrait"
+    ]
   },
   {
     "id": "sourced-0038",
@@ -377,7 +583,13 @@
       "type": "ethics_unwrapped",
       "title": "Dr. V's Magical Putter",
       "url": "https://ethicsunwrapped.utexas.edu/case-study/dr-vs-magical-putter"
-    }
+    },
+    "options": [
+      "Publish the personal details",
+      "Honor the agreement and omit them",
+      "Publish only details relevant to the product claims",
+      "Drop the story"
+    ]
   },
   {
     "id": "sourced-0039",
@@ -387,7 +599,13 @@
       "type": "ethics_unwrapped",
       "title": "Cyber Harassment",
       "url": "https://ethicsunwrapped.utexas.edu/case-study/cyber-harassment"
-    }
+    },
+    "options": [
+      "Respond publicly",
+      "Use formal disciplinary channels",
+      "Ask for a private correction",
+      "Say nothing"
+    ]
   },
   {
     "id": "sourced-0040",
@@ -397,246 +615,220 @@
       "type": "ethics_unwrapped",
       "title": "Research Conflicts at UT Austin",
       "url": "https://ethicsunwrapped.utexas.edu/video/research-conflicts-at-ut-austin"
-    }
+    },
+    "options": [
+      "Publish with the conflict disclosed",
+      "Commission a new independent study",
+      "Retract the study",
+      "Publish only the data and remove the professor's interpretation"
+    ]
   },
   {
     "id": "sourced-0041",
-    "theme": "The admissions side door",
-    "text": "A parent is told that a university's normal admissions process can be bypassed through a private consultant who promises to present the applicant as an athlete. The student is qualified enough to attend, but the family would be using money and a false story to obtain a scarce place. Should the parent proceed, refuse, or tell the university what the consultant proposed?",
+    "theme": "The midnight roommate",
+    "text": "Your roommate works late shifts and comes home at midnight, while you have an early class and need the room quiet. The housing agreement encourages quiet hours but also treats the room as shared space. Should you ask your roommate to change their routine, use the library and accept the inconvenience, or ask a resident adviser to mediate before resentment grows?",
     "source": {
-      "type": "ethics_unwrapped",
-      "title": "The Varsity Blues Scandal",
-      "url": "https://ethicsunwrapped.utexas.edu/case-study/the-varsity-blues-scandal"
-    }
+      "type": "university",
+      "title": "Living with Roommates",
+      "url": "https://reslife.ucla.edu/roommates"
+    },
+    "options": [
+      "Ask the roommate to change their routine",
+      "Use another place to sleep or study",
+      "Ask a resident adviser to mediate",
+      "Agree on quiet hours and a compromise"
+    ]
   },
   {
     "id": "sourced-0042",
-    "theme": "The coach's false roster",
-    "text": "A university coach is asked to certify a wealthy applicant as a recruited athlete even though the student has never competed in the sport. The coach could protect the program's funding and accept a promised donation, but the certification would displace applicants admitted honestly and make the coach part of a fraud. Should the coach sign, refuse, or report the request?",
+    "theme": "The unannounced guest",
+    "text": "Your roommate invites a partner to stay several nights without asking. The guest is polite, but the arrangement changes your privacy, utilities, and ability to relax at home. Should you insist on advance notice, tolerate the visits because your roommate pays equal rent, or propose a guest rule that limits both of you equally?",
     "source": {
-      "type": "ethics_unwrapped",
-      "title": "The Varsity Blues Scandal",
-      "url": "https://ethicsunwrapped.utexas.edu/case-study/the-varsity-blues-scandal"
-    }
+      "type": "university",
+      "title": "Guide to Community Living",
+      "url": "https://www.udel.edu/students/reslife/campus-living/housing-policies/guide-to-community-living/"
+    },
+    "options": [
+      "Insist on advance notice",
+      "Tolerate the visits",
+      "Propose a guest rule that applies equally",
+      "Ask housing staff to intervene"
+    ]
   },
   {
     "id": "sourced-0043",
-    "theme": "The paper class request",
-    "text": "A university adviser is asked to place athletes in a nominal course that requires little or no work so they can remain eligible. The adviser knows the students are under pressure and that refusing may cost them scholarships, but approving the arrangement turns grades into a service rather than an assessment. Should the adviser protect the students' eligibility, insist on real coursework, or report the request?",
+    "theme": "The borrowed groceries",
+    "text": "Your roommate repeatedly uses your groceries and kitchen supplies, saying they will replace them after their next paycheck. You can lock up your food, confront them, or keep sharing because they are struggling financially. Which response respects your roommate's needs without turning a shared home into a ledger of every snack and dish?",
     "source": {
-      "type": "ethics_unwrapped",
-      "title": "Academic Fraud at UNC",
-      "url": "https://ethicsunwrapped.utexas.edu/video/academic-fraud-at-unc"
-    }
+      "type": "university",
+      "title": "Roommates",
+      "url": "https://www.uc.edu/campus-life/housing/resident-support/daily-living/roommates.html"
+    },
+    "options": [
+      "Lock up your food",
+      "Confront the roommate",
+      "Keep sharing without tracking every item",
+      "Set a repayment and shared-supplies agreement"
+    ]
   },
   {
     "id": "sourced-0044",
-    "theme": "The department's empty course",
-    "text": "A department has created a course on paper, but attendance and substantive assignments are not being required and athletes receive high grades. Closing it immediately could invalidate transcripts and harm students who relied on those credits; leaving it open continues a system that privileges athletic eligibility. Should the chair close the course, review every grade, or protect the students from the institution's own failure?",
+    "theme": "The free-riding teammate",
+    "text": "A group project is due tomorrow. One teammate has contributed little, but they have been caring for a sick family member and the group never set clear responsibilities. You can report the unequal work in the peer evaluation, give everyone the same grade, or ask for an extension that may hurt the rest of the group. What would be fair to the teammate and to those who did the work?",
     "source": {
-      "type": "ethics_unwrapped",
-      "title": "Academic Fraud at UNC",
-      "url": "https://ethicsunwrapped.utexas.edu/video/academic-fraud-at-unc"
-    }
+      "type": "university",
+      "title": "Individual Contributions to the Group",
+      "url": "https://cei.umn.edu/teaching-resources/group-projects/assessing-project/individual-contributions-group"
+    },
+    "options": [
+      "Report the unequal work",
+      "Give everyone the same grade",
+      "Ask for an extension",
+      "Describe the circumstances and contributions honestly"
+    ]
   },
   {
     "id": "sourced-0045",
-    "theme": "The report to campus police",
-    "text": "A campus police officer receives an allegation of sexual assault involving a prominent athlete. A public investigation could support the survivor and protect future students, but mishandling the case could expose private details, damage due process, and intensify public pressure before facts are established. Should the officer report immediately, conduct a confidential inquiry first, or defer to university administrators?",
+    "theme": "The club initiation",
+    "text": "A student organization asks new members to complete an embarrassing overnight challenge. No one is threatened, and many members say the ritual creates trust, but a new student looks uncomfortable and worries that refusing will cost them their place. Should you participate, ask the group to change the ritual, or report it even if the members call it harmless tradition?",
     "source": {
-      "type": "ethics_unwrapped",
-      "title": "Baylor's Silence on Sexual Assault",
-      "url": "https://ethicsunwrapped.utexas.edu/video/baylors-silence-on-sexual-assault"
-    }
+      "type": "university",
+      "title": "Hazing Policy Statement",
+      "url": "https://hazing.cornell.edu/hazingpolicy"
+    },
+    "options": [
+      "Participate",
+      "Ask the group to change the ritual",
+      "Refuse but stay in the organization",
+      "Report the ritual"
+    ]
   },
   {
     "id": "sourced-0046",
-    "theme": "The coach's warning",
-    "text": "A coach hears a credible warning that a player may have assaulted another student. Reporting it may cost the team its star player and bring scrutiny to the program; keeping the matter inside the athletic department may preserve a season but leave a possible victim without protection. Is the coach's first duty to the team, the accused student, the person reporting, or the wider campus?",
+    "theme": "The resident assistant's report",
+    "text": "As a resident assistant, you hear that a club held an off-campus initiation that may have crossed the university's hazing policy. Reporting it could protect new members but could also end the organization and expose students who thought the event was consensual. Should you report what you know, investigate informally, or give the club one chance to address it itself?",
     "source": {
-      "type": "ethics_unwrapped",
-      "title": "Baylor's Silence on Sexual Assault",
-      "url": "https://ethicsunwrapped.utexas.edu/video/baylors-silence-on-sexual-assault"
-    }
+      "type": "official",
+      "title": "Anti-Hazing Policy",
+      "url": "https://policies.osu.edu/sites/default/files/documents/2024/09/anti-hazing-policy.pdf"
+    },
+    "options": [
+      "Report what you know",
+      "Investigate informally first",
+      "Give the club one chance to address it",
+      "Ask the affected students what response they want"
+    ]
   },
   {
     "id": "sourced-0047",
-    "theme": "The second warning",
-    "text": "A university administrator receives a second report that an adult connected to a powerful sports program may have abused a young person. The first report was never fully acted on, and reopening it will expose the university to legal and reputational harm. Should the administrator protect the institution from a scandal, or report the information even without certainty that a crime occurred?",
+    "theme": "The friend who refuses help",
+    "text": "A friend tells you they have stopped sleeping and are missing class but asks you not to tell anyone. They want privacy and fear being judged, while you think a counselor could help. Should you keep their confidence, encourage them to contact counseling while staying involved, or call for help yourself if the situation seems to worsen?",
     "source": {
-      "type": "ethics_unwrapped",
-      "title": "The Sandusky Scandal",
-      "url": "https://ethicsunwrapped.utexas.edu/case-study/the-sandusky-scandal"
-    }
+      "type": "university",
+      "title": "Helping a Friend",
+      "url": "https://studentlife.utk.edu/counselingcenter/helping-a-friend/"
+    },
+    "options": [
+      "Keep the confidence",
+      "Encourage counseling while staying involved",
+      "Contact a counselor for guidance",
+      "Call for urgent help if the risk worsens"
+    ]
   },
   {
     "id": "sourced-0048",
-    "theme": "The protest email",
-    "text": "After racially charged incidents, students protest and a faculty member sends an email asking colleagues to consider whether campus traditions and costumes can cause harm. Some students see the message as necessary criticism; others see it as an attack on free expression and academic independence. Should the university defend the speaker, condemn the message, or leave the dispute to students and faculty?",
+    "theme": "The urgent text",
+    "text": "A friend sends a message saying they may hurt themselves and then stops replying. Calling emergency services could keep them safe but might feel like a betrayal and bring unwanted attention to their family. Waiting could respect their privacy but leave you unsure whether they are in immediate danger. What should you do first?",
     "source": {
-      "type": "ethics_unwrapped",
-      "title": "Freedom of Speech on Campus",
-      "url": "https://ethicsunwrapped.utexas.edu/case-study/freedom-speech-campus"
-    }
+      "type": "university",
+      "title": "Helping a Friend",
+      "url": "https://studentlife.utk.edu/counselingcenter/helping-a-friend/"
+    },
+    "options": [
+      "Call emergency services",
+      "Contact a trusted person nearby",
+      "Keep trying to reach the friend first",
+      "Wait and respect the request for privacy"
+    ]
   },
   {
     "id": "sourced-0049",
-    "theme": "The speaker and the threatened event",
-    "text": "A university has invited a controversial speaker. Protesters say the invitation legitimizes hateful ideas, while administrators say cancelling it would let threats determine who may speak. Keeping the event could create a safety risk and burden students; cancelling it could establish a precedent against unpopular views. Should the university host it, move it, or withdraw the invitation?",
+    "theme": "The accommodation disclosure",
+    "text": "A classmate asks why another student receives extra time on exams. You know the accommodation is private, but explaining it might stop classmates from assuming the student is receiving an unfair advantage. Should you say nothing, encourage the student to explain if they choose, or tell the classmate only that accommodations are reviewed through a formal process?",
     "source": {
-      "type": "ethics_unwrapped",
-      "title": "Freedom of Speech on Campus",
-      "url": "https://ethicsunwrapped.utexas.edu/case-study/freedom-speech-campus"
-    }
+      "type": "university",
+      "title": "Confidentiality",
+      "url": "https://ods.princeton.edu/rights-responsibilities/confidentiality"
+    },
+    "options": [
+      "Say nothing",
+      "Encourage the student to explain if they choose",
+      "Say accommodations are handled privately",
+      "Tell the classmate the accommodation details"
+    ]
   },
   {
     "id": "sourced-0050",
-    "theme": "The team social-media ban",
-    "text": "A college coach bans players from using Twitter during the season because posts can embarrass the team and sponsors. The rule may reduce harassment and protect a shared public image, but it also controls students' speech outside practice and may silence criticism. Should the players accept the ban, challenge it, or agree only to rules against threats and private-information leaks?",
+    "theme": "The recorded lecture",
+    "text": "A student has an approved accommodation to record lectures and promises not to share the files. A friend asks for the recording because they missed class, and the recording would make studying easier for everyone. Should the student share it, refuse even though the friend is struggling, or ask the instructor whether a broader version can be provided?",
     "source": {
-      "type": "ethics_unwrapped",
-      "title": "Sacking Social Media in College Sports",
-      "url": "https://ethicsunwrapped.utexas.edu/case-study/sacking-social-media-college-sports"
-    }
+      "type": "university",
+      "title": "Permission to Record Classroom Lectures and Discussions",
+      "url": "https://sds.utk.edu/permission-to-record-classroom-lectures-and-discussions/"
+    },
+    "options": [
+      "Share the recording",
+      "Refuse to share it",
+      "Ask the instructor for an approved copy",
+      "Share only notes you wrote yourself"
+    ]
   },
   {
     "id": "sourced-0051",
-    "theme": "The stolen final",
-    "text": "A student crawls through a university building to steal a final exam before the test. The student can return it anonymously and claim no one was harmed, or confess and risk suspension, a criminal investigation, and loss of the course. Should the professor focus on punishment, repair the assessment and show mercy, or treat the theft as a serious breach even if the student never used the questions?",
+    "theme": "The parent who pays",
+    "text": "A parent who pays most of a student's tuition asks the university for access to the student's grades. The student is legally an adult and has asked for privacy, but the parent says financial support should include the right to know whether the student is passing. Should the university disclose the records, refuse, or ask the student and parent to agree on limited information?",
     "source": {
-      "type": "ethics_unwrapped",
-      "title": "Final Exam Heist",
-      "url": "https://ethicsunwrapped.utexas.edu/video/final-exam-heist"
-    }
+      "type": "official",
+      "title": "Can parents view a child's post-secondary education record?",
+      "url": "https://studentprivacy.ed.gov/faq/can-parents-view-childs-post-secondary-education-record"
+    },
+    "options": [
+      "Disclose the records",
+      "Refuse without the student's consent",
+      "Ask the student and parent to agree on limited information",
+      "Share only whether the student is enrolled"
+    ]
   },
   {
     "id": "sourced-0052",
-    "theme": "The friend at the door",
-    "text": "A student realizes that a friend plans to enter a professor's office and take an exam. Stopping the friend may preserve academic fairness but could end the friendship and trigger severe discipline; staying silent makes the student part of a planned theft. Should the student intervene, report the plan, or wait to see whether the friend changes their mind?",
+    "theme": "The research assistant's side job",
+    "text": "A professor offers you paid work for a private project related to your research. The job would provide useful experience and money, but the professor also grades your work and may benefit from your ideas. Should you accept with a written agreement, ask for a neutral supervisor, or refuse to avoid a conflict that could affect your academic progress?",
     "source": {
-      "type": "ethics_unwrapped",
-      "title": "Final Exam Heist",
-      "url": "https://ethicsunwrapped.utexas.edu/video/final-exam-heist"
-    }
+      "type": "university",
+      "title": "Use of Students in Outside Employment",
+      "url": "https://policy.uconn.edu/2011/06/02/use-of-students-in-outside-employment/"
+    },
+    "options": [
+      "Accept with a written agreement",
+      "Ask for a neutral supervisor",
+      "Refuse the work",
+      "Accept only after disclosing the conflict"
+    ]
   },
   {
     "id": "sourced-0053",
-    "theme": "The compromised exam",
-    "text": "A professor learns that a final exam may have been stolen shortly before students are scheduled to take it. Replacing the exam inconveniences everyone and may reveal a security failure; using it risks rewarding students who saw it and unfairly accusing those who did not. Should the professor cancel, replace, delay, or administer the compromised exam while investigating?",
-    "source": {
-      "type": "ethics_unwrapped",
-      "title": "Final Exam Heist",
-      "url": "https://ethicsunwrapped.utexas.edu/video/final-exam-heist"
-    }
-  },
-  {
-    "id": "sourced-0054",
-    "theme": "The silent witness to cheating",
-    "text": "A student is offered a copy of a stolen exam but refuses to use it. Reporting the source could protect classmates who prepared honestly, yet it could also expose a friend and cause the entire class to retake the exam. Should the student report what happened, return the copy without explanation, or keep silent because they did not cheat?",
-    "source": {
-      "type": "ethics_unwrapped",
-      "title": "Final Exam Heist",
-      "url": "https://ethicsunwrapped.utexas.edu/video/final-exam-heist"
-    }
-  },
-  {
-    "id": "sourced-0055",
-    "theme": "The recruiting payment",
-    "text": "A sports executive offers money to a college athlete's family and asks a coach to steer the athlete toward a sponsored university. The payment could cover tuition and support the family, but it turns an educational choice into a transaction and gives the athlete an advantage unavailable to others. Should the family accept, disclose the offer, or refuse even if the money would change their future?",
-    "source": {
-      "type": "ethics_unwrapped",
-      "title": "Steering Student Athletes",
-      "url": "https://ethicsunwrapped.utexas.edu/video/steering-student-athletes"
-    }
-  },
-  {
-    "id": "sourced-0056",
-    "theme": "The athlete's adviser",
-    "text": "An athlete's adviser learns that a shoe company is secretly paying coaches to influence recruiting. Exposing the arrangement may protect fair competition but could cost the athlete a scholarship, sponsorship, or place on the team. Should the adviser protect the athlete's immediate opportunity, report the scheme, or let the athlete decide after hearing the risks?",
-    "source": {
-      "type": "ethics_unwrapped",
-      "title": "Steering Student Athletes",
-      "url": "https://ethicsunwrapped.utexas.edu/video/steering-student-athletes"
-    }
-  },
-  {
-    "id": "sourced-0057",
-    "theme": "The prison simulation",
-    "text": "A university researcher assigns student volunteers to act as prisoners or guards in a simulated prison. The study's value depends on the roles feeling real, but participants begin showing distress and some guards behave abusively. Should the researcher stop the study, continue because the findings may matter, or rely on the consent form and scheduled end date?",
-    "source": {
-      "type": "wikipedia",
-      "title": "Stanford prison experiment",
-      "url": "https://en.wikipedia.org/wiki/Stanford_prison_experiment"
-    }
-  },
-  {
-    "id": "sourced-0058",
-    "theme": "The tribe's blood samples",
-    "text": "A university obtains blood samples from members of an Indigenous community for diabetes research. Years later, researchers use the samples for unrelated studies the community did not expect, including ancestry and migration research. Should the university return or destroy the samples, seek new consent, or treat the original broad consent as sufficient?",
-    "source": {
-      "type": "wikipedia",
-      "title": "Havasupai Indian Tribe v. Arizona Board of Regents",
-      "url": "https://en.wikipedia.org/wiki/Havasupai_Indian_Tribe_v._Arizona_Board_of_Regents"
-    }
-  },
-  {
-    "id": "sourced-0059",
-    "theme": "The hidden news feed",
-    "text": "A university-affiliated research team helps a social-media company test whether quietly changing users' news feeds changes their emotions. The study could reveal how online systems affect wellbeing, but users were not told they were research participants and cannot easily understand what was altered. Is the social value enough to justify the lack of specific consent?",
-    "source": {
-      "type": "wikipedia",
-      "title": "Facebook emotional contagion experiment",
-      "url": "https://en.wikipedia.org/wiki/Facebook_emotional_contagion_experiment"
-    }
-  },
-  {
-    "id": "sourced-0060",
-    "theme": "The infant conditioning study",
-    "text": "A researcher proposes to condition fear in an infant by repeatedly pairing a harmless object with a frightening noise. The work might illuminate how phobias develop, but the infant cannot consent and the fear may persist after the study. Should the research proceed if it could produce useful knowledge, or is deliberately creating distress in a child unacceptable?",
-    "source": {
-      "type": "wikipedia",
-      "title": "Little Albert experiment",
-      "url": "https://en.wikipedia.org/wiki/Little_Albert_experiment"
-    }
-  },
-  {
-    "id": "sourced-0061",
-    "theme": "The admissions rule after the court decision",
-    "text": "A university wants a diverse class after a court decision limits the use of race in admissions. It can consider essays about lived experience, give more weight to socioeconomic disadvantage, or use race-neutral preferences that may produce less diversity. Which approach best balances equal treatment, remedying exclusion, and selecting students as individuals?",
-    "source": {
-      "type": "official",
-      "title": "Students for Fair Admissions v. Harvard",
-      "url": "https://www.supremecourt.gov/opinions/22pdf/20-1199_hgdj.pdf"
-    }
-  },
-  {
-    "id": "sourced-0062",
-    "theme": "The parents asking for grades",
-    "text": "A college parent demands access to an adult student's grades after learning that the student is struggling. The parent pays tuition and threatens to withdraw support, but the student expects education records to remain private. Should the university disclose the grades, refuse absent the student's consent, or treat financial dependence as a reason for an exception?",
-    "source": {
-      "type": "official",
-      "title": "Family Educational Rights and Privacy Act (FERPA)",
-      "url": "https://studentprivacy.ed.gov/faq/can-parents-view-childs-post-secondary-education-record"
-    }
-  },
-  {
-    "id": "sourced-0063",
-    "theme": "The incomplete consent form",
-    "text": "A university study needs student volunteers, but explaining every hypothesis could change how participants behave and weaken the results. The research team can use limited disclosure with a prompt debriefing, or explain everything and accept less reliable data. When is incomplete information compatible with informed consent, and what risks can never be withheld?",
+    "theme": "The incomplete study explanation",
+    "text": "A research team recruiting students wants to withhold its exact hypothesis so participants do not change their behavior. The team promises to explain the study afterward and says the risk is minimal, but participants cannot judge whether the undisclosed purpose matters to them. Should the study proceed, disclose the hypothesis and accept noisier results, or redesign the project?",
     "source": {
       "type": "official",
       "title": "The Belmont Report",
       "url": "https://www.hhs.gov/ohrp/regulations-and-policy/belmont-report/read-the-belmont-report/index.html"
-    }
-  },
-  {
-    "id": "sourced-0064",
-    "theme": "The scholarship athlete's union",
-    "text": "College football players organize to bargain collectively over scholarships, medical care, and the demands of their sport. A union could give athletes a voice and address unequal power, but the university argues that students are not employees and that bargaining could disrupt scholarships and competition. Should the players unionize, and what obligations does the university owe them?",
-    "source": {
-      "type": "wikipedia",
-      "title": "Amateurism in the NCAA",
-      "url": "https://en.wikipedia.org/wiki/Amateurism_in_the_NCAA"
-    }
+    },
+    "options": [
+      "Proceed with limited disclosure and debriefing",
+      "Disclose the hypothesis",
+      "Redesign the study",
+      "Do not enroll anyone until the risks are fully explained"
+    ]
   }
 ]

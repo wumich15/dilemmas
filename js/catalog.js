@@ -1,6 +1,4 @@
-// The replaceable dilemma catalog. Entries: { id, text, source|null }.
-// A Wikipedia source marks source-backed content; source: null marks generated
-// content.
+// The replaceable dilemma catalog. Entries: { id, text, options, source }.
 let entries = [];
 let loadError = null;
 
@@ -19,4 +17,5 @@ const byId = new Map(entries.map((entry) => [entry.id, entry]));
 
 export const entryFor = (id) => byId.get(id) || null;
 export const textFor = (id) => byId.get(id)?.text || "";
+export const optionsFor = (id) => byId.get(id)?.options || [];
 export const sourceFor = (id) => byId.get(id)?.source || null;

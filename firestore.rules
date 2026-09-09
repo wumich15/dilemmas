@@ -20,6 +20,10 @@ service cloud.firestore {
         exists(/databases/$(database)/documents/rooms/$(roomId)/players/$(request.auth.uid));
     }
 
+    function playerData(roomId, uid) {
+      return get(/databases/$(database)/documents/rooms/$(roomId)/players/$(uid)).data;
+    }
+
     function roundPhase(roomId, roundId) {
       return get(/databases/$(database)/documents/rooms/$(roomId)/rounds/$(roundId)).data.phase;
     }
@@ -56,12 +60,16 @@ service cloud.firestore {
         && request.resource.data.status == 'lobby'
         && request.resource.data.currentRound == 0
         && request.resource.data.totalRounds is int
-        && request.resource.data.totalRounds > 0;
+        && request.resource.data.totalRounds > 0
+        && request.resource.data.mode in ['free-response', 'multiple-choice']
+        && request.resource.data.anonymous is bool;
       // Only the host drives the room, and the host cannot hand itself off.
       allow update: if isHost(roomId)
         && request.resource.data.hostUid == resource.data.hostUid
         && request.resource.data.totalRounds is int
-        && request.resource.data.totalRounds > 0;
+        && request.resource.data.totalRounds > 0
+        && request.resource.data.mode in ['free-response', 'multiple-choice']
+        && request.resource.data.anonymous is bool;
       allow delete: if false;
 
       // A player may only write their own player document, so nobody can edit
@@ -107,13 +115,32 @@ service cloud.firestore {
           allow read: if isPlayer(roomId) && roundPhase(roomId, roundId) != 'answer';
           allow create: if isPlayer(roomId)
             && roundPhase(roomId, roundId) == 'answer'
-            && request.resource.data.keys().hasOnly(['text'])
+            && roomData(roomId).mode == 'free-response'
+            && request.resource.data.keys().hasOnly(['text', 'author'])
             && request.resource.data.text is string
+            && (request.resource.data.author == null || request.resource.data.author is string)
+            && ((roomData(roomId).anonymous == false
+              && request.resource.data.author == playerData(roomId, request.auth.uid).name)
+              || (roomData(roomId).anonymous == true && request.resource.data.author == null))
             && !exists(/databases/$(database)/documents/rooms/$(roomId)/rounds/$(roundId)/submitted/$(request.auth.uid));
           allow update: if isPlayer(roomId)
             && roundPhase(roomId, roundId) == 'answer'
+            && roomData(roomId).mode == 'free-response'
             && myResponseId(roomId, roundId) == responseId;
           allow delete: if false;
+        }
+
+        // A multiple-choice selection is private until results, while the
+        // submitted marker remains public so the host can advance the round.
+        match /choices/{uid} {
+          allow read: if isPlayer(roomId) && roundPhase(roomId, roundId) != 'answer';
+          allow create: if isPlayer(roomId) && uid == request.auth.uid
+            && roomData(roomId).mode == 'multiple-choice'
+            && roundPhase(roomId, roundId) == 'answer'
+            && request.resource.data.keys().hasOnly(['optionIndex'])
+            && request.resource.data.optionIndex is int
+            && !exists(/databases/$(database)/documents/rooms/$(roomId)/rounds/$(roundId)/submitted/$(request.auth.uid));
+          allow update, delete: if false;
         }
 
         // Maps a player to their response id. Readable only by that player, so
@@ -121,6 +148,7 @@ service cloud.firestore {
         match /authors/{uid} {
           allow read: if signedIn() && uid == request.auth.uid;
           allow create: if isPlayer(roomId) && uid == request.auth.uid
+            && roomData(roomId).mode == 'free-response'
             && request.resource.data.responseId is string;
           allow update, delete: if false;
         }
@@ -137,6 +165,7 @@ service cloud.firestore {
         match /votes/{uid} {
           allow read: if isPlayer(roomId);
           allow create: if isPlayer(roomId) && uid == request.auth.uid
+            && roomData(roomId).mode == 'free-response'
             && roundPhase(roomId, roundId) == 'vote'
             && request.resource.data.keys().hasOnly(['responseId'])
             && myResponseId(roomId, roundId) != request.resource.data.responseId;

@@ -1,10 +1,11 @@
 import {
   auth, isConfigured, onAuthStateChanged, createUserWithEmailAndPassword,
-  signInWithEmailAndPassword, signOut, updateProfile,
+  signInWithEmailAndPassword, sendSignInLinkToEmail, isSignInWithEmailLink,
+  signInWithEmailLink, signOut, updateProfile,
 } from "./firebase.js";
 import * as mp from "./multiplayer.js";
 import * as history from "./history.js";
-import { catalogIds, catalogError, textFor, sourceFor } from "./catalog.js";
+import { catalogIds, catalogError, textFor, optionsFor, sourceFor } from "./catalog.js";
 import { pickSingleplayerQueue } from "./selection.js";
 import { pointsFor, tallyVotes } from "./scoring.js";
 
@@ -53,8 +54,10 @@ const state = {
   round: null,
   answers: [],
   votes: [],
+  choices: [],
   submitted: [],
   myResponseId: null,
+  myChoice: null,
   contrib: [],
   draft: "",
   scoredRound: 0,
@@ -66,15 +69,18 @@ const state = {
 let roomUnsubs = [];
 let roundUnsubs = [];
 let answersUnsub = null;
+let choicesUnsub = null;
 
 function stopRound() {
   roundUnsubs.forEach((fn) => fn());
   roundUnsubs = [];
   if (answersUnsub) answersUnsub();
   answersUnsub = null;
+  if (choicesUnsub) choicesUnsub();
+  choicesUnsub = null;
   Object.assign(state, {
-    round: null, answers: [], votes: [], submitted: [],
-    myResponseId: null, draft: "", scoredRound: 0, recordedRound: 0,
+    round: null, answers: [], votes: [], choices: [], submitted: [],
+    myResponseId: null, myChoice: null, draft: "", scoredRound: 0, recordedRound: 0,
   });
 }
 function stopRoom() {
@@ -140,6 +146,47 @@ function requireAuth() {
   return true;
 }
 
+const EMAIL_LINK_KEY = "moral-dilemma:email-link";
+const emailLinkStatus = $("auth-link-status");
+const emailLinkButton = $("btn-email-complete");
+
+function setEmailLinkStatus(message) {
+  emailLinkStatus.textContent = message || "";
+  emailLinkStatus.hidden = !message;
+}
+
+function emailLinkSettings() {
+  return {
+    url: window.location.origin + window.location.pathname,
+    handleCodeInApp: true,
+  };
+}
+
+async function completeEmailLink(email) {
+  if (!isConfigured) {
+    setError("auth-error", "Firebase is not configured yet — see README.md.");
+    return;
+  }
+  const address = (email || "").trim();
+  if (!address) {
+    setError("auth-error", "Enter the email address that received the link.");
+    return;
+  }
+  try {
+    await signInWithEmailLink(auth, address, window.location.href);
+    try { localStorage.removeItem(EMAIL_LINK_KEY); } catch {}
+    window.history.replaceState({}, document.title, window.location.pathname);
+    emailLinkButton.hidden = true;
+    setEmailLinkStatus("Signed in with your email link.");
+    showView("home");
+  } catch (error) {
+    if (["auth/invalid-action-code", "auth/expired-action-code", "auth/invalid-email"].includes(error?.code)) {
+      try { localStorage.removeItem(EMAIL_LINK_KEY); } catch {}
+    }
+    setError("auth-error", "That sign-in link is invalid or expired. Request a new one.");
+  }
+}
+
 $("auth-form").addEventListener("submit", async (event) => {
   event.preventDefault();
   setError("auth-error", "");
@@ -147,6 +194,32 @@ $("auth-form").addEventListener("submit", async (event) => {
     await signInWithEmailAndPassword(auth, $("auth-email").value.trim(), $("auth-password").value);
   } catch (error) { setError("auth-error", error.message); }
 });
+$("auth-link-form").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  setError("auth-error", "");
+  setEmailLinkStatus("");
+  if (!isConfigured) return setError("auth-error", "Firebase is not configured yet — see README.md.");
+  const email = $("auth-link-email").value.trim();
+  if (!email) return setError("auth-error", "Enter an email address.");
+  try {
+    await sendSignInLinkToEmail(auth, email, emailLinkSettings());
+    try { localStorage.setItem(EMAIL_LINK_KEY, email); } catch {}
+    setEmailLinkStatus("Check your email for a sign-in link. Keep this tab open or return to it from the link.");
+  } catch (error) { setError("auth-error", error.message); }
+});
+$("btn-email-complete").addEventListener("click", () => completeEmailLink($("auth-link-email").value));
+if (isConfigured && isSignInWithEmailLink(auth, window.location.href)) {
+  showView("auth");
+  let rememberedEmail = "";
+  try { rememberedEmail = localStorage.getItem(EMAIL_LINK_KEY) || ""; } catch {}
+  $("auth-link-email").value = rememberedEmail;
+  emailLinkButton.hidden = false;
+  if (rememberedEmail) {
+    completeEmailLink(rememberedEmail);
+  } else {
+    setEmailLinkStatus("Enter the email address that received the link, then complete sign-in.");
+  }
+}
 $("btn-signup").addEventListener("click", async () => {
   setError("auth-error", "");
   try {
@@ -168,14 +241,20 @@ $("btn-rooms").addEventListener("click", () => {
   setError("rooms-error", "");
   if (requireAuth()) showView("rooms");
 });
-$("btn-singleplayer").addEventListener("click", () => { startSingleplayer(); showView("single"); });
+$("btn-singleplayer").addEventListener("click", () => showView("single-setup"));
+$("btn-single-free").addEventListener("click", () => { startSingleplayer("free-response"); showView("single"); });
+$("btn-single-choice").addEventListener("click", () => { startSingleplayer("multiple-choice"); showView("single"); });
 
 /* ---------- create / join ---------- */
 $("btn-create-room").addEventListener("click", async () => {
   if (!requireAuth()) return;
   setError("rooms-error", "");
   try {
-    enterRoom(await mp.createRoom(state.user));
+    enterRoom(await mp.createRoom(
+      state.user,
+      $("create-mode").value,
+      $("create-anonymous").value === "on",
+    ));
   } catch (error) { setError("rooms-error", error.message); }
 });
 $("join-form").addEventListener("submit", async (event) => {
@@ -236,6 +315,13 @@ function watchRound(code, n) {
         update();
       }, roomFailed);
     }
+    if (state.round && state.round.phase !== "answer" && !choicesUnsub) {
+      choicesUnsub = mp.onSnapshot(mp.choicesRef(code, n), (choiceSnap) => {
+        state.choices = choiceSnap.docs.map((d) => ({ voter: d.id, ...d.data() }));
+        update();
+      }, roomFailed);
+      mp.myChoice(code, n, state.user.uid).then((choice) => { state.myChoice = choice; update(); }).catch(() => {});
+    }
     update();
   }, roomFailed));
   roundUnsubs.push(mp.onSnapshot(mp.submittedRef(code, n), (snap) => {
@@ -246,7 +332,7 @@ function watchRound(code, n) {
     state.votes = snap.docs.map((d) => ({ voter: d.id, ...d.data() }));
     update();
   }, roomFailed));
-  mp.myResponseId(code, n, state.user.uid).then((id) => { state.myResponseId = id; update(); });
+  mp.myResponseId(code, n, state.user.uid).then((id) => { state.myResponseId = id; update(); }).catch(() => {});
 }
 
 let hostBusy = false;
@@ -267,10 +353,11 @@ async function hostTick() {
   hostBusy = true;
   try {
     if (round.phase === "answer" && players.length > 0 && submitted.length >= players.length) {
-      await mp.closeAnswering(code, roundNumber);
-    } else if (round.phase === "reveal") {
+      if (room.mode === "multiple-choice") await mp.showResults(code, roundNumber);
+      else await mp.closeAnswering(code, roundNumber);
+    } else if (room.mode !== "multiple-choice" && round.phase === "reveal") {
       await mp.revealAnswers(code, roundNumber);
-    } else if (round.phase === "vote" && players.length > 0 && votes.length >= players.length) {
+    } else if (room.mode !== "multiple-choice" && round.phase === "vote" && players.length > 0 && votes.length >= players.length) {
       await mp.showResults(code, roundNumber);
     }
   } catch (error) {
@@ -282,6 +369,7 @@ async function hostTick() {
 
 async function scoreTick() {
   const { code, round, roundNumber, players, votes, myResponseId, user } = state;
+  if (state.room?.mode === "multiple-choice") return;
   if (!round || round.phase !== "results" || state.scoredRound === roundNumber) return;
   // Wait for every vote to arrive locally, so the score is not computed from a
   // partial tally that happened to reach this client first.
@@ -328,6 +416,7 @@ function update() {
     state.room, state.roundNumber, state.contrib.length, state.round, state.myResponseId,
     state.players.map((p) => [p.uid, p.name, p.score]),
     state.submitted.length, state.votes.map((v) => [v.voter, v.responseId]),
+    state.choices.map((v) => [v.voter, v.optionIndex]),
     state.answers.map((a) => a.id),
   ]);
   if (signature === state.signature) return;
@@ -368,9 +457,22 @@ function renderRoomBody() {
   if (room.status === "selecting") {
     return void body.append(el("p", `Choosing dilemmas… (${state.contrib.length} of ${players.length})`));
   }
-  if (room.status === "finished") return renderScoreboard(body, players, "Final scoreboard");
+  if (room.status === "finished") {
+    if (room.mode === "multiple-choice") {
+      body.append(el("h2", "Game complete"));
+      const list = el("ul");
+      players.forEach((player) => list.append(el("li", player.name)));
+      return void body.append(list);
+    }
+    return renderScoreboard(body, players, "Final scoreboard");
+  }
   if (!round) return void body.append(el("p", "Loading round…"));
-  if (round.phase === "answer") return renderAnswer(body, round, players);
+  if (round.phase === "answer") {
+    return room.mode === "multiple-choice"
+      ? renderChoiceAnswer(body, round, players)
+      : renderAnswer(body, round, players);
+  }
+  if (room.mode === "multiple-choice" && round.phase === "results") return renderChoiceResults(body, round, players);
   if (round.phase === "reveal") return void body.append(dilemmaBlock(round), el("p", "Revealing responses…"));
   if (round.phase === "vote") return renderVote(body, round, players);
   return renderResults(body, round, players);
@@ -381,6 +483,8 @@ function renderLobby(body, room, players) {
   const list = el("ul");
   for (const player of players) list.append(el("li", player.name));
   body.append(list, el("p", `Rounds: ${room.totalRounds}`));
+  body.append(el("p", `Game type: ${room.mode === "multiple-choice" ? "Multiple-choice" : "Free response"}`));
+  body.append(el("p", `Anonymous responses: ${room.anonymous === false ? "off" : "on"}`));
   if (!isHost()) {
     body.append(el("p", "Waiting for the host to start."));
     return;
@@ -394,6 +498,23 @@ function renderLobby(body, room, players) {
     if (Number.isInteger(value) && value > 0) mp.setTotalRounds(state.code, value);
     else setError("room-error", "Rounds must be a positive whole number.");
   });
+  const mode = document.createElement("select");
+  for (const [value, label] of [["free-response", "Free response"], ["multiple-choice", "Multiple-choice"]]) {
+    const option = el("option", label);
+    option.value = value;
+    option.selected = (room.mode || "free-response") === value;
+    mode.append(option);
+  }
+  mode.addEventListener("change", () => mp.setGameSettings(state.code, mode.value, anonymous.value === "on"));
+  const anonymous = document.createElement("select");
+  for (const [value, label] of [["on", "Anonymous on"], ["off", "Anonymous off"]]) {
+    const option = el("option", label);
+    option.value = value;
+    option.selected = (room.anonymous !== false) === (value === "on");
+    anonymous.append(option);
+  }
+  anonymous.addEventListener("change", () => mp.setGameSettings(state.code, mode.value, anonymous.value === "on"));
+  body.append(el("label", "Game type"), mode, el("label", "Response identity"), anonymous);
   const start = el("button", "Start game");
   start.type = "button";
   start.disabled = players.length < 2;
@@ -446,11 +567,49 @@ function renderAnswer(body, round, players) {
     submit.disabled = true;
     setError("room-error", "");
     try {
-      state.myResponseId = await mp.submitAnswer(state.code, state.roundNumber, state.user.uid, text);
+      state.myResponseId = await mp.submitAnswer(
+        state.code,
+        state.roundNumber,
+        state.user.uid,
+        text,
+        state.room.anonymous === false ? (state.players.find((p) => p.uid === state.user.uid)?.name || "player") : null,
+      );
       state.draft = "";
     } catch (error) { setError("room-error", error.message); submit.disabled = false; }
   });
   body.append(box, submit);
+}
+
+function renderChoiceAnswer(body, round, players) {
+  body.append(dilemmaBlock(round));
+  const done = state.submitted.includes(state.user.uid);
+  if (done) {
+    body.append(el("p", `Choice submitted. Waiting for everyone (${state.submitted.length} of ${players.length}).`));
+    return;
+  }
+  const options = round.options || optionsFor(round.dilemmaId);
+  const fieldset = document.createElement("fieldset");
+  fieldset.append(el("legend", "Choose one"));
+  options.forEach((option, index) => {
+    const label = document.createElement("label");
+    const radio = document.createElement("input");
+    radio.type = "radio";
+    radio.name = "round-choice";
+    radio.value = String(index);
+    label.append(radio, " ", option);
+    fieldset.append(label, document.createElement("br"));
+  });
+  const submit = el("button", "Submit choice");
+  submit.type = "button";
+  submit.addEventListener("click", async () => {
+    const selected = fieldset.querySelector("input:checked");
+    if (!selected) return setError("room-error", "Choose an option first.");
+    submit.disabled = true;
+    setError("room-error", "");
+    try { state.myChoice = await mp.submitChoice(state.code, state.roundNumber, state.user.uid, Number(selected.value)); }
+    catch (error) { setError("room-error", error.message); submit.disabled = false; }
+  });
+  body.append(fieldset, submit);
 }
 
 function orderedAnswers(round) {
@@ -466,6 +625,7 @@ function renderVote(body, round, players) {
   for (const answer of orderedAnswers(round)) {
     const item = el("li");
     item.append(el("span", answer.text));
+    if (state.room?.anonymous === false && answer.author) item.append(el("span", ` — ${answer.author}`));
     if (answer.id === state.myResponseId) {
       item.append(el("span", " (your response)"));
     } else if (!myVote) {
@@ -485,6 +645,37 @@ function renderVote(body, round, players) {
     : "Vote for the best response."));
 }
 
+function renderChoiceResults(body, round, players) {
+  body.append(dilemmaBlock(round), el("h2", "Results"));
+  const options = round.options || optionsFor(round.dilemmaId);
+  const counts = new Map(options.map((_, index) => [index, 0]));
+  for (const choice of state.choices) {
+    if (Number.isInteger(choice.optionIndex) && counts.has(choice.optionIndex)) {
+      counts.set(choice.optionIndex, counts.get(choice.optionIndex) + 1);
+    }
+  }
+  const list = el("ol");
+  options.forEach((option, index) => {
+    const count = counts.get(index) || 0;
+    const percent = players.length ? Math.round((count / players.length) * 100) : 0;
+    list.append(el("li", `${option} — ${percent}% (${count} of ${players.length})`));
+  });
+  body.append(list);
+  if (!isHost()) {
+    body.append(el("p", "Waiting for the host."));
+    return;
+  }
+  const last = state.roundNumber >= state.room.totalRounds;
+  const next = el("button", last ? "Finish game" : "Next round");
+  next.type = "button";
+  next.addEventListener("click", async () => {
+    next.disabled = true;
+    try { await mp.nextRound(state.code, state.room); }
+    catch (error) { setError("room-error", error.message); next.disabled = false; }
+  });
+  body.append(next);
+}
+
 function renderResults(body, round, players) {
   body.append(dilemmaBlock(round), el("h2", "Results"));
   const counts = tallyVotes(state.votes);
@@ -494,6 +685,7 @@ function renderResults(body, round, players) {
     const points = pointsFor(answer.id, state.votes, players.length);
     const item = el("li");
     item.append(el("span", answer.text));
+    if (state.room?.anonymous === false && answer.author) item.append(el("span", ` — ${answer.author}`));
     const detail = el("span", ` — ${votes} vote${votes === 1 ? "" : "s"}, ${points} point${points === 1 ? "" : "s"}`);
     detail.className = "muted";
     item.append(detail);
@@ -529,8 +721,10 @@ function renderScoreboard(body, players, title) {
 /* ---------- singleplayer ---------- */
 let queue = [];
 let queueIndex = 0;
+let singleMode = "free-response";
 
-function startSingleplayer() {
+function startSingleplayer(mode = "free-response") {
+  singleMode = mode;
   // Unseen dilemmas first; the queue is rebuilt whenever it runs out.
   queue = pickSingleplayerQueue(catalogIds, state.history, 25);
   queueIndex = 0;
@@ -541,7 +735,9 @@ function renderSingle() {
   if (queueIndex >= queue.length) queue = pickSingleplayerQueue(catalogIds, state.history, 25);
   const id = queue[queueIndex];
   const source = $("single-source");
+  const options = $("single-options");
   source.replaceChildren();
+  options.replaceChildren();
   $("single-response").value = "";
   if (!id) {
     $("single-dilemma").textContent = "No dilemmas available.";
@@ -551,11 +747,33 @@ function renderSingle() {
   $("single-dilemma").className = "dilemma";
   const meta = sourceFor(id);
   if (meta && meta.url) source.append(sourceLine(meta));
+  if (singleMode === "multiple-choice") {
+    $("single-response").hidden = true;
+    $("single-response").required = false;
+    const fieldset = document.createElement("fieldset");
+    fieldset.append(el("legend", "Choose one"));
+    options.hidden = false;
+    optionsFor(id).forEach((option, index) => {
+      const label = document.createElement("label");
+      const radio = document.createElement("input");
+      radio.type = "radio";
+      radio.name = "single-choice";
+      radio.value = String(index);
+      label.append(radio, " ", option);
+      fieldset.append(label, document.createElement("br"));
+    });
+    options.append(fieldset);
+  } else {
+    options.hidden = true;
+    $("single-response").hidden = false;
+    $("single-response").required = true;
+  }
   recordSeen(id);
 }
 
 $("single-form").addEventListener("submit", (event) => {
   event.preventDefault();
+  if (singleMode === "multiple-choice" && !document.querySelector("#single-options input:checked")) return;
   queueIndex += 1;
   renderSingle();
 });

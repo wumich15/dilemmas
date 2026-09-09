@@ -34,6 +34,8 @@ button:disabled { color: var(--muted); cursor: default; }
 .view > button, .view > form { display: block; margin: 0.5rem 0; }
 input, textarea { width: 100%; max-width: 24rem; display: block; margin: 0.5rem 0; }
 textarea { max-width: 100%; }
+fieldset { border: 1px solid var(--line); margin: 0.75rem 0; padding: 0.75rem; }
+fieldset label { display: block; margin: 0.5rem 0; }
 ol, ul { padding-left: 1.5rem; }
 li { margin: 0.5rem 0; }
 .error { color: #b00020; }

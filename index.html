@@ -30,6 +30,12 @@
         <button id="btn-signin" type="submit">Sign in</button>
         <button id="btn-signup" type="button">Sign up</button>
       </form>
+      <form id="auth-link-form">
+        <input id="auth-link-email" type="email" placeholder="Email for sign-in link" autocomplete="email" required>
+        <button id="btn-email-link" type="submit">Email me a sign-in link</button>
+        <button id="btn-email-complete" type="button" hidden>Complete sign-in link</button>
+      </form>
+      <p id="auth-link-status" class="muted" hidden></p>
     </div>
     <div id="auth-signed-in" hidden>
       <p id="auth-who"></p>
@@ -41,12 +47,30 @@
 
   <!-- create / join -->
   <section id="view-rooms" class="view" hidden>
+    <label for="create-mode">Game type</label>
+    <select id="create-mode">
+      <option value="free-response">Free response</option>
+      <option value="multiple-choice">Multiple-choice</option>
+    </select>
+    <label for="create-anonymous">Response identity</label>
+    <select id="create-anonymous">
+      <option value="on">Anonymous on</option>
+      <option value="off">Anonymous off</option>
+    </select>
     <button id="btn-create-room" type="button">Create a room</button>
     <form id="join-form">
       <input id="join-code" type="text" placeholder="Room code" maxlength="4" autocomplete="off">
       <button type="submit">Join a room</button>
     </form>
     <p id="rooms-error" class="error" hidden></p>
+    <button class="back" type="button" data-back>Back</button>
+  </section>
+
+  <!-- singleplayer setup -->
+  <section id="view-single-setup" class="view" hidden>
+    <p>Choose a game type.</p>
+    <button id="btn-single-free" type="button">Free response</button>
+    <button id="btn-single-choice" type="button">Multiple-choice</button>
     <button class="back" type="button" data-back>Back</button>
   </section>
 
@@ -63,6 +87,7 @@
     <p id="single-dilemma"></p>
     <p id="single-source"></p>
     <form id="single-form">
+      <div id="single-options"></div>
       <textarea id="single-response" rows="5" required></textarea>
       <button type="submit">Next dilemma</button>
     </form>

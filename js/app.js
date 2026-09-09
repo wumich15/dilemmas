@@ -251,11 +251,16 @@ $("btn-single-choice").addEventListener("click", () => { startSingleplayer("mult
 $("btn-create-room").addEventListener("click", async () => {
   if (!requireAuth()) return;
   setError("rooms-error", "");
+  const totalRounds = Number($("create-rounds").value);
+  if (!Number.isInteger(totalRounds) || totalRounds < 1 || totalRounds > 20) {
+    return setError("rooms-error", "Rounds must be a whole number from 1 to 20.");
+  }
   try {
     enterRoom(await mp.createRoom(
       state.user,
       $("create-mode").value,
       $("create-anonymous").value === "on",
+      totalRounds,
     ));
   } catch (error) { setError("rooms-error", error.message); }
 });
@@ -484,23 +489,29 @@ function renderLobby(body, room, players) {
   body.append(el("h2", "Players"));
   const list = el("ul");
   for (const player of players) list.append(el("li", player.name));
-  body.append(list, el("p", `Rounds: ${room.totalRounds}`));
-  body.append(el("p", `Game type: ${room.mode === "multiple-choice" ? "Multiple-choice" : "Free response"}`));
-  body.append(el("p", `Anonymous responses: ${room.anonymous === false ? "off" : "on"}`));
+  body.append(list);
   if (!isHost()) {
-    body.append(el("p", "Waiting for the host to start."));
+    body.append(
+      el("p", `Game type: ${room.mode === "multiple-choice" ? "Multiple-choice" : "Free response"}`),
+      el("p", `Rounds: ${room.totalRounds}`),
+      el("p", `Anonymous responses: ${room.anonymous === false ? "off" : "on"}`),
+      el("p", "Waiting for the host to start."),
+    );
     return;
   }
   const input = el("input");
+  input.id = "lobby-rounds";
   input.type = "number";
   input.min = "1";
+  input.max = "20";
   input.value = String(room.totalRounds);
   input.addEventListener("change", () => {
     const value = Number(input.value);
-    if (Number.isInteger(value) && value > 0) mp.setTotalRounds(state.code, value);
-    else setError("room-error", "Rounds must be a positive whole number.");
+    if (Number.isInteger(value) && value >= 1 && value <= 20) mp.setTotalRounds(state.code, value);
+    else setError("room-error", "Rounds must be a whole number from 1 to 20.");
   });
   const mode = document.createElement("select");
+  mode.id = "lobby-mode";
   for (const [value, label] of [["free-response", "Free response"], ["multiple-choice", "Multiple-choice"]]) {
     const option = el("option", label);
     option.value = value;
@@ -509,6 +520,7 @@ function renderLobby(body, room, players) {
   }
   mode.addEventListener("change", () => mp.setGameSettings(state.code, mode.value, anonymous.value === "on"));
   const anonymous = document.createElement("select");
+  anonymous.id = "lobby-anonymous";
   for (const [value, label] of [["on", "Anonymous on"], ["off", "Anonymous off"]]) {
     const option = el("option", label);
     option.value = value;
@@ -516,7 +528,22 @@ function renderLobby(body, room, players) {
     anonymous.append(option);
   }
   anonymous.addEventListener("change", () => mp.setGameSettings(state.code, mode.value, anonymous.value === "on"));
-  body.append(el("label", "Game type"), mode, el("label", "Response identity"), anonymous);
+  const settings = el("div");
+  settings.className = "settings-panel";
+  const setting = (labelText, control) => {
+    const row = el("div");
+    row.className = "setting-row";
+    const label = el("label", labelText);
+    label.htmlFor = control.id;
+    row.append(label, control);
+    return row;
+  };
+  settings.append(
+    setting("Game type", mode),
+    setting("Number of rounds", input),
+    setting("Response identity", anonymous),
+  );
+  body.append(el("h2", "Game options"), settings);
   const start = el("button", "Start game");
   start.type = "button";
   start.disabled = players.length < 2;
@@ -525,7 +552,7 @@ function renderLobby(body, room, players) {
     try { await mp.proposeSelection(state.code, room.totalRounds, catalogIds); }
     catch (error) { setError("room-error", error.message); start.disabled = false; }
   });
-  body.append(el("label", "Number of rounds"), input, start);
+  body.append(start);
   if (players.length < 2) body.append(el("p", "At least two players are needed."));
 }
 
@@ -546,7 +573,8 @@ function sourceLine(source) {
   link.href = source.url;
   link.target = "_blank";
   link.rel = "noreferrer";
-  line.append("Source: ", link);
+  const prefix = String(source.type).includes("inspiration") ? "Inspired by: " : "Source: ";
+  line.append(prefix, link);
   return line;
 }
 

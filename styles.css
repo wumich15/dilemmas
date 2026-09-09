@@ -86,6 +86,37 @@ button:disabled { color: var(--muted); cursor: default; }
 }
 input, textarea { width: 100%; max-width: 24rem; display: block; margin: 0.5rem 0; }
 textarea { max-width: 100%; }
+.settings-panel {
+  display: grid;
+  gap: 1rem;
+  margin: 1rem 0 1.25rem;
+  padding: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 0.2rem;
+}
+.setting-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.35rem;
+}
+.setting-row label,
+.setting-row > span {
+  color: var(--muted);
+}
+.setting-row input,
+.setting-row select {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+}
+#view-rooms > h2:not(:first-child) { margin-top: 2.5rem; }
+#join-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.5rem;
+  align-items: center;
+}
+#join-form input { max-width: none; margin: 0; text-transform: uppercase; }
 fieldset { border: 1px solid var(--line); margin: 0.75rem 0; padding: 0.75rem; }
 fieldset label { display: block; margin: 0.5rem 0; }
 .choice-list {
@@ -134,6 +165,7 @@ html[data-theme="dark"] .error { color: #ff8a80; }
   main { padding-top: 3.5rem; }
   body[data-view="home"] main { padding-top: 0; }
   h1 { margin-bottom: 2rem; }
+  #join-form { grid-template-columns: 1fr; }
 }
 
 @media (prefers-reduced-motion: reduce) {

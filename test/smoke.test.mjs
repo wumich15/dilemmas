@@ -55,8 +55,8 @@ after(async () => {
 const text = (selector) => page.$eval(selector, (node) => node.textContent.trim());
 
 test("the landing page centers the name and play actions with sign-in at the top", async () => {
-  assert.equal(await page.title(), "moral dilemmas");
-  assert.equal(await text("h1"), "moral dilemmas");
+  assert.equal(await page.title(), "dilemmas");
+  assert.equal(await text("h1"), "dilemmas");
   const labels = await page.$$eval("#view-home button", (nodes) => nodes.map((n) => n.textContent.trim()));
   assert.deepEqual(labels, ["Singleplayer", "Play"]);
   assert.equal(await text("#btn-auth"), "Sign in");
@@ -66,6 +66,14 @@ test("the landing page centers the name and play actions with sign-in at the top
   assert.equal(homeAlignment, "center");
   const font = await page.$eval("body", (node) => getComputedStyle(node).fontFamily);
   assert.match(font, /Times New Roman/);
+});
+
+test("room creation settings use one clearly labeled row per option", async () => {
+  const labels = await page.$$eval("#view-rooms .setting-row > label", (nodes) => nodes.map((node) => node.textContent.trim()));
+  assert.deepEqual(labels, ["Game type", "Number of rounds", "Response identity"]);
+  assert.equal(await page.$eval("#create-rounds", (node) => node.value), "3");
+  const layout = await page.$eval("#view-rooms .settings-panel", (node) => getComputedStyle(node).display);
+  assert.equal(layout, "grid");
 });
 
 test("the dark mode toggle switches and persists", async () => {

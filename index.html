@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>moral dilemmas</title>
+<title>dilemmas</title>
 <link rel="stylesheet" href="styles.css">
 </head>
 <body data-view="home">
@@ -13,7 +13,7 @@
 </header>
 
 <main>
-  <h1>moral dilemmas</h1>
+  <h1>dilemmas</h1>
   <p id="global-error" class="error" hidden></p>
 
   <!-- home -->
@@ -49,17 +49,29 @@
 
   <!-- create / join -->
   <section id="view-rooms" class="view" hidden>
-    <label for="create-mode">Game type</label>
-    <select id="create-mode">
-      <option value="free-response">Free response</option>
-      <option value="multiple-choice">Multiple-choice</option>
-    </select>
-    <label for="create-anonymous">Response identity</label>
-    <select id="create-anonymous">
-      <option value="on">Anonymous on</option>
-      <option value="off">Anonymous off</option>
-    </select>
+    <h2>Game options</h2>
+    <div class="settings-panel">
+      <div class="setting-row">
+        <label for="create-mode">Game type</label>
+        <select id="create-mode">
+          <option value="free-response">Free response</option>
+          <option value="multiple-choice">Multiple-choice</option>
+        </select>
+      </div>
+      <div class="setting-row">
+        <label for="create-rounds">Number of rounds</label>
+        <input id="create-rounds" type="number" min="1" max="20" value="3" inputmode="numeric">
+      </div>
+      <div class="setting-row">
+        <label for="create-anonymous">Response identity</label>
+        <select id="create-anonymous">
+          <option value="on">Anonymous</option>
+          <option value="off">Show names</option>
+        </select>
+      </div>
+    </div>
     <button id="btn-create-room" type="button">Create a room</button>
+    <h2>Join a room</h2>
     <form id="join-form">
       <input id="join-code" type="text" placeholder="Room code" maxlength="4" autocomplete="off">
       <button type="submit">Join a room</button>

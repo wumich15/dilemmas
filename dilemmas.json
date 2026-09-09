@@ -1,834 +1,631 @@
 [
   {
-    "id": "sourced-0001",
-    "theme": "The trolley switch",
-    "text": "A runaway trolley is heading toward five people trapped on the track. You can pull a lever to divert it onto a side track where one trapped person will die instead. You did not create the danger, and there is no time to warn anyone. Should you redirect the trolley, or refuse to intervene? Consider whether redirecting harm differs morally from allowing harm, and whether saving more lives settles the question.",
-    "source": {
-      "type": "wikipedia",
-      "title": "Trolley problem",
-      "url": "https://en.wikipedia.org/wiki/Trolley_problem"
-    },
+    "id": "dilemma-0001",
+    "theme": "The parking-lot dent",
+    "text": "You scrape a parked car in an empty lot. The mark is noticeable, nobody saw it, and leaving your details could cost most of your savings. What do you do?",
     "options": [
-      "Pull the lever",
-      "Do not pull the lever",
-      "Try to warn the people instead"
-    ]
+      "Leave a note with your details",
+      "Wait nearby for the owner",
+      "Drive away",
+      "Leave cash but no name"
+    ],
+    "source": {
+      "type": "inspiration",
+      "title": "Extreme Hypothetical Moral Dilemma Questions",
+      "url": "https://areyousittingdown.games/blogs/questions/extreme-hypothetical-moral-dilemma-questions"
+    }
   },
   {
-    "id": "sourced-0002",
-    "theme": "The footbridge stranger",
-    "text": "A runaway trolley will kill five people unless you push a large stranger from a footbridge onto the track. His body would stop the trolley, killing him but saving the five. He has not agreed to be used, and you can save the group only by deliberately making him the obstacle. Should you push him? Explain whether physical contact, intention, and the numbers affected change the answer.",
-    "source": {
-      "type": "wikipedia",
-      "title": "Trolley problem",
-      "url": "https://en.wikipedia.org/wiki/Trolley_problem"
-    },
-    "options": [
-      "Push the stranger",
-      "Do not push",
-      "Look for another way even if the five may die"
-    ]
-  },
-  {
-    "id": "sourced-0003",
-    "theme": "Heinz and the unaffordable medicine",
-    "text": "Heinz's spouse is dying from a rare illness. A pharmacist has developed a medicine that could save her, but charges $2,000 even though it cost about $200 to make. Heinz has borrowed only half the money, begged for a discount and a payment plan, and been refused. The pharmacist says the price protects the investment and that stealing is against the law. The medicine may be gone by morning. Should Heinz break into the pharmacy and take it? Discuss saving a life, respecting property, rewarding research, obeying the law, and accepting punishment afterward.",
-    "source": {
-      "type": "wikipedia",
-      "title": "Heinz dilemma",
-      "url": "https://en.wikipedia.org/wiki/Heinz_dilemma"
-    },
-    "options": [
-      "Steal the medicine",
-      "Do not steal it",
-      "Take it and accept punishment afterward"
-    ]
-  },
-  {
-    "id": "sourced-0004",
-    "theme": "The prisoner's bargain",
-    "text": "You and a trusted partner are arrested and questioned in separate rooms. If both of you remain silent, each receives one year. If one testifies against the other while the other stays silent, the witness goes free and the silent person receives ten years. If both testify, each receives five years. You cannot communicate. Should you stay silent, betray your partner, or choose based on what cooperation means when trust cannot be verified?",
-    "source": {
-      "type": "wikipedia",
-      "title": "Prisoner's dilemma",
-      "url": "https://en.wikipedia.org/wiki/Prisoner%27s_dilemma"
-    },
-    "options": [
-      "Stay silent",
-      "Testify against the partner",
-      "Refuse to choose without communication"
-    ]
-  },
-  {
-    "id": "sourced-0005",
-    "theme": "The experience machine",
-    "text": "A machine can stimulate your brain so convincingly that you experience a lifetime of friendship, achievement, beauty, and pleasure. You would never know the experiences were simulated, but you would never make real choices or affect anyone outside the machine. You must choose before connecting and cannot leave once connected. Should you choose guaranteed wonderful experiences, or ordinary life with risk, frustration, real relationships, and the chance to accomplish something outside your mind?",
-    "source": {
-      "type": "wikipedia",
-      "title": "Experience machine",
-      "url": "https://en.wikipedia.org/wiki/Experience_machine"
-    },
-    "options": [
-      "Connect to the machine",
-      "Stay in ordinary life",
-      "Connect temporarily if leaving remains possible"
-    ]
-  },
-  {
-    "id": "sourced-0006",
-    "theme": "The plank of Carneades",
-    "text": "After a shipwreck, two strangers reach a floating plank that can support only one person. If neither acts, both drown; if one pushes the other away, the pusher survives. Neither caused the shipwreck, and there is no rescue in sight. Is pushing the other person off an unjust killing, permissible self-preservation, or a tragic act for which no one is fully responsible?",
-    "source": {
-      "type": "wikipedia",
-      "title": "Plank of Carneades",
-      "url": "https://en.wikipedia.org/wiki/Plank_of_Carneades"
-    },
-    "options": [
-      "Push the other person away",
-      "Share the plank and risk both lives",
-      "Refuse to push and accept the likely outcome"
-    ]
-  },
-  {
-    "id": "sourced-0007",
-    "theme": "The ticking bomb",
-    "text": "A captured prisoner may know where a bomb is hidden in a city, and the bomb could kill thousands within an hour. Investigators have no proof that the prisoner knows the location, and torture may produce a false confession while violating an absolute ban on abuse. Should interrogators use torture to try to prevent the attack, or refuse even when the threatened harm is enormous?",
-    "source": {
-      "type": "wikipedia",
-      "title": "Ticking time bomb scenario",
-      "url": "https://en.wikipedia.org/wiki/Ticking_time_bomb_scenario"
-    },
-    "options": [
-      "Use torture",
-      "Refuse torture",
-      "Use urgent questioning but no physical abuse"
-    ]
-  },
-  {
-    "id": "sourced-0008",
-    "theme": "The nearby child and the distant child",
-    "text": "You pass a shallow pond and see a child drowning. You can save the child immediately, but your expensive clothes and shoes will be ruined. You can also send the same amount of money to a distant relief organization and probably save a child's life there, although you will never know which child benefits. If saving the nearby child is an obvious duty, do you owe the same sacrifice to the distant child?",
-    "source": {
-      "type": "wikipedia",
-      "title": "Famine, Affluence, and Morality",
-      "url": "https://en.wikipedia.org/wiki/Famine,_Affluence,_and_Morality"
-    },
-    "options": [
-      "Save the nearby child",
-      "Give the money to distant relief",
-      "Split the sacrifice between both efforts"
-    ]
-  },
-  {
-    "id": "sourced-0009",
-    "theme": "The shared pasture",
-    "text": "A village shares a pasture. Each herder can add one more animal and receive immediate income, but if too many do so, the grass will fail and every herd will suffer. Everyone knows that a single extra animal will not cause the collapse, and no individual herder can enforce restraint. Should you add your animal, ask the others to sacrifice together, or support a rule that limits everyone's private gain to protect the commons?",
-    "source": {
-      "type": "wikipedia",
-      "title": "Tragedy of the commons",
-      "url": "https://en.wikipedia.org/wiki/Tragedy_of_the_commons"
-    },
-    "options": [
-      "Add another animal",
-      "Choose restraint",
-      "Support a rule that limits everyone equally"
-    ]
-  },
-  {
-    "id": "sourced-0010",
-    "theme": "The ultimatum offer",
-    "text": "A stranger is given $100 and told to offer you any share. If you accept, both of you receive the proposed amounts; if you reject the offer, neither receives anything. The stranger offers you $2 and keeps $98. You could punish the unfairness at a cost to yourself, or accept money that may be useful. Should you accept the offer, reject it, or negotiate even though the rules permit no counteroffer?",
-    "source": {
-      "type": "wikipedia",
-      "title": "Ultimatum game",
-      "url": "https://en.wikipedia.org/wiki/Ultimatum_game"
-    },
-    "options": [
-      "Accept the $2",
-      "Reject the offer",
-      "Accept but explain that it is unfair"
-    ]
-  },
-  {
-    "id": "sourced-0011",
-    "theme": "The veil of ignorance",
-    "text": "You must choose the basic rules of a new society before learning whether you will be rich or poor, healthy or disabled, powerful or marginalized, talented or dependent on others. You may choose equal outcomes, unequal rewards for effort, a strong safety net, or a system that maximizes total prosperity. Once the veil lifts, you must live under the rules you selected. Which inequalities, if any, would you permit without knowing where you will land?",
-    "source": {
-      "type": "wikipedia",
-      "title": "Original position",
-      "url": "https://en.wikipedia.org/wiki/Original_position"
-    },
-    "options": [
-      "Choose equal outcomes",
-      "Allow unequal rewards with a safety net",
-      "Maximize total prosperity",
-      "Choose the rules you would want if vulnerable"
-    ]
-  },
-  {
-    "id": "sourced-0012",
-    "theme": "The crowded lifeboat",
-    "text": "Your lifeboat has fifty people aboard and enough supplies for ten more. One hundred exhausted swimmers are approaching after a shipwreck. If everyone climbs aboard, the boat will likely capsize; if you keep the boat stable, many swimmers will die. Some are children, some are injured, and some ignored earlier evacuation instructions. Who should be admitted, and should need, age, responsibility, a lottery, or the chance to help the boat determine the places?",
-    "source": {
-      "type": "wikipedia",
-      "title": "Lifeboat ethics",
-      "url": "https://en.wikipedia.org/wiki/Lifeboat_ethics"
-    },
-    "options": [
-      "Use a lottery",
-      "Prioritize those in greatest need",
-      "Prioritize those most able to help keep the boat afloat",
-      "Keep the boat closed"
-    ]
-  },
-  {
-    "id": "sourced-0013",
-    "theme": "Obedience in the laboratory",
-    "text": "A researcher in a white coat instructs you to continue pressing switches that appear to deliver increasingly painful shocks to a stranger who answers questions incorrectly. The stranger pleads for the experiment to stop, but the researcher says the study requires you to continue and assures you that no permanent injury is occurring. Should you obey the authority, refuse, or continue only until you have independent proof that the shocks are real?",
-    "source": {
-      "type": "wikipedia",
-      "title": "Milgram experiment",
-      "url": "https://en.wikipedia.org/wiki/Milgram_experiment"
-    },
-    "options": [
-      "Continue as instructed",
-      "Refuse immediately",
-      "Ask for independent confirmation before continuing"
-    ]
-  },
-  {
-    "id": "sourced-0014",
-    "theme": "The invisible ring",
-    "text": "You find a ring that makes you invisible whenever you turn its stone. No camera, witness, or magical test can reveal what you do while wearing it, and there is no chance of punishment. You could take money from a wealthy stranger, expose a corrupt official, rescue someone from danger, or satisfy a private desire. Does justice require you to act fairly even when reputation and consequences disappear, or does perfect secrecy change what you owe other people?",
-    "source": {
-      "type": "wikipedia",
-      "title": "Ring of Gyges",
-      "url": "https://en.wikipedia.org/wiki/Ring_of_Gyges"
-    },
-    "options": [
-      "Use it for personal gain",
-      "Use it only to expose wrongdoing",
-      "Never use it to affect others",
-      "Use it secretly to rescue someone"
-    ]
-  },
-  {
-    "id": "sourced-0015",
-    "theme": "The bomber and the civilians",
-    "text": "A bomber pilot can destroy a weapons factory that is supplying an invading army, but the attack will almost certainly kill civilians living in nearby homes. The pilot's aim is the factory, not the civilians, and waiting for a more precise weapon will allow more soldiers to die. Is the raid permissible because the civilian deaths are foreseen but not intended, or is knowingly causing those deaths still wrong?",
-    "source": {
-      "type": "wikipedia",
-      "title": "Principle of double effect",
-      "url": "https://en.wikipedia.org/wiki/Principle_of_double_effect"
-    },
-    "options": [
-      "Authorize the raid",
-      "Cancel the raid",
-      "Delay for a more precise weapon"
-    ]
-  },
-  {
-    "id": "sourced-0016",
-    "theme": "The child who would otherwise not exist",
-    "text": "A parent can have a child now, knowing that the child will face a difficult but worthwhile life, or wait two years for treatment that would likely allow a healthier child to be born. Waiting would not improve the first child's life; it would mean a different child exists instead. Is it morally permissible to choose which possible person comes into existence based on expected wellbeing?",
-    "source": {
-      "type": "wikipedia",
-      "title": "Non-identity problem",
-      "url": "https://en.wikipedia.org/wiki/Non-identity_problem"
-    },
-    "options": [
-      "Have the child now",
-      "Wait for the healthier-child option",
-      "Leave the choice to chance"
-    ]
-  },
-  {
-    "id": "sourced-0017",
-    "theme": "The impossible choice",
-    "text": "An armed authority tells a parent that one of two children will be killed, but both will die if the parent refuses to choose. The parent cannot fight, bargain, or save both. Is choosing one child a moral act, an act under coercion for which the authority bears all blame, or a wrong that remains wrong even when refusal guarantees a worse outcome?",
-    "source": {
-      "type": "wikipedia",
-      "title": "Sophie's Choice",
-      "url": "https://en.wikipedia.org/wiki/Sophie%27s_Choice"
-    },
-    "options": [
-      "Choose one child",
-      "Refuse to choose",
-      "Try to deceive or resist the authority"
-    ]
-  },
-  {
-    "id": "sourced-0018",
-    "theme": "The good place and the suffering child",
-    "text": "A prosperous city is peaceful and joyful because its citizens' comfort depends on one neglected child being kept alone in misery. Every adult is told the truth when they come of age. If the child is released, the city's prosperity will end; if someone walks away, they reject the bargain without rescuing the child. Should the citizens accept the bargain, leave, or try to dismantle it even if everyone suffers?",
-    "source": {
-      "type": "wikipedia",
-      "title": "The Ones Who Walk Away from Omelas",
-      "url": "https://en.wikipedia.org/wiki/The_Ones_Who_Walk_Away_from_Omelas"
-    },
-    "options": [
-      "Accept the bargain",
-      "Leave the city",
-      "Work to end the bargain even if everyone suffers",
-      "Stay and secretly help the child"
-    ]
-  },
-  {
-    "id": "sourced-0019",
-    "theme": "Political dirty hands",
-    "text": "A leader can prevent a violent coup only by authorizing a secret operation that violates a moral rule the leader publicly promised to respect. If the operation succeeds, thousands may be spared and the violation may never become known; if the leader refuses, the coup may succeed. Can a leader be morally required to do something they must later admit was wrong, or does a good outcome fail to cleanse the act?",
-    "source": {
-      "type": "wikipedia",
-      "title": "Dirty hands",
-      "url": "https://en.wikipedia.org/wiki/Dirty_hands"
-    },
-    "options": [
-      "Authorize the secret operation",
-      "Refuse and keep the promise",
-      "Authorize it only with later public accountability"
-    ]
-  },
-  {
-    "id": "sourced-0020",
-    "theme": "The repugnant population",
-    "text": "A policy could produce a small population whose lives are extraordinarily good, or a much larger population whose lives are barely worth living but still positive. A further increase would eventually produce a population whose total welfare is greater only because there are more people. Should a policy choose the larger population, the better lives, or reject comparisons that treat the existence of additional people as a reason to accept worse lives?",
-    "source": {
-      "type": "wikipedia",
-      "title": "Repugnant conclusion",
-      "url": "https://en.wikipedia.org/wiki/Repugnant_conclusion"
-    },
-    "options": [
-      "Choose the larger population",
-      "Choose the smaller population with better lives",
-      "Reject the comparison as morally inadequate"
-    ]
-  },
-  {
-    "id": "sourced-0021",
-    "theme": "Who is accountable for the autonomous car?",
-    "text": "A self-driving test vehicle strikes and kills a pedestrian. The safety driver was watching the road but did not take control, the software team knew the system had edge-case failures, the company had a testing schedule, and regulators allowed the trial. The pedestrian's family wants one person held responsible, but the failure came from a chain of decisions. Who should answer for the death, and what kind of accountability would prevent the next one?",
-    "source": {
-      "type": "ethics_unwrapped",
-      "title": "AI & Accountability: Who’s at the Wheel?",
-      "url": "https://ethicsunwrapped.utexas.edu/case-study/a-i-accountability-whos-at-the-wheel"
-    },
-    "options": [
-      "Hold the safety driver responsible",
-      "Hold the company and developers responsible",
-      "Hold the regulator responsible",
-      "Treat it as shared responsibility"
-    ]
-  },
-  {
-    "id": "sourced-0022",
-    "theme": "The family DNA database",
-    "text": "A consumer buys a home DNA test for ancestry and agrees to broad terms about research and data sharing. Years later, investigators use a public genealogy match from a relative to identify a suspect in a violent crime. The match may help convict the guilty and exonerate the innocent, but the customer did not expect their genetic information to become a law-enforcement tool, and relatives never consented. Should the database be available for such searches, and who gets to decide?",
-    "source": {
-      "type": "ethics_unwrapped",
-      "title": "Ethical Use of Home DNA Testing",
-      "url": "https://ethicsunwrapped.utexas.edu/case-study/ethical-use-of-home-dna-testing"
-    },
-    "options": [
-      "Allow the law-enforcement search",
-      "Require the customer's permission",
-      "Allow searches only with a court order",
-      "Ban the use of relatives' matches"
-    ]
-  },
-  {
-    "id": "sourced-0023",
-    "theme": "The file-sharing shortcut",
-    "text": "A file-sharing service lets millions of people obtain music without paying the artists or producers. It gives listeners access, challenges an expensive distribution system, and helps inspire later subscription services, but it also makes unauthorized copying easy and shifts costs onto people who created the work. Should a user download the music, should the service continue operating, or does a beneficial innovation remain wrong when it violates creators' rights?",
-    "source": {
-      "type": "ethics_unwrapped",
-      "title": "Digital Downloads",
-      "url": "https://ethicsunwrapped.utexas.edu/case-study/digital-downloads"
-    },
-    "options": [
-      "Download the music",
-      "Pay for an authorized copy",
-      "Use the service only if artists are compensated",
-      "Do not use it"
-    ]
-  },
-  {
-    "id": "sourced-0024",
-    "theme": "The Daraprim price decision",
-    "text": "A company buys the rights to Daraprim, an old medicine used for toxoplasmosis and other serious infections, and raises the price from $13.50 to $750 per tablet. The CEO says profits could fund research and that the medicine is a small part of national health spending; doctors warn that some vulnerable patients need it for life and hospitals may be unable to stock it. Is the price defensible as a business decision, or does access to an essential medicine create a duty to keep it affordable?",
-    "source": {
-      "type": "ethics_unwrapped",
-      "title": "Daraprim Price Hike",
-      "url": "https://ethicsunwrapped.utexas.edu/video/daraprim-price-hike"
-    },
-    "options": [
-      "Keep the price",
-      "Lower the price",
-      "Keep the price but fund patient assistance",
-      "Ask regulators to intervene"
-    ]
-  },
-  {
-    "id": "sourced-0025",
-    "theme": "The EpiPen price",
-    "text": "A company raises the price of a two-pack of EpiPens, a life-saving emergency treatment for severe allergic reactions. Executives point to business costs and the need to sustain a profitable company, while families and schools say the price makes it harder to keep the medicine available when a reaction can become fatal in minutes. How should a company balance profit, executive compensation, innovation, and the obligation to keep an emergency medicine within reach?",
-    "source": {
-      "type": "ethics_unwrapped",
-      "title": "EpiPen: Out of Reach",
-      "url": "https://ethicsunwrapped.utexas.edu/video/epipen-out-of-reach"
-    },
-    "options": [
-      "Keep the current price",
-      "Lower the price",
-      "Use subsidies or discounts for schools and families",
-      "Leave access to public policy"
-    ]
-  },
-  {
-    "id": "sourced-0026",
-    "theme": "The Theranos promise",
-    "text": "A health company tells investors and patients that its technology can run many blood tests from a finger prick, while internal doubts remain about whether the system works as advertised. Revealing the doubts could end the company and its promised medical access; hiding them could expose patients to incorrect results and investors to fraud. When does confidence in an unfinished innovation become a duty to disclose uncertainty?",
-    "source": {
-      "type": "ethics_unwrapped",
-      "title": "Theranos’ Bad Blood",
-      "url": "https://ethicsunwrapped.utexas.edu/video/theranos-bad-blood"
-    },
-    "options": [
-      "Disclose the doubts immediately",
-      "Continue while gathering more evidence",
-      "Stop patient testing until validated",
-      "Keep the claims private to protect the company"
-    ]
-  },
-  {
-    "id": "sourced-0027",
-    "theme": "The breach of credit data",
-    "text": "A company that holds sensitive credit information suffers a major breach after security weaknesses were left unaddressed. The company can disclose the breach quickly, accepting panic and financial damage, or delay until it understands the scope and has a fix. What does the company owe people whose data it collected, and is protecting its reputation ever a legitimate reason to delay warning them?",
-    "source": {
-      "type": "ethics_unwrapped",
-      "title": "Equifax’s Breach of Trust",
-      "url": "https://ethicsunwrapped.utexas.edu/video/equifaxs-breach-of-trust"
-    },
-    "options": [
-      "Disclose immediately",
-      "Wait until the scope is confirmed",
-      "Notify affected people first and explain later",
-      "Offer protection without public disclosure"
-    ]
-  },
-  {
-    "id": "sourced-0028",
-    "theme": "The emissions defeat device",
-    "text": "An automaker sells diesel vehicles advertised as clean, while software detects laboratory tests and changes the vehicles' behavior only during testing. The company can disclose the deception and face recalls, costs, and lost trust, or argue that the vehicles meet customer expectations in ordinary driving. Is a product acceptable when it passes a formal test by manipulating the test rather than meeting its purpose?",
-    "source": {
-      "type": "ethics_unwrapped",
-      "title": "Volkswagen’s Emissions Evasion",
-      "url": "https://ethicsunwrapped.utexas.edu/video/volkswagens-emissions-evasion"
-    },
-    "options": [
-      "Disclose and recall the vehicles",
-      "Keep selling while fixing the software",
-      "Argue that passing the test is sufficient",
-      "Ask regulators for a new test"
-    ]
-  },
-  {
-    "id": "sourced-0029",
-    "theme": "The champion who doped",
-    "text": "A cyclist competes in a sport where performance-enhancing drugs are widespread. He can dope to keep pace with rivals and preserve a team, sponsors, and career, or refuse and compete at a disadvantage while others may gain the rewards. If the sport's culture has made clean competition unrealistic, does using the same methods level the field or betray the meaning of fair competition?",
-    "source": {
-      "type": "ethics_unwrapped",
-      "title": "Armstrong’s Doping Downfall",
-      "url": "https://ethicsunwrapped.utexas.edu/video/armstrongs-doping-downfall"
-    },
-    "options": [
-      "Use the drugs",
-      "Compete clean even at a disadvantage",
-      "Disclose the widespread use and seek a new standard",
-      "Leave the sport"
-    ]
-  },
-  {
-    "id": "sourced-0030",
-    "theme": "The donor's mistaken gift",
-    "text": "An intern learns that a donor made a large gift to a nonprofit while misunderstanding what the organization would do with it. Correcting the misunderstanding may cost the nonprofit essential funding; staying quiet lets the organization keep money given under misleading assumptions. Should the intern speak up, and should the organization return a gift that was legally completed but ethically misinformed?",
-    "source": {
-      "type": "ethics_unwrapped",
-      "title": "Full Disclosure: Manipulating Donors",
-      "url": "https://ethicsunwrapped.utexas.edu/case-study/full-disclosure-manipulating-donors"
-    },
-    "options": [
-      "Correct the donor and return the gift",
-      "Keep the gift and say nothing",
-      "Keep it only after making the misunderstanding clear",
-      "Ask an independent board to decide"
-    ]
-  },
-  {
-    "id": "sourced-0031",
-    "theme": "Snowden's disclosure",
-    "text": "A government contractor releases classified documents showing the existence and scale of government surveillance programs. He breaks secrecy agreements and may harm intelligence operations, but argues that citizens have a right to know what is being done in their name and that legal channels were inadequate. Is the disclosure an ethical act of whistleblowing, an unacceptable breach of trust, or both?",
-    "source": {
-      "type": "ethics_unwrapped",
-      "title": "Edward Snowden: Traitor or Hero?",
-      "url": "https://ethicsunwrapped.utexas.edu/case-study/edward-snowden-traitor-hero"
-    },
-    "options": [
-      "Release the documents",
-      "Use internal channels only",
-      "Release a limited set after redaction",
-      "Keep the material classified"
-    ]
-  },
-  {
-    "id": "sourced-0032",
-    "theme": "The Ebola intervention",
-    "text": "During an Ebola outbreak, a government considers sending military personnel to help deliver supplies, enforce quarantines, and build treatment capacity. Military logistics could save lives, but the presence of soldiers may frighten residents, undermine trust, and make communities less willing to seek care. Should outside power intervene, and how should it weigh speed against local autonomy and trust?",
-    "source": {
-      "type": "ethics_unwrapped",
-      "title": "Ebola & American Intervention",
-      "url": "https://ethicsunwrapped.utexas.edu/case-study/ebola-american-intervention"
-    },
-    "options": [
-      "Send military support",
-      "Use only civilian responders",
-      "Send logistics support under local civilian leadership",
-      "Wait for local authorities to request help"
-    ]
-  },
-  {
-    "id": "sourced-0033",
-    "theme": "Prenatal diagnosis and choice",
-    "text": "A prenatal test reveals a serious genetic condition. The parents must decide whether to continue the pregnancy, while also confronting what the decision communicates about people already living with the condition, what burdens the family can bear, and how much authority parents should have over reproductive choices. Should the decision focus on expected suffering, parental freedom, disability justice, or some combination?",
-    "source": {
-      "type": "ethics_unwrapped",
-      "title": "Prenatal Diagnosis & Parental Choice",
-      "url": "https://ethicsunwrapped.utexas.edu/case-study/prenatal-diagnosis-parental-choice"
-    },
-    "options": [
-      "Continue the pregnancy",
-      "End the pregnancy",
-      "Seek more information and support before deciding",
-      "Let the decision turn on the parents' capacity and wishes"
-    ]
-  },
-  {
-    "id": "sourced-0034",
-    "theme": "A clinician's personal objection",
-    "text": "A clinical social worker's religious or moral beliefs conflict with a client's identity or requested service. The worker wants to avoid participating in something they believe is wrong, while professional duties require nondiscrimination, cultural competence, and service to the client. Should the worker provide the service, arrange a prompt transfer, or refuse even if refusal limits the client's access to care?",
-    "source": {
-      "type": "ethics_unwrapped",
-      "title": "Freedom vs. Duty in Clinical Social Work",
-      "url": "https://ethicsunwrapped.utexas.edu/case-study/freedom-vs-duty-in-clinical-social-work"
-    },
-    "options": [
-      "Provide the service",
-      "Arrange a prompt transfer",
-      "Refuse the service",
-      "Ask the client what transfer would preserve access"
-    ]
-  },
-  {
-    "id": "sourced-0035",
-    "theme": "The DNA research conflict",
-    "text": "A university professor leads a study on hydraulic-fracturing risks while receiving substantial payments and stock from a drilling company affected by the result. The professor says the financial relationship did not determine the findings and disclosure would not change the science. Should the study be trusted, withdrawn, independently reviewed, or published with the conflict prominently disclosed?",
-    "source": {
-      "type": "ethics_unwrapped",
-      "title": "Research Conflicts at UT Austin",
-      "url": "https://ethicsunwrapped.utexas.edu/video/research-conflicts-at-ut-austin"
-    },
-    "options": [
-      "Publish with full disclosure",
-      "Withdraw the study",
-      "Commission independent review",
-      "Publish only after separating the professor from the analysis"
-    ]
-  },
-  {
-    "id": "sourced-0036",
-    "theme": "The reporter's poll",
-    "text": "A news organization covers a sports championship while also conducting polls that influence the public conversation about which teams deserve recognition. The organization can publish the poll as news, disclose its role and possible conflict, or stop covering the subject. Can journalism fairly report on a story when its own reporting helps create the story?",
-    "source": {
-      "type": "ethics_unwrapped",
-      "title": "Covering Yourself? Journalists and the Bowl Championship",
-      "url": "https://ethicsunwrapped.utexas.edu/case-study/covering-journalists-bowl-championship-series"
-    },
-    "options": [
-      "Publish the poll as news",
-      "Disclose the conflict",
-      "Stop covering the poll",
-      "Separate the polling and reporting teams"
-    ]
-  },
-  {
-    "id": "sourced-0037",
-    "theme": "The athlete's cover image",
-    "text": "A sports magazine profiles an accomplished woman athlete, but the proposed cover emphasizes her body and attractiveness more than her athletic achievement. The image may sell more magazines and reflect common audience demand, while the athlete argues that it reduces her to appearance. Should the magazine follow market incentives, represent the athlete on her sporting merits, or give her control over the image?",
-    "source": {
-      "type": "ethics_unwrapped",
-      "title": "Covering Female Athletes",
-      "url": "https://ethicsunwrapped.utexas.edu/case-study/covering-female-athletes"
-    },
-    "options": [
-      "Use the marketable image",
-      "Use an athletic-action image",
-      "Let the athlete approve the cover",
-      "Publish the profile without a cover portrait"
-    ]
-  },
-  {
-    "id": "sourced-0038",
-    "theme": "Dr. V's magical putter",
-    "text": "A journalist investigates a golf putter and discovers that its inventor lied about parts of her professional history and wanted her private life left out of the story. The journalist publishes details that include her transgender identity despite an earlier agreement to focus on the science; the article is defended as exposing deception and criticized as an unnecessary invasion that may have contributed to her suicide. Should the journalist publish the personal details, honor the agreement, or stop the story?",
-    "source": {
-      "type": "ethics_unwrapped",
-      "title": "Dr. V's Magical Putter",
-      "url": "https://ethicsunwrapped.utexas.edu/case-study/dr-vs-magical-putter"
-    },
-    "options": [
-      "Publish the personal details",
-      "Honor the agreement and omit them",
-      "Publish only details relevant to the product claims",
-      "Drop the story"
-    ]
-  },
-  {
-    "id": "sourced-0039",
-    "theme": "The cyber-harassment response",
-    "text": "A student posts defamatory material about a teacher online. The teacher confronts the student in class and posts a video of that confrontation, turning a private disciplinary matter into another public spectacle. Should the teacher respond publicly, use formal channels, or remain silent to avoid amplifying the harm?",
-    "source": {
-      "type": "ethics_unwrapped",
-      "title": "Cyber Harassment",
-      "url": "https://ethicsunwrapped.utexas.edu/case-study/cyber-harassment"
-    },
-    "options": [
-      "Respond publicly",
-      "Use formal disciplinary channels",
-      "Ask for a private correction",
-      "Say nothing"
-    ]
-  },
-  {
-    "id": "sourced-0040",
-    "theme": "The fracking study disclosure",
-    "text": "A university research study concludes that hydraulic fracturing did not contaminate groundwater, but its lead professor had undisclosed financial ties to a drilling company. The professor says he coordinated rather than altered the research; critics say the conflict undermines trust in the result. Should the university publish the study with a disclosure, commission a new study, or retract it?",
-    "source": {
-      "type": "ethics_unwrapped",
-      "title": "Research Conflicts at UT Austin",
-      "url": "https://ethicsunwrapped.utexas.edu/video/research-conflicts-at-ut-austin"
-    },
-    "options": [
-      "Publish with the conflict disclosed",
-      "Commission a new independent study",
-      "Retract the study",
-      "Publish only the data and remove the professor's interpretation"
-    ]
-  },
-  {
-    "id": "sourced-0041",
-    "theme": "The midnight roommate",
-    "text": "Your roommate works late shifts and comes home at midnight, while you have an early class and need the room quiet. The housing agreement encourages quiet hours but also treats the room as shared space. Should you ask your roommate to change their routine, use the library and accept the inconvenience, or ask a resident adviser to mediate before resentment grows?",
-    "source": {
-      "type": "university",
-      "title": "Living with Roommates",
-      "url": "https://reslife.ucla.edu/roommates"
-    },
-    "options": [
-      "Ask the roommate to change their routine",
-      "Use another place to sleep or study",
-      "Ask a resident adviser to mediate",
-      "Agree on quiet hours and a compromise"
-    ]
-  },
-  {
-    "id": "sourced-0042",
-    "theme": "The unannounced guest",
-    "text": "Your roommate invites a partner to stay several nights without asking. The guest is polite, but the arrangement changes your privacy, utilities, and ability to relax at home. Should you insist on advance notice, tolerate the visits because your roommate pays equal rent, or propose a guest rule that limits both of you equally?",
-    "source": {
-      "type": "university",
-      "title": "Guide to Community Living",
-      "url": "https://www.udel.edu/students/reslife/campus-living/housing-policies/guide-to-community-living/"
-    },
-    "options": [
-      "Insist on advance notice",
-      "Tolerate the visits",
-      "Propose a guest rule that applies equally",
-      "Ask housing staff to intervene"
-    ]
-  },
-  {
-    "id": "sourced-0043",
-    "theme": "The borrowed groceries",
-    "text": "Your roommate repeatedly uses your groceries and kitchen supplies, saying they will replace them after their next paycheck. You can lock up your food, confront them, or keep sharing because they are struggling financially. Which response respects your roommate's needs without turning a shared home into a ledger of every snack and dish?",
-    "source": {
-      "type": "university",
-      "title": "Roommates",
-      "url": "https://www.uc.edu/campus-life/housing/resident-support/daily-living/roommates.html"
-    },
-    "options": [
-      "Lock up your food",
-      "Confront the roommate",
-      "Keep sharing without tracking every item",
-      "Set a repayment and shared-supplies agreement"
-    ]
-  },
-  {
-    "id": "sourced-0044",
-    "theme": "The free-riding teammate",
-    "text": "A group project is due tomorrow. One teammate has contributed little, but they have been caring for a sick family member and the group never set clear responsibilities. You can report the unequal work in the peer evaluation, give everyone the same grade, or ask for an extension that may hurt the rest of the group. What would be fair to the teammate and to those who did the work?",
-    "source": {
-      "type": "university",
-      "title": "Individual Contributions to the Group",
-      "url": "https://cei.umn.edu/teaching-resources/group-projects/assessing-project/individual-contributions-group"
-    },
-    "options": [
-      "Report the unequal work",
-      "Give everyone the same grade",
-      "Ask for an extension",
-      "Describe the circumstances and contributions honestly"
-    ]
-  },
-  {
-    "id": "sourced-0045",
-    "theme": "The club initiation",
-    "text": "A student organization asks new members to complete an embarrassing overnight challenge. No one is threatened, and many members say the ritual creates trust, but a new student looks uncomfortable and worries that refusing will cost them their place. Should you participate, ask the group to change the ritual, or report it even if the members call it harmless tradition?",
-    "source": {
-      "type": "university",
-      "title": "Hazing Policy Statement",
-      "url": "https://hazing.cornell.edu/hazingpolicy"
-    },
-    "options": [
-      "Participate",
-      "Ask the group to change the ritual",
-      "Refuse but stay in the organization",
-      "Report the ritual"
-    ]
-  },
-  {
-    "id": "sourced-0046",
-    "theme": "The resident assistant's report",
-    "text": "As a resident assistant, you hear that a club held an off-campus initiation that may have crossed the university's hazing policy. Reporting it could protect new members but could also end the organization and expose students who thought the event was consensual. Should you report what you know, investigate informally, or give the club one chance to address it itself?",
-    "source": {
-      "type": "official",
-      "title": "Anti-Hazing Policy",
-      "url": "https://policies.osu.edu/sites/default/files/documents/2024/09/anti-hazing-policy.pdf"
-    },
-    "options": [
-      "Report what you know",
-      "Investigate informally first",
-      "Give the club one chance to address it",
-      "Ask the affected students what response they want"
-    ]
-  },
-  {
-    "id": "sourced-0047",
-    "theme": "The friend who refuses help",
-    "text": "A friend tells you they have stopped sleeping and are missing class but asks you not to tell anyone. They want privacy and fear being judged, while you think a counselor could help. Should you keep their confidence, encourage them to contact counseling while staying involved, or call for help yourself if the situation seems to worsen?",
-    "source": {
-      "type": "university",
-      "title": "Helping a Friend",
-      "url": "https://studentlife.utk.edu/counselingcenter/helping-a-friend/"
-    },
+    "id": "dilemma-0002",
+    "theme": "The old confession",
+    "text": "Your closest friend admits they stole something valuable years ago. Nobody was hurt, the owner was quietly repaid, and your friend has changed. Do you tell anyone?",
     "options": [
       "Keep the confidence",
-      "Encourage counseling while staying involved",
-      "Contact a counselor for guidance",
-      "Call for urgent help if the risk worsens"
-    ]
+      "Encourage them to confess",
+      "Tell the owner yourself",
+      "Ask for more context first"
+    ],
+    "source": {
+      "type": "inspiration",
+      "title": "Extreme Hypothetical Moral Dilemma Questions",
+      "url": "https://areyousittingdown.games/blogs/questions/extreme-hypothetical-moral-dilemma-questions"
+    }
   },
   {
-    "id": "sourced-0048",
-    "theme": "The urgent text",
-    "text": "A friend sends a message saying they may hurt themselves and then stops replying. Calling emergency services could keep them safe but might feel like a betrayal and bring unwanted attention to their family. Waiting could respect their privacy but leave you unsure whether they are in immediate danger. What should you do first?",
-    "source": {
-      "type": "university",
-      "title": "Helping a Friend",
-      "url": "https://studentlife.utk.edu/counselingcenter/helping-a-friend/"
-    },
+    "id": "dilemma-0003",
+    "theme": "The sibling's secret",
+    "text": "Your sibling admits they told a major lie to their partner. Revealing it could end the relationship; keeping it makes you part of the secret. What is your move?",
     "options": [
-      "Call emergency services",
-      "Contact a trusted person nearby",
-      "Keep trying to reach the friend first",
-      "Wait and respect the request for privacy"
-    ]
+      "Keep the secret",
+      "Give them a deadline to confess",
+      "Tell their partner",
+      "Refuse to get involved"
+    ],
+    "source": {
+      "type": "inspiration",
+      "title": "Extreme Hypothetical Moral Dilemma Questions",
+      "url": "https://areyousittingdown.games/blogs/questions/extreme-hypothetical-moral-dilemma-questions"
+    }
   },
   {
-    "id": "sourced-0049",
-    "theme": "The accommodation disclosure",
-    "text": "A classmate asks why another student receives extra time on exams. You know the accommodation is private, but explaining it might stop classmates from assuming the student is receiving an unfair advantage. Should you say nothing, encourage the student to explain if they choose, or tell the classmate only that accommodations are reviewed through a formal process?",
-    "source": {
-      "type": "university",
-      "title": "Confidentiality",
-      "url": "https://ods.princeton.edu/rights-responsibilities/confidentiality"
-    },
+    "id": "dilemma-0004",
+    "theme": "The suspicious reviews",
+    "text": "Your boss asks you to hide honest one-star reviews before a product launch. It is legal, your team needs the launch, and refusing may cost your job. What do you do?",
     "options": [
-      "Say nothing",
-      "Encourage the student to explain if they choose",
-      "Say accommodations are handled privately",
-      "Tell the classmate the accommodation details"
-    ]
+      "Hide the reviews",
+      "Refuse",
+      "Escalate it inside the company",
+      "Warn customers anonymously"
+    ],
+    "source": {
+      "type": "inspiration",
+      "title": "Extreme Hypothetical Moral Dilemma Questions",
+      "url": "https://areyousittingdown.games/blogs/questions/extreme-hypothetical-moral-dilemma-questions"
+    }
   },
   {
-    "id": "sourced-0050",
-    "theme": "The recorded lecture",
-    "text": "A student has an approved accommodation to record lectures and promises not to share the files. A friend asks for the recording because they missed class, and the recording would make studying easier for everyone. Should the student share it, refuse even though the friend is struggling, or ask the instructor whether a broader version can be provided?",
-    "source": {
-      "type": "university",
-      "title": "Permission to Record Classroom Lectures and Discussions",
-      "url": "https://sds.utk.edu/permission-to-record-classroom-lectures-and-discussions/"
-    },
+    "id": "dilemma-0005",
+    "theme": "The unwanted warning",
+    "text": "A friend is about to make a huge life choice that you think will go badly. They are excited and have not asked for advice. Do you step in?",
     "options": [
-      "Share the recording",
-      "Refuse to share it",
-      "Ask the instructor for an approved copy",
-      "Share only notes you wrote yourself"
-    ]
+      "Say exactly what you think",
+      "Ask if they want your honest view",
+      "Stay quiet",
+      "Talk to someone close to them"
+    ],
+    "source": {
+      "type": "inspiration",
+      "title": "Extreme Hypothetical Moral Dilemma Questions",
+      "url": "https://areyousittingdown.games/blogs/questions/extreme-hypothetical-moral-dilemma-questions"
+    }
   },
   {
-    "id": "sourced-0051",
-    "theme": "The parent who pays",
-    "text": "A parent who pays most of a student's tuition asks the university for access to the student's grades. The student is legally an adult and has asked for privacy, but the parent says financial support should include the right to know whether the student is passing. Should the university disclose the records, refuse, or ask the student and parent to agree on limited information?",
-    "source": {
-      "type": "official",
-      "title": "Can parents view a child's post-secondary education record?",
-      "url": "https://studentprivacy.ed.gov/faq/can-parents-view-childs-post-secondary-education-record"
-    },
+    "id": "dilemma-0006",
+    "theme": "The terrible audition",
+    "text": "Your friend asks if they are ready for an important audition tomorrow. They are not, but brutal honesty might wreck their confidence. What do you say?",
     "options": [
-      "Disclose the records",
-      "Refuse without the student's consent",
-      "Ask the student and parent to agree on limited information",
-      "Share only whether the student is enrolled"
-    ]
+      "Be completely honest",
+      "Give gentle, specific feedback",
+      "Build their confidence",
+      "Avoid answering"
+    ],
+    "source": {
+      "type": "inspiration",
+      "title": "Extreme Hypothetical Moral Dilemma Questions",
+      "url": "https://areyousittingdown.games/blogs/questions/extreme-hypothetical-moral-dilemma-questions"
+    }
   },
   {
-    "id": "sourced-0052",
-    "theme": "The research assistant's side job",
-    "text": "A professor offers you paid work for a private project related to your research. The job would provide useful experience and money, but the professor also grades your work and may benefit from your ideas. Should you accept with a written agreement, ask for a neutral supervisor, or refuse to avoid a conflict that could affect your academic progress?",
-    "source": {
-      "type": "university",
-      "title": "Use of Students in Outside Employment",
-      "url": "https://policy.uconn.edu/2011/06/02/use-of-students-in-outside-employment/"
-    },
+    "id": "dilemma-0007",
+    "theme": "One hour of mind-reading",
+    "text": "You may hear one person's unfiltered thoughts for an hour. They will never know unless you tell them. How do you use it?",
     "options": [
-      "Accept with a written agreement",
-      "Ask for a neutral supervisor",
-      "Refuse the work",
-      "Accept only after disclosing the conflict"
-    ]
+      "Choose someone close to me",
+      "Choose someone powerful",
+      "Choose a stranger",
+      "Refuse the power"
+    ],
+    "source": {
+      "type": "inspiration",
+      "title": "Extreme Hypothetical Moral Dilemma Questions",
+      "url": "https://areyousittingdown.games/blogs/questions/extreme-hypothetical-moral-dilemma-questions"
+    }
   },
   {
-    "id": "sourced-0053",
-    "theme": "The incomplete study explanation",
-    "text": "A research team recruiting students wants to withhold its exact hypothesis so participants do not change their behavior. The team promises to explain the study afterward and says the risk is minimal, but participants cannot judge whether the undisclosed purpose matters to them. Should the study proceed, disclose the hypothesis and accept noisier results, or redesign the project?",
-    "source": {
-      "type": "official",
-      "title": "The Belmont Report",
-      "url": "https://www.hhs.gov/ohrp/regulations-and-policy/belmont-report/read-the-belmont-report/index.html"
-    },
+    "id": "dilemma-0008",
+    "theme": "Invisible until midnight",
+    "text": "You are completely invisible and untraceable until midnight. You cannot extend it. What kind of day do you have?",
     "options": [
-      "Proceed with limited disclosure and debriefing",
-      "Disclose the hypothesis",
-      "Redesign the study",
-      "Do not enroll anyone until the risks are fully explained"
-    ]
+      "Secretly help people",
+      "Snoop somewhere forbidden",
+      "Pull harmless pranks",
+      "Stay home until it wears off"
+    ],
+    "source": {
+      "type": "inspiration",
+      "title": "Extreme Hypothetical Moral Dilemma Questions",
+      "url": "https://areyousittingdown.games/blogs/questions/extreme-hypothetical-moral-dilemma-questions"
+    }
+  },
+  {
+    "id": "dilemma-0009",
+    "theme": "The memory eraser",
+    "text": "You can make one person forget every memory involving you. Your own memories remain. Would you use it?",
+    "options": [
+      "On an ex",
+      "On someone I hurt",
+      "On someone who hurt me",
+      "I would not use it"
+    ],
+    "source": {
+      "type": "inspiration",
+      "title": "Extreme Hypothetical Moral Dilemma Questions",
+      "url": "https://areyousittingdown.games/blogs/questions/extreme-hypothetical-moral-dilemma-questions"
+    }
+  },
+  {
+    "id": "dilemma-0010",
+    "theme": "The sealed envelope",
+    "text": "An envelope contains the exact date and cause of your death. The prediction cannot be changed. Do you open it?",
+    "options": [
+      "Open it immediately",
+      "Save it for later",
+      "Let someone else decide",
+      "Destroy it unopened"
+    ],
+    "source": {
+      "type": "inspiration",
+      "title": "Extreme Hypothetical Moral Dilemma Questions",
+      "url": "https://areyousittingdown.games/blogs/questions/extreme-hypothetical-moral-dilemma-questions"
+    }
+  },
+  {
+    "id": "dilemma-0011",
+    "theme": "A warning from future you",
+    "text": "Your future self appears for ten seconds and says only, “Cancel tomorrow.” You have several plans and no other clues. What do you cancel?",
+    "options": [
+      "Everything",
+      "Only the biggest plan",
+      "Nothing",
+      "Ask everyone else to cancel too"
+    ],
+    "source": {
+      "type": "inspiration",
+      "title": "Extreme Hypothetical Moral Dilemma Questions",
+      "url": "https://areyousittingdown.games/blogs/questions/extreme-hypothetical-moral-dilemma-questions"
+    }
+  },
+  {
+    "id": "dilemma-0012",
+    "theme": "Your pet finally talks",
+    "text": "Your pet suddenly speaks perfect English and says, “We need to discuss what you do when you think you're alone.” What is your first response?",
+    "options": [
+      "Ask what they saw",
+      "Offer a bribe",
+      "Change the subject",
+      "Start recording"
+    ],
+    "source": {
+      "type": "inspiration",
+      "title": "Extreme Hypothetical Moral Dilemma Questions",
+      "url": "https://areyousittingdown.games/blogs/questions/extreme-hypothetical-moral-dilemma-questions"
+    }
+  },
+  {
+    "id": "dilemma-0013",
+    "theme": "A glimpse ahead",
+    "text": "Would you rather see a few minutes into your own future or get one brief look at the world a century from now?",
+    "options": [
+      "See ten minutes ahead",
+      "See a century ahead",
+      "Take neither"
+    ],
+    "source": {
+      "type": "inspiration",
+      "title": "250 Best Would You Rather Questions",
+      "url": "https://parade.com/964027/parade/would-you-rather-questions/"
+    }
+  },
+  {
+    "id": "dilemma-0014",
+    "theme": "Every song is a command",
+    "text": "For one year, every song you hear forces a reaction. Which curse do you take?",
+    "options": [
+      "Sing along every time",
+      "Dance every time",
+      "Avoid music for the year"
+    ],
+    "source": {
+      "type": "inspiration",
+      "title": "250 Best Would You Rather Questions",
+      "url": "https://parade.com/964027/parade/would-you-rather-questions/"
+    }
+  },
+  {
+    "id": "dilemma-0015",
+    "theme": "Love or the jackpot",
+    "text": "Choose one guaranteed outcome: meet the love of your life today, or win a life-changing lottery next year.",
+    "options": [
+      "Meet true love today",
+      "Win the lottery next year",
+      "Leave both to chance"
+    ],
+    "source": {
+      "type": "inspiration",
+      "title": "250 Best Would You Rather Questions",
+      "url": "https://parade.com/964027/parade/would-you-rather-questions/"
+    }
+  },
+  {
+    "id": "dilemma-0016",
+    "theme": "Nothing stays private",
+    "text": "One part of your private life becomes available to everyone you know. Which do you expose?",
+    "options": [
+      "My unfiltered thoughts",
+      "My complete browsing history",
+      "My camera roll",
+      "My spending history"
+    ],
+    "source": {
+      "type": "inspiration",
+      "title": "250 Best Would You Rather Questions",
+      "url": "https://parade.com/964027/parade/would-you-rather-questions/"
+    }
+  },
+  {
+    "id": "dilemma-0017",
+    "theme": "Respect or influence",
+    "text": "You can be admired by everyone but have no special authority, or gain enormous influence while nobody personally respects you.",
+    "options": [
+      "Universal respect",
+      "Enormous influence",
+      "A little of both",
+      "Neither"
+    ],
+    "source": {
+      "type": "inspiration",
+      "title": "250 Best Would You Rather Questions",
+      "url": "https://parade.com/964027/parade/would-you-rather-questions/"
+    }
+  },
+  {
+    "id": "dilemma-0018",
+    "theme": "The household upgrade",
+    "text": "You receive one free household service for life. Which improves your life most?",
+    "options": [
+      "A personal chef",
+      "A daily cleaner",
+      "A personal assistant",
+      "Free repairs forever"
+    ],
+    "source": {
+      "type": "inspiration",
+      "title": "250 Best Would You Rather Questions",
+      "url": "https://parade.com/964027/parade/would-you-rather-questions/"
+    }
+  },
+  {
+    "id": "dilemma-0019",
+    "theme": "Your movie career",
+    "text": "Pick your one appearance in movie history.",
+    "options": [
+      "A tiny role in a beloved classic",
+      "The lead in a legendary flop",
+      "A stunt double in an action hit",
+      "A voice in an animated cult favorite"
+    ],
+    "source": {
+      "type": "inspiration",
+      "title": "250 Best Would You Rather Questions",
+      "url": "https://parade.com/964027/parade/would-you-rather-questions/"
+    }
+  },
+  {
+    "id": "dilemma-0020",
+    "theme": "The punctuality curse",
+    "text": "For the rest of your life, you can never arrive exactly on time. Which way are you cursed?",
+    "options": [
+      "Always ten minutes late",
+      "Always twenty minutes early",
+      "A random one each day"
+    ],
+    "source": {
+      "type": "inspiration",
+      "title": "250 Best Would You Rather Questions",
+      "url": "https://parade.com/964027/parade/would-you-rather-questions/"
+    }
+  },
+  {
+    "id": "dilemma-0021",
+    "theme": "Pause or rewind",
+    "text": "You get one remote control button for your life. It works once per day, but only for you.",
+    "options": [
+      "Pause for ten minutes",
+      "Rewind one minute",
+      "Fast-forward one boring hour",
+      "Mute one person for five minutes"
+    ],
+    "source": {
+      "type": "inspiration",
+      "title": "250 Best Would You Rather Questions",
+      "url": "https://parade.com/964027/parade/would-you-rather-questions/"
+    }
+  },
+  {
+    "id": "dilemma-0022",
+    "theme": "Words or whispers",
+    "text": "Choose one social superpower, with no way to turn it off.",
+    "options": [
+      "Take back anything I say",
+      "Hear every conversation about me",
+      "Know whenever someone lies to me"
+    ],
+    "source": {
+      "type": "inspiration",
+      "title": "250 Best Would You Rather Questions",
+      "url": "https://parade.com/964027/parade/would-you-rather-questions/"
+    }
+  },
+  {
+    "id": "dilemma-0023",
+    "theme": "Wear your truth",
+    "text": "Your body must reveal something personal to everyone who sees you. Which version do you choose?",
+    "options": [
+      "Skin color shows my mood",
+      "Temporary tattoos show yesterday's actions",
+      "A subtitle shows my current thought"
+    ],
+    "source": {
+      "type": "inspiration",
+      "title": "250 Best Would You Rather Questions",
+      "url": "https://parade.com/964027/parade/would-you-rather-questions/"
+    }
+  },
+  {
+    "id": "dilemma-0024",
+    "theme": "The unusual talent",
+    "text": "Which career sounds better?",
+    "options": [
+      "World's best at something silly",
+      "Solidly average at something prestigious",
+      "Great at something nobody knows I do"
+    ],
+    "source": {
+      "type": "inspiration",
+      "title": "250 Best Would You Rather Questions",
+      "url": "https://parade.com/964027/parade/would-you-rather-questions/"
+    }
+  },
+  {
+    "id": "dilemma-0025",
+    "theme": "A year away",
+    "text": "You may either travel anywhere for a year with every basic expense covered, or stay home and receive a large cash payment.",
+    "options": [
+      "Travel for free for a year",
+      "Take $50,000",
+      "Split it into six months and $25,000"
+    ],
+    "source": {
+      "type": "inspiration",
+      "title": "250 Best Would You Rather Questions",
+      "url": "https://parade.com/964027/parade/would-you-rather-questions/"
+    }
+  },
+  {
+    "id": "dilemma-0026",
+    "theme": "Daily friction remover",
+    "text": "Which tiny inconvenience disappears from your life forever?",
+    "options": [
+      "Every traffic light is green",
+      "I never wait in a line",
+      "My devices never need charging",
+      "I always find parking"
+    ],
+    "source": {
+      "type": "inspiration",
+      "title": "250 Best Would You Rather Questions",
+      "url": "https://parade.com/964027/parade/would-you-rather-questions/"
+    }
+  },
+  {
+    "id": "dilemma-0027",
+    "theme": "Wishes on delay",
+    "text": "A wish service offers two plans. Which contract do you sign?",
+    "options": [
+      "One wish granted today",
+      "Ten wishes granted in twenty years",
+      "No wishes with hidden fine print"
+    ],
+    "source": {
+      "type": "inspiration",
+      "title": "250 Best Would You Rather Questions",
+      "url": "https://parade.com/964027/parade/would-you-rather-questions/"
+    }
+  },
+  {
+    "id": "dilemma-0028",
+    "theme": "A universal translator",
+    "text": "You can understand and speak with one enormous group. Who gets included?",
+    "options": [
+      "Every human language",
+      "Every animal",
+      "Every computer system",
+      "Every version of myself in the multiverse"
+    ],
+    "source": {
+      "type": "inspiration",
+      "title": "250 Best Would You Rather Questions",
+      "url": "https://parade.com/964027/parade/would-you-rather-questions/"
+    }
+  },
+  {
+    "id": "dilemma-0029",
+    "theme": "Your next fictional universe",
+    "text": "You must spend a year inside either the last video game you played or the last movie or series you watched. You keep your real-world abilities.",
+    "options": [
+      "The video-game universe",
+      "The movie or series universe",
+      "Let a coin choose"
+    ],
+    "source": {
+      "type": "community_inspiration",
+      "title": "Last game or last show universe",
+      "url": "https://www.reddit.com/r/WouldYouRather/comments/1uy8g4p"
+    }
+  },
+  {
+    "id": "dilemma-0030",
+    "theme": "Truth without a voice",
+    "text": "Pick a power: know the truth behind any question but never explain what you learned, or make anyone believe one claim per day even when it is false.",
+    "options": [
+      "Know any truth but stay silent",
+      "Make one claim believed each day",
+      "Refuse both"
+    ],
+    "source": {
+      "type": "community_inspiration",
+      "title": "Truth or persuasion",
+      "url": "https://www.reddit.com/r/WouldYouRather/comments/1k9vogw"
+    }
+  },
+  {
+    "id": "dilemma-0031",
+    "theme": "A power with baggage",
+    "text": "Choose one impressive power and accept its permanent drawback.",
+    "options": [
+      "Flight, but with enormous visible wings",
+      "Teleportation, but three trips a year go somewhere random",
+      "Super speed, but stopping is difficult",
+      "Strength, but I become unusually fragile"
+    ],
+    "source": {
+      "type": "community_inspiration",
+      "title": "Balanced superpowers",
+      "url": "https://www.reddit.com/r/WouldYouRather/comments/16d0jqw"
+    }
+  },
+  {
+    "id": "dilemma-0032",
+    "theme": "Overpowered in the past",
+    "text": "You become incredibly strong, fast, and hard to injure, but must live out your life in one historical setting with no trip home.",
+    "options": [
+      "Ancient Egypt",
+      "Ancient Rome",
+      "Medieval Scotland",
+      "Keep my normal life and no powers"
+    ],
+    "source": {
+      "type": "community_inspiration",
+      "title": "Powers in another era",
+      "url": "https://www.reddit.com/r/WouldYouRather/comments/nevts5"
+    }
+  },
+  {
+    "id": "dilemma-0033",
+    "theme": "The internet becomes real",
+    "text": "Choose your strange new reality.",
+    "options": [
+      "Every hypothetical I answer comes true",
+      "I may borrow one ridiculous minor power each month",
+      "The internet stays fictional"
+    ],
+    "source": {
+      "type": "community_inspiration",
+      "title": "Would You Rather answers become real",
+      "url": "https://www.reddit.com/r/WouldYouRather/comments/17cpl47"
+    }
+  },
+  {
+    "id": "dilemma-0034",
+    "theme": "Mystery power or safe pick",
+    "text": "A machine offers either a random major superpower or one useful but modest ability you choose in advance.",
+    "options": [
+      "Take the random major power",
+      "Always know when someone is bluffing",
+      "Fix any object I own",
+      "Never need sleep"
+    ],
+    "source": {
+      "type": "community_inspiration",
+      "title": "r/WouldYouRather",
+      "url": "https://www.reddit.com/r/WouldYouRather/"
+    }
+  },
+  {
+    "id": "dilemma-0035",
+    "theme": "Pick a perk",
+    "text": "You may install exactly one upgrade. Which would improve your life the most?",
+    "options": [
+      "Instant repairs",
+      "Perfect social timing",
+      "Change my appearance at will",
+      "Travel to places I have photographed",
+      "Read nearby minds",
+      "Heal much faster"
+    ],
+    "source": {
+      "type": "community_inspiration",
+      "title": "Choose three perks",
+      "url": "https://www.reddit.com/r/WouldYouRather/comments/1kj2z3k"
+    }
+  },
+  {
+    "id": "dilemma-0036",
+    "theme": "Independent clones",
+    "text": "You can create up to five copies of yourself. They share your memories at creation but immediately gain free will. Do you take the ability?",
+    "options": [
+      "Yes, and treat them as equals",
+      "Yes, but create only one",
+      "Yes, only for emergencies",
+      "No—too complicated"
+    ],
+    "source": {
+      "type": "community_inspiration",
+      "title": "Minor superpowers",
+      "url": "https://www.reddit.com/r/WouldYouRather/comments/15o2hmp"
+    }
+  },
+  {
+    "id": "dilemma-0037",
+    "theme": "The delayed fortune",
+    "text": "You can receive enough money to change your life now, or an absurd fortune after a long wait. Both are guaranteed and tax-free.",
+    "options": [
+      "$1 million today",
+      "$1 billion in fifteen years",
+      "Give the choice to my future self"
+    ],
+    "source": {
+      "type": "community_inspiration",
+      "title": "r/WouldYouRather",
+      "url": "https://www.reddit.com/r/WouldYouRather/"
+    }
+  },
+  {
+    "id": "dilemma-0038",
+    "theme": "Fast travel rules",
+    "text": "You may teleport only to places where you personally took a photo. One accidental background photo counts. What is your first strategy?",
+    "options": [
+      "Build a worldwide photo map",
+      "Keep it to places I trust",
+      "Sell trips to other people",
+      "Decline the power"
+    ],
+    "source": {
+      "type": "community_inspiration",
+      "title": "r/WouldYouRather",
+      "url": "https://www.reddit.com/r/WouldYouRather/"
+    }
+  },
+  {
+    "id": "dilemma-0039",
+    "theme": "One room knows",
+    "text": "Whenever you enter a room, you may instantly become either its funniest person or its smartest person—but everyone knows you used a power.",
+    "options": [
+      "Always choose funniest",
+      "Always choose smartest",
+      "Choose based on the room",
+      "Never use it"
+    ],
+    "source": {
+      "type": "community_inspiration",
+      "title": "r/WouldYouRather",
+      "url": "https://www.reddit.com/r/WouldYouRather/"
+    }
+  },
+  {
+    "id": "dilemma-0040",
+    "theme": "The tiny luck budget",
+    "text": "Once a day, you can make one unlikely event slightly more likely. The unused luck never carries over. What gets most of your boosts?",
+    "options": [
+      "Money and work",
+      "Friends and relationships",
+      "Travel and adventures",
+      "Helping strangers"
+    ],
+    "source": {
+      "type": "community_inspiration",
+      "title": "r/WouldYouRather",
+      "url": "https://www.reddit.com/r/WouldYouRather/"
+    }
   }
 ]

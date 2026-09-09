@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Write the curated, source-backed dilemma catalog."""
+"""Write the curated, source-inspired game catalog."""
 
 from __future__ import annotations
 
@@ -9,160 +9,307 @@ from pathlib import Path
 
 OUTPUT = Path(__file__).resolve().parents[1] / "dilemmas.json"
 
-
-def source(kind: str, title: str, url: str) -> dict[str, str]:
-    return {"type": kind, "title": title, "url": url}
-
-
-def entry(theme: str, text: str, citation: dict[str, str]) -> dict:
-    return {"id": "", "theme": theme, "text": text, "source": citation}
-
-
-W = "wikipedia"
-E = "ethics_unwrapped"
-O = "official"
-U = "university"
-
-
-CATALOG = [
-    entry("The trolley switch", "A runaway trolley is heading toward five people trapped on the track. You can pull a lever to divert it onto a side track where one trapped person will die instead. You did not create the danger, and there is no time to warn anyone. Should you redirect the trolley, or refuse to intervene? Consider whether redirecting harm differs morally from allowing harm, and whether saving more lives settles the question.", source(W, "Trolley problem", "https://en.wikipedia.org/wiki/Trolley_problem")),
-    entry("The footbridge stranger", "A runaway trolley will kill five people unless you push a large stranger from a footbridge onto the track. His body would stop the trolley, killing him but saving the five. He has not agreed to be used, and you can save the group only by deliberately making him the obstacle. Should you push him? Explain whether physical contact, intention, and the numbers affected change the answer.", source(W, "Trolley problem", "https://en.wikipedia.org/wiki/Trolley_problem")),
-    entry("Heinz and the unaffordable medicine", "Heinz's spouse is dying from a rare illness. A pharmacist has developed a medicine that could save her, but charges $2,000 even though it cost about $200 to make. Heinz has borrowed only half the money, begged for a discount and a payment plan, and been refused. The pharmacist says the price protects the investment and that stealing is against the law. The medicine may be gone by morning. Should Heinz break into the pharmacy and take it? Discuss saving a life, respecting property, rewarding research, obeying the law, and accepting punishment afterward.", source(W, "Heinz dilemma", "https://en.wikipedia.org/wiki/Heinz_dilemma")),
-    entry("The prisoner's bargain", "You and a trusted partner are arrested and questioned in separate rooms. If both of you remain silent, each receives one year. If one testifies against the other while the other stays silent, the witness goes free and the silent person receives ten years. If both testify, each receives five years. You cannot communicate. Should you stay silent, betray your partner, or choose based on what cooperation means when trust cannot be verified?", source(W, "Prisoner's dilemma", "https://en.wikipedia.org/wiki/Prisoner%27s_dilemma")),
-    entry("The experience machine", "A machine can stimulate your brain so convincingly that you experience a lifetime of friendship, achievement, beauty, and pleasure. You would never know the experiences were simulated, but you would never make real choices or affect anyone outside the machine. You must choose before connecting and cannot leave once connected. Should you choose guaranteed wonderful experiences, or ordinary life with risk, frustration, real relationships, and the chance to accomplish something outside your mind?", source(W, "Experience machine", "https://en.wikipedia.org/wiki/Experience_machine")),
-    entry("The plank of Carneades", "After a shipwreck, two strangers reach a floating plank that can support only one person. If neither acts, both drown; if one pushes the other away, the pusher survives. Neither caused the shipwreck, and there is no rescue in sight. Is pushing the other person off an unjust killing, permissible self-preservation, or a tragic act for which no one is fully responsible?", source(W, "Plank of Carneades", "https://en.wikipedia.org/wiki/Plank_of_Carneades")),
-    entry("The ticking bomb", "A captured prisoner may know where a bomb is hidden in a city, and the bomb could kill thousands within an hour. Investigators have no proof that the prisoner knows the location, and torture may produce a false confession while violating an absolute ban on abuse. Should interrogators use torture to try to prevent the attack, or refuse even when the threatened harm is enormous?", source(W, "Ticking time bomb scenario", "https://en.wikipedia.org/wiki/Ticking_time_bomb_scenario")),
-    entry("The nearby child and the distant child", "You pass a shallow pond and see a child drowning. You can save the child immediately, but your expensive clothes and shoes will be ruined. You can also send the same amount of money to a distant relief organization and probably save a child's life there, although you will never know which child benefits. If saving the nearby child is an obvious duty, do you owe the same sacrifice to the distant child?", source(W, "Famine, Affluence, and Morality", "https://en.wikipedia.org/wiki/Famine,_Affluence,_and_Morality")),
-    entry("The shared pasture", "A village shares a pasture. Each herder can add one more animal and receive immediate income, but if too many do so, the grass will fail and every herd will suffer. Everyone knows that a single extra animal will not cause the collapse, and no individual herder can enforce restraint. Should you add your animal, ask the others to sacrifice together, or support a rule that limits everyone's private gain to protect the commons?", source(W, "Tragedy of the commons", "https://en.wikipedia.org/wiki/Tragedy_of_the_commons")),
-    entry("The ultimatum offer", "A stranger is given $100 and told to offer you any share. If you accept, both of you receive the proposed amounts; if you reject the offer, neither receives anything. The stranger offers you $2 and keeps $98. You could punish the unfairness at a cost to yourself, or accept money that may be useful. Should you accept the offer, reject it, or negotiate even though the rules permit no counteroffer?", source(W, "Ultimatum game", "https://en.wikipedia.org/wiki/Ultimatum_game")),
-    entry("The veil of ignorance", "You must choose the basic rules of a new society before learning whether you will be rich or poor, healthy or disabled, powerful or marginalized, talented or dependent on others. You may choose equal outcomes, unequal rewards for effort, a strong safety net, or a system that maximizes total prosperity. Once the veil lifts, you must live under the rules you selected. Which inequalities, if any, would you permit without knowing where you will land?", source(W, "Original position", "https://en.wikipedia.org/wiki/Original_position")),
-    entry("The crowded lifeboat", "Your lifeboat has fifty people aboard and enough supplies for ten more. One hundred exhausted swimmers are approaching after a shipwreck. If everyone climbs aboard, the boat will likely capsize; if you keep the boat stable, many swimmers will die. Some are children, some are injured, and some ignored earlier evacuation instructions. Who should be admitted, and should need, age, responsibility, a lottery, or the chance to help the boat determine the places?", source(W, "Lifeboat ethics", "https://en.wikipedia.org/wiki/Lifeboat_ethics")),
-    entry("Obedience in the laboratory", "A researcher in a white coat instructs you to continue pressing switches that appear to deliver increasingly painful shocks to a stranger who answers questions incorrectly. The stranger pleads for the experiment to stop, but the researcher says the study requires you to continue and assures you that no permanent injury is occurring. Should you obey the authority, refuse, or continue only until you have independent proof that the shocks are real?", source(W, "Milgram experiment", "https://en.wikipedia.org/wiki/Milgram_experiment")),
-    entry("The invisible ring", "You find a ring that makes you invisible whenever you turn its stone. No camera, witness, or magical test can reveal what you do while wearing it, and there is no chance of punishment. You could take money from a wealthy stranger, expose a corrupt official, rescue someone from danger, or satisfy a private desire. Does justice require you to act fairly even when reputation and consequences disappear, or does perfect secrecy change what you owe other people?", source(W, "Ring of Gyges", "https://en.wikipedia.org/wiki/Ring_of_Gyges")),
-    entry("The bomber and the civilians", "A bomber pilot can destroy a weapons factory that is supplying an invading army, but the attack will almost certainly kill civilians living in nearby homes. The pilot's aim is the factory, not the civilians, and waiting for a more precise weapon will allow more soldiers to die. Is the raid permissible because the civilian deaths are foreseen but not intended, or is knowingly causing those deaths still wrong?", source(W, "Principle of double effect", "https://en.wikipedia.org/wiki/Principle_of_double_effect")),
-    entry("The child who would otherwise not exist", "A parent can have a child now, knowing that the child will face a difficult but worthwhile life, or wait two years for treatment that would likely allow a healthier child to be born. Waiting would not improve the first child's life; it would mean a different child exists instead. Is it morally permissible to choose which possible person comes into existence based on expected wellbeing?", source(W, "Non-identity problem", "https://en.wikipedia.org/wiki/Non-identity_problem")),
-    entry("The impossible choice", "An armed authority tells a parent that one of two children will be killed, but both will die if the parent refuses to choose. The parent cannot fight, bargain, or save both. Is choosing one child a moral act, an act under coercion for which the authority bears all blame, or a wrong that remains wrong even when refusal guarantees a worse outcome?", source(W, "Sophie's Choice", "https://en.wikipedia.org/wiki/Sophie%27s_Choice")),
-    entry("The good place and the suffering child", "A prosperous city is peaceful and joyful because its citizens' comfort depends on one neglected child being kept alone in misery. Every adult is told the truth when they come of age. If the child is released, the city's prosperity will end; if someone walks away, they reject the bargain without rescuing the child. Should the citizens accept the bargain, leave, or try to dismantle it even if everyone suffers?", source(W, "The Ones Who Walk Away from Omelas", "https://en.wikipedia.org/wiki/The_Ones_Who_Walk_Away_from_Omelas")),
-    entry("Political dirty hands", "A leader can prevent a violent coup only by authorizing a secret operation that violates a moral rule the leader publicly promised to respect. If the operation succeeds, thousands may be spared and the violation may never become known; if the leader refuses, the coup may succeed. Can a leader be morally required to do something they must later admit was wrong, or does a good outcome fail to cleanse the act?", source(W, "Dirty hands", "https://en.wikipedia.org/wiki/Dirty_hands")),
-    entry("The repugnant population", "A policy could produce a small population whose lives are extraordinarily good, or a much larger population whose lives are barely worth living but still positive. A further increase would eventually produce a population whose total welfare is greater only because there are more people. Should a policy choose the larger population, the better lives, or reject comparisons that treat the existence of additional people as a reason to accept worse lives?", source(W, "Repugnant conclusion", "https://en.wikipedia.org/wiki/Repugnant_conclusion")),
-
-    entry("Who is accountable for the autonomous car?", "A self-driving test vehicle strikes and kills a pedestrian. The safety driver was watching the road but did not take control, the software team knew the system had edge-case failures, the company had a testing schedule, and regulators allowed the trial. The pedestrian's family wants one person held responsible, but the failure came from a chain of decisions. Who should answer for the death, and what kind of accountability would prevent the next one?", source(E, "AI & Accountability: Who’s at the Wheel?", "https://ethicsunwrapped.utexas.edu/case-study/a-i-accountability-whos-at-the-wheel")),
-    entry("The family DNA database", "A consumer buys a home DNA test for ancestry and agrees to broad terms about research and data sharing. Years later, investigators use a public genealogy match from a relative to identify a suspect in a violent crime. The match may help convict the guilty and exonerate the innocent, but the customer did not expect their genetic information to become a law-enforcement tool, and relatives never consented. Should the database be available for such searches, and who gets to decide?", source(E, "Ethical Use of Home DNA Testing", "https://ethicsunwrapped.utexas.edu/case-study/ethical-use-of-home-dna-testing")),
-    entry("The file-sharing shortcut", "A file-sharing service lets millions of people obtain music without paying the artists or producers. It gives listeners access, challenges an expensive distribution system, and helps inspire later subscription services, but it also makes unauthorized copying easy and shifts costs onto people who created the work. Should a user download the music, should the service continue operating, or does a beneficial innovation remain wrong when it violates creators' rights?", source(E, "Digital Downloads", "https://ethicsunwrapped.utexas.edu/case-study/digital-downloads")),
-    entry("The Daraprim price decision", "A company buys the rights to Daraprim, an old medicine used for toxoplasmosis and other serious infections, and raises the price from $13.50 to $750 per tablet. The CEO says profits could fund research and that the medicine is a small part of national health spending; doctors warn that some vulnerable patients need it for life and hospitals may be unable to stock it. Is the price defensible as a business decision, or does access to an essential medicine create a duty to keep it affordable?", source(E, "Daraprim Price Hike", "https://ethicsunwrapped.utexas.edu/video/daraprim-price-hike")),
-    entry("The EpiPen price", "A company raises the price of a two-pack of EpiPens, a life-saving emergency treatment for severe allergic reactions. Executives point to business costs and the need to sustain a profitable company, while families and schools say the price makes it harder to keep the medicine available when a reaction can become fatal in minutes. How should a company balance profit, executive compensation, innovation, and the obligation to keep an emergency medicine within reach?", source(E, "EpiPen: Out of Reach", "https://ethicsunwrapped.utexas.edu/video/epipen-out-of-reach")),
-    entry("The Theranos promise", "A health company tells investors and patients that its technology can run many blood tests from a finger prick, while internal doubts remain about whether the system works as advertised. Revealing the doubts could end the company and its promised medical access; hiding them could expose patients to incorrect results and investors to fraud. When does confidence in an unfinished innovation become a duty to disclose uncertainty?", source(E, "Theranos’ Bad Blood", "https://ethicsunwrapped.utexas.edu/video/theranos-bad-blood")),
-    entry("The breach of credit data", "A company that holds sensitive credit information suffers a major breach after security weaknesses were left unaddressed. The company can disclose the breach quickly, accepting panic and financial damage, or delay until it understands the scope and has a fix. What does the company owe people whose data it collected, and is protecting its reputation ever a legitimate reason to delay warning them?", source(E, "Equifax’s Breach of Trust", "https://ethicsunwrapped.utexas.edu/video/equifaxs-breach-of-trust")),
-    entry("The emissions defeat device", "An automaker sells diesel vehicles advertised as clean, while software detects laboratory tests and changes the vehicles' behavior only during testing. The company can disclose the deception and face recalls, costs, and lost trust, or argue that the vehicles meet customer expectations in ordinary driving. Is a product acceptable when it passes a formal test by manipulating the test rather than meeting its purpose?", source(E, "Volkswagen’s Emissions Evasion", "https://ethicsunwrapped.utexas.edu/video/volkswagens-emissions-evasion")),
-    entry("The champion who doped", "A cyclist competes in a sport where performance-enhancing drugs are widespread. He can dope to keep pace with rivals and preserve a team, sponsors, and career, or refuse and compete at a disadvantage while others may gain the rewards. If the sport's culture has made clean competition unrealistic, does using the same methods level the field or betray the meaning of fair competition?", source(E, "Armstrong’s Doping Downfall", "https://ethicsunwrapped.utexas.edu/video/armstrongs-doping-downfall")),
-    entry("The donor's mistaken gift", "An intern learns that a donor made a large gift to a nonprofit while misunderstanding what the organization would do with it. Correcting the misunderstanding may cost the nonprofit essential funding; staying quiet lets the organization keep money given under misleading assumptions. Should the intern speak up, and should the organization return a gift that was legally completed but ethically misinformed?", source(E, "Full Disclosure: Manipulating Donors", "https://ethicsunwrapped.utexas.edu/case-study/full-disclosure-manipulating-donors")),
-    entry("Snowden's disclosure", "A government contractor releases classified documents showing the existence and scale of government surveillance programs. He breaks secrecy agreements and may harm intelligence operations, but argues that citizens have a right to know what is being done in their name and that legal channels were inadequate. Is the disclosure an ethical act of whistleblowing, an unacceptable breach of trust, or both?", source(E, "Edward Snowden: Traitor or Hero?", "https://ethicsunwrapped.utexas.edu/case-study/edward-snowden-traitor-hero")),
-    entry("The Ebola intervention", "During an Ebola outbreak, a government considers sending military personnel to help deliver supplies, enforce quarantines, and build treatment capacity. Military logistics could save lives, but the presence of soldiers may frighten residents, undermine trust, and make communities less willing to seek care. Should outside power intervene, and how should it weigh speed against local autonomy and trust?", source(E, "Ebola & American Intervention", "https://ethicsunwrapped.utexas.edu/case-study/ebola-american-intervention")),
-    entry("Prenatal diagnosis and choice", "A prenatal test reveals a serious genetic condition. The parents must decide whether to continue the pregnancy, while also confronting what the decision communicates about people already living with the condition, what burdens the family can bear, and how much authority parents should have over reproductive choices. Should the decision focus on expected suffering, parental freedom, disability justice, or some combination?", source(E, "Prenatal Diagnosis & Parental Choice", "https://ethicsunwrapped.utexas.edu/case-study/prenatal-diagnosis-parental-choice")),
-    entry("A clinician's personal objection", "A clinical social worker's religious or moral beliefs conflict with a client's identity or requested service. The worker wants to avoid participating in something they believe is wrong, while professional duties require nondiscrimination, cultural competence, and service to the client. Should the worker provide the service, arrange a prompt transfer, or refuse even if refusal limits the client's access to care?", source(E, "Freedom vs. Duty in Clinical Social Work", "https://ethicsunwrapped.utexas.edu/case-study/freedom-vs-duty-in-clinical-social-work")),
-    entry("The DNA research conflict", "A university professor leads a study on hydraulic-fracturing risks while receiving substantial payments and stock from a drilling company affected by the result. The professor says the financial relationship did not determine the findings and disclosure would not change the science. Should the study be trusted, withdrawn, independently reviewed, or published with the conflict prominently disclosed?", source(E, "Research Conflicts at UT Austin", "https://ethicsunwrapped.utexas.edu/video/research-conflicts-at-ut-austin")),
-    entry("The reporter's poll", "A news organization covers a sports championship while also conducting polls that influence the public conversation about which teams deserve recognition. The organization can publish the poll as news, disclose its role and possible conflict, or stop covering the subject. Can journalism fairly report on a story when its own reporting helps create the story?", source(E, "Covering Yourself? Journalists and the Bowl Championship", "https://ethicsunwrapped.utexas.edu/case-study/covering-journalists-bowl-championship-series")),
-    entry("The athlete's cover image", "A sports magazine profiles an accomplished woman athlete, but the proposed cover emphasizes her body and attractiveness more than her athletic achievement. The image may sell more magazines and reflect common audience demand, while the athlete argues that it reduces her to appearance. Should the magazine follow market incentives, represent the athlete on her sporting merits, or give her control over the image?", source(E, "Covering Female Athletes", "https://ethicsunwrapped.utexas.edu/case-study/covering-female-athletes")),
-    entry("Dr. V's magical putter", "A journalist investigates a golf putter and discovers that its inventor lied about parts of her professional history and wanted her private life left out of the story. The journalist publishes details that include her transgender identity despite an earlier agreement to focus on the science; the article is defended as exposing deception and criticized as an unnecessary invasion that may have contributed to her suicide. Should the journalist publish the personal details, honor the agreement, or stop the story?", source(E, "Dr. V's Magical Putter", "https://ethicsunwrapped.utexas.edu/case-study/dr-vs-magical-putter")),
-    entry("The cyber-harassment response", "A student posts defamatory material about a teacher online. The teacher confronts the student in class and posts a video of that confrontation, turning a private disciplinary matter into another public spectacle. Should the teacher respond publicly, use formal channels, or remain silent to avoid amplifying the harm?", source(E, "Cyber Harassment", "https://ethicsunwrapped.utexas.edu/case-study/cyber-harassment")),
-    entry("The fracking study disclosure", "A university research study concludes that hydraulic fracturing did not contaminate groundwater, but its lead professor had undisclosed financial ties to a drilling company. The professor says he coordinated rather than altered the research; critics say the conflict undermines trust in the result. Should the university publish the study with a disclosure, commission a new study, or retract it?", source(E, "Research Conflicts at UT Austin", "https://ethicsunwrapped.utexas.edu/video/research-conflicts-at-ut-austin")),
-]
-
-
-# Everyday college situations are kept separate so the game can offer a
-# student-life pack without mixing them into the general-purpose catalog.
-COLLEGE_ENTRIES = [
-    entry("The midnight roommate", "Your roommate works late shifts and comes home at midnight, while you have an early class and need the room quiet. The housing agreement encourages quiet hours but also treats the room as shared space. Should you ask your roommate to change their routine, use the library and accept the inconvenience, or ask a resident adviser to mediate before resentment grows?", source(U, "Living with Roommates", "https://reslife.ucla.edu/roommates")),
-    entry("The unannounced guest", "Your roommate invites a partner to stay several nights without asking. The guest is polite, but the arrangement changes your privacy, utilities, and ability to relax at home. Should you insist on advance notice, tolerate the visits because your roommate pays equal rent, or propose a guest rule that limits both of you equally?", source(U, "Guide to Community Living", "https://www.udel.edu/students/reslife/campus-living/housing-policies/guide-to-community-living/")),
-    entry("The borrowed groceries", "Your roommate repeatedly uses your groceries and kitchen supplies, saying they will replace them after their next paycheck. You can lock up your food, confront them, or keep sharing because they are struggling financially. Which response respects your roommate's needs without turning a shared home into a ledger of every snack and dish?", source(U, "Roommates", "https://www.uc.edu/campus-life/housing/resident-support/daily-living/roommates.html")),
-    entry("The free-riding teammate", "A group project is due tomorrow. One teammate has contributed little, but they have been caring for a sick family member and the group never set clear responsibilities. You can report the unequal work in the peer evaluation, give everyone the same grade, or ask for an extension that may hurt the rest of the group. What would be fair to the teammate and to those who did the work?", source(U, "Individual Contributions to the Group", "https://cei.umn.edu/teaching-resources/group-projects/assessing-project/individual-contributions-group")),
-    entry("The club initiation", "A student organization asks new members to complete an embarrassing overnight challenge. No one is threatened, and many members say the ritual creates trust, but a new student looks uncomfortable and worries that refusing will cost them their place. Should you participate, ask the group to change the ritual, or report it even if the members call it harmless tradition?", source(U, "Hazing Policy Statement", "https://hazing.cornell.edu/hazingpolicy")),
-    entry("The resident assistant's report", "As a resident assistant, you hear that a club held an off-campus initiation that may have crossed the university's hazing policy. Reporting it could protect new members but could also end the organization and expose students who thought the event was consensual. Should you report what you know, investigate informally, or give the club one chance to address it itself?", source(O, "Anti-Hazing Policy", "https://policies.osu.edu/sites/default/files/documents/2024/09/anti-hazing-policy.pdf")),
-    entry("The friend who refuses help", "A friend tells you they have stopped sleeping and are missing class but asks you not to tell anyone. They want privacy and fear being judged, while you think a counselor could help. Should you keep their confidence, encourage them to contact counseling while staying involved, or call for help yourself if the situation seems to worsen?", source(U, "Helping a Friend", "https://studentlife.utk.edu/counselingcenter/helping-a-friend/")),
-    entry("The urgent text", "A friend sends a message saying they may hurt themselves and then stops replying. Calling emergency services could keep them safe but might feel like a betrayal and bring unwanted attention to their family. Waiting could respect their privacy but leave you unsure whether they are in immediate danger. What should you do first?", source(U, "Helping a Friend", "https://studentlife.utk.edu/counselingcenter/helping-a-friend/")),
-    entry("The accommodation disclosure", "A classmate asks why another student receives extra time on exams. You know the accommodation is private, but explaining it might stop classmates from assuming the student is receiving an unfair advantage. Should you say nothing, encourage the student to explain if they choose, or tell the classmate only that accommodations are reviewed through a formal process?", source(U, "Confidentiality", "https://ods.princeton.edu/rights-responsibilities/confidentiality")),
-    entry("The recorded lecture", "A student has an approved accommodation to record lectures and promises not to share the files. A friend asks for the recording because they missed class, and the recording would make studying easier for everyone. Should the student share it, refuse even though the friend is struggling, or ask the instructor whether a broader version can be provided?", source(U, "Permission to Record Classroom Lectures and Discussions", "https://sds.utk.edu/permission-to-record-classroom-lectures-and-discussions/")),
-    entry("The parent who pays", "A parent who pays most of a student's tuition asks the university for access to the student's grades. The student is legally an adult and has asked for privacy, but the parent says financial support should include the right to know whether the student is passing. Should the university disclose the records, refuse, or ask the student and parent to agree on limited information?", source(O, "Can parents view a child's post-secondary education record?", "https://studentprivacy.ed.gov/faq/can-parents-view-childs-post-secondary-education-record")),
-    entry("The research assistant's side job", "A professor offers you paid work for a private project related to your research. The job would provide useful experience and money, but the professor also grades your work and may benefit from your ideas. Should you accept with a written agreement, ask for a neutral supervisor, or refuse to avoid a conflict that could affect your academic progress?", source(U, "Use of Students in Outside Employment", "https://policy.uconn.edu/2011/06/02/use-of-students-in-outside-employment/")),
-    entry("The incomplete study explanation", "A research team recruiting students wants to withhold its exact hypothesis so participants do not change their behavior. The team promises to explain the study afterward and says the risk is minimal, but participants cannot judge whether the undisclosed purpose matters to them. Should the study proceed, disclose the hypothesis and accept noisier results, or redesign the project?", source(O, "The Belmont Report", "https://www.hhs.gov/ohrp/regulations-and-policy/belmont-report/read-the-belmont-report/index.html")),
-]
-
-
-OPTION_SETS = {
-    "The trolley switch": ["Pull the lever", "Do not pull the lever", "Try to warn the people instead"],
-    "The footbridge stranger": ["Push the stranger", "Do not push", "Look for another way even if the five may die"],
-    "Heinz and the unaffordable medicine": ["Steal the medicine", "Do not steal it", "Take it and accept punishment afterward"],
-    "The prisoner's bargain": ["Stay silent", "Testify against the partner", "Refuse to choose without communication"],
-    "The experience machine": ["Connect to the machine", "Stay in ordinary life", "Connect temporarily if leaving remains possible"],
-    "The plank of Carneades": ["Push the other person away", "Share the plank and risk both lives", "Refuse to push and accept the likely outcome"],
-    "The ticking bomb": ["Use torture", "Refuse torture", "Use urgent questioning but no physical abuse"],
-    "The nearby child and the distant child": ["Save the nearby child", "Give the money to distant relief", "Split the sacrifice between both efforts"],
-    "The shared pasture": ["Add another animal", "Choose restraint", "Support a rule that limits everyone equally"],
-    "The ultimatum offer": ["Accept the $2", "Reject the offer", "Accept but explain that it is unfair"],
-    "The veil of ignorance": ["Choose equal outcomes", "Allow unequal rewards with a safety net", "Maximize total prosperity", "Choose the rules you would want if vulnerable"],
-    "The crowded lifeboat": ["Use a lottery", "Prioritize those in greatest need", "Prioritize those most able to help keep the boat afloat", "Keep the boat closed"],
-    "Obedience in the laboratory": ["Continue as instructed", "Refuse immediately", "Ask for independent confirmation before continuing"],
-    "The invisible ring": ["Use it for personal gain", "Use it only to expose wrongdoing", "Never use it to affect others", "Use it secretly to rescue someone"],
-    "The bomber and the civilians": ["Authorize the raid", "Cancel the raid", "Delay for a more precise weapon"],
-    "The child who would otherwise not exist": ["Have the child now", "Wait for the healthier-child option", "Leave the choice to chance"],
-    "The impossible choice": ["Choose one child", "Refuse to choose", "Try to deceive or resist the authority"],
-    "The good place and the suffering child": ["Accept the bargain", "Leave the city", "Work to end the bargain even if everyone suffers", "Stay and secretly help the child"],
-    "Political dirty hands": ["Authorize the secret operation", "Refuse and keep the promise", "Authorize it only with later public accountability"],
-    "The repugnant population": ["Choose the larger population", "Choose the smaller population with better lives", "Reject the comparison as morally inadequate"],
-    "Who is accountable for the autonomous car?": ["Hold the safety driver responsible", "Hold the company and developers responsible", "Hold the regulator responsible", "Treat it as shared responsibility"],
-    "The family DNA database": ["Allow the law-enforcement search", "Require the customer's permission", "Allow searches only with a court order", "Ban the use of relatives' matches"],
-    "The file-sharing shortcut": ["Download the music", "Pay for an authorized copy", "Use the service only if artists are compensated", "Do not use it"],
-    "The Daraprim price decision": ["Keep the price", "Lower the price", "Keep the price but fund patient assistance", "Ask regulators to intervene"],
-    "The EpiPen price": ["Keep the current price", "Lower the price", "Use subsidies or discounts for schools and families", "Leave access to public policy"],
-    "The Theranos promise": ["Disclose the doubts immediately", "Continue while gathering more evidence", "Stop patient testing until validated", "Keep the claims private to protect the company"],
-    "The breach of credit data": ["Disclose immediately", "Wait until the scope is confirmed", "Notify affected people first and explain later", "Offer protection without public disclosure"],
-    "The emissions defeat device": ["Disclose and recall the vehicles", "Keep selling while fixing the software", "Argue that passing the test is sufficient", "Ask regulators for a new test"],
-    "The champion who doped": ["Use the drugs", "Compete clean even at a disadvantage", "Disclose the widespread use and seek a new standard", "Leave the sport"],
-    "The donor's mistaken gift": ["Correct the donor and return the gift", "Keep the gift and say nothing", "Keep it only after making the misunderstanding clear", "Ask an independent board to decide"],
-    "Snowden's disclosure": ["Release the documents", "Use internal channels only", "Release a limited set after redaction", "Keep the material classified"],
-    "The Ebola intervention": ["Send military support", "Use only civilian responders", "Send logistics support under local civilian leadership", "Wait for local authorities to request help"],
-    "Prenatal diagnosis and choice": ["Continue the pregnancy", "End the pregnancy", "Seek more information and support before deciding", "Let the decision turn on the parents' capacity and wishes"],
-    "A clinician's personal objection": ["Provide the service", "Arrange a prompt transfer", "Refuse the service", "Ask the client what transfer would preserve access"],
-    "The DNA research conflict": ["Publish with full disclosure", "Withdraw the study", "Commission independent review", "Publish only after separating the professor from the analysis"],
-    "The reporter's poll": ["Publish the poll as news", "Disclose the conflict", "Stop covering the poll", "Separate the polling and reporting teams"],
-    "The athlete's cover image": ["Use the marketable image", "Use an athletic-action image", "Let the athlete approve the cover", "Publish the profile without a cover portrait"],
-    "Dr. V's magical putter": ["Publish the personal details", "Honor the agreement and omit them", "Publish only details relevant to the product claims", "Drop the story"],
-    "The cyber-harassment response": ["Respond publicly", "Use formal disciplinary channels", "Ask for a private correction", "Say nothing"],
-    "The fracking study disclosure": ["Publish with the conflict disclosed", "Commission a new independent study", "Retract the study", "Publish only the data and remove the professor's interpretation"],
-    "The midnight roommate": ["Ask the roommate to change their routine", "Use another place to sleep or study", "Ask a resident adviser to mediate", "Agree on quiet hours and a compromise"],
-    "The unannounced guest": ["Insist on advance notice", "Tolerate the visits", "Propose a guest rule that applies equally", "Ask housing staff to intervene"],
-    "The borrowed groceries": ["Lock up your food", "Confront the roommate", "Keep sharing without tracking every item", "Set a repayment and shared-supplies agreement"],
-    "The free-riding teammate": ["Report the unequal work", "Give everyone the same grade", "Ask for an extension", "Describe the circumstances and contributions honestly"],
-    "The club initiation": ["Participate", "Ask the group to change the ritual", "Refuse but stay in the organization", "Report the ritual"],
-    "The resident assistant's report": ["Report what you know", "Investigate informally first", "Give the club one chance to address it", "Ask the affected students what response they want"],
-    "The friend who refuses help": ["Keep the confidence", "Encourage counseling while staying involved", "Contact a counselor for guidance", "Call for urgent help if the risk worsens"],
-    "The urgent text": ["Call emergency services", "Contact a trusted person nearby", "Keep trying to reach the friend first", "Wait and respect the request for privacy"],
-    "The accommodation disclosure": ["Say nothing", "Encourage the student to explain if they choose", "Say accommodations are handled privately", "Tell the classmate the accommodation details"],
-    "The recorded lecture": ["Share the recording", "Refuse to share it", "Ask the instructor for an approved copy", "Share only notes you wrote yourself"],
-    "The parent who pays": ["Disclose the records", "Refuse without the student's consent", "Ask the student and parent to agree on limited information", "Share only whether the student is enrolled"],
-    "The research assistant's side job": ["Accept with a written agreement", "Ask for a neutral supervisor", "Refuse the work", "Accept only after disclosing the conflict"],
-    "The incomplete study explanation": ["Proceed with limited disclosure and debriefing", "Disclose the hypothesis", "Redesign the study", "Do not enroll anyone until the risks are fully explained"],
+SITTING_DOWN = {
+    "type": "inspiration",
+    "title": "Extreme Hypothetical Moral Dilemma Questions",
+    "url": "https://areyousittingdown.games/blogs/questions/extreme-hypothetical-moral-dilemma-questions",
+}
+PARADE = {
+    "type": "inspiration",
+    "title": "250 Best Would You Rather Questions",
+    "url": "https://parade.com/964027/parade/would-you-rather-questions/",
+}
+REDDIT = {
+    "type": "community_inspiration",
+    "title": "r/WouldYouRather",
+    "url": "https://www.reddit.com/r/WouldYouRather/",
 }
 
 
+def entry(theme: str, text: str, options: list[str], citation: dict[str, str]) -> dict:
+    return {
+        "id": "",
+        "theme": theme,
+        "text": text,
+        "options": options,
+        "source": citation,
+    }
+
+
+def reddit_source(title: str, path: str) -> dict[str, str]:
+    return {
+        "type": "community_inspiration",
+        "title": title,
+        "url": f"https://www.reddit.com/r/WouldYouRather/comments/{path}",
+    }
+
+
+CATALOG = [
+    # Social and slightly uncomfortable: adapted into new, lighter scenarios
+    # from Are You Sitting Down?'s public dilemma list.
+    entry(
+        "The parking-lot dent",
+        "You scrape a parked car in an empty lot. The mark is noticeable, nobody saw it, and leaving your details could cost most of your savings. What do you do?",
+        ["Leave a note with your details", "Wait nearby for the owner", "Drive away", "Leave cash but no name"],
+        SITTING_DOWN,
+    ),
+    entry(
+        "The old confession",
+        "Your closest friend admits they stole something valuable years ago. Nobody was hurt, the owner was quietly repaid, and your friend has changed. Do you tell anyone?",
+        ["Keep the confidence", "Encourage them to confess", "Tell the owner yourself", "Ask for more context first"],
+        SITTING_DOWN,
+    ),
+    entry(
+        "The sibling's secret",
+        "Your sibling admits they told a major lie to their partner. Revealing it could end the relationship; keeping it makes you part of the secret. What is your move?",
+        ["Keep the secret", "Give them a deadline to confess", "Tell their partner", "Refuse to get involved"],
+        SITTING_DOWN,
+    ),
+    entry(
+        "The suspicious reviews",
+        "Your boss asks you to hide honest one-star reviews before a product launch. It is legal, your team needs the launch, and refusing may cost your job. What do you do?",
+        ["Hide the reviews", "Refuse", "Escalate it inside the company", "Warn customers anonymously"],
+        SITTING_DOWN,
+    ),
+    entry(
+        "The unwanted warning",
+        "A friend is about to make a huge life choice that you think will go badly. They are excited and have not asked for advice. Do you step in?",
+        ["Say exactly what you think", "Ask if they want your honest view", "Stay quiet", "Talk to someone close to them"],
+        SITTING_DOWN,
+    ),
+    entry(
+        "The terrible audition",
+        "Your friend asks if they are ready for an important audition tomorrow. They are not, but brutal honesty might wreck their confidence. What do you say?",
+        ["Be completely honest", "Give gentle, specific feedback", "Build their confidence", "Avoid answering"],
+        SITTING_DOWN,
+    ),
+    entry(
+        "One hour of mind-reading",
+        "You may hear one person's unfiltered thoughts for an hour. They will never know unless you tell them. How do you use it?",
+        ["Choose someone close to me", "Choose someone powerful", "Choose a stranger", "Refuse the power"],
+        SITTING_DOWN,
+    ),
+    entry(
+        "Invisible until midnight",
+        "You are completely invisible and untraceable until midnight. You cannot extend it. What kind of day do you have?",
+        ["Secretly help people", "Snoop somewhere forbidden", "Pull harmless pranks", "Stay home until it wears off"],
+        SITTING_DOWN,
+    ),
+    entry(
+        "The memory eraser",
+        "You can make one person forget every memory involving you. Your own memories remain. Would you use it?",
+        ["On an ex", "On someone I hurt", "On someone who hurt me", "I would not use it"],
+        SITTING_DOWN,
+    ),
+    entry(
+        "The sealed envelope",
+        "An envelope contains the exact date and cause of your death. The prediction cannot be changed. Do you open it?",
+        ["Open it immediately", "Save it for later", "Let someone else decide", "Destroy it unopened"],
+        SITTING_DOWN,
+    ),
+    entry(
+        "A warning from future you",
+        "Your future self appears for ten seconds and says only, “Cancel tomorrow.” You have several plans and no other clues. What do you cancel?",
+        ["Everything", "Only the biggest plan", "Nothing", "Ask everyone else to cancel too"],
+        SITTING_DOWN,
+    ),
+    entry(
+        "Your pet finally talks",
+        "Your pet suddenly speaks perfect English and says, “We need to discuss what you do when you think you're alone.” What is your first response?",
+        ["Ask what they saw", "Offer a bribe", "Change the subject", "Start recording"],
+        SITTING_DOWN,
+    ),
+
+    # Quick, clean tradeoffs inspired by Parade's public Would You Rather list.
+    entry(
+        "A glimpse ahead",
+        "Would you rather see a few minutes into your own future or get one brief look at the world a century from now?",
+        ["See ten minutes ahead", "See a century ahead", "Take neither"],
+        PARADE,
+    ),
+    entry(
+        "Every song is a command",
+        "For one year, every song you hear forces a reaction. Which curse do you take?",
+        ["Sing along every time", "Dance every time", "Avoid music for the year"],
+        PARADE,
+    ),
+    entry(
+        "Love or the jackpot",
+        "Choose one guaranteed outcome: meet the love of your life today, or win a life-changing lottery next year.",
+        ["Meet true love today", "Win the lottery next year", "Leave both to chance"],
+        PARADE,
+    ),
+    entry(
+        "Nothing stays private",
+        "One part of your private life becomes available to everyone you know. Which do you expose?",
+        ["My unfiltered thoughts", "My complete browsing history", "My camera roll", "My spending history"],
+        PARADE,
+    ),
+    entry(
+        "Respect or influence",
+        "You can be admired by everyone but have no special authority, or gain enormous influence while nobody personally respects you.",
+        ["Universal respect", "Enormous influence", "A little of both", "Neither"],
+        PARADE,
+    ),
+    entry(
+        "The household upgrade",
+        "You receive one free household service for life. Which improves your life most?",
+        ["A personal chef", "A daily cleaner", "A personal assistant", "Free repairs forever"],
+        PARADE,
+    ),
+    entry(
+        "Your movie career",
+        "Pick your one appearance in movie history.",
+        ["A tiny role in a beloved classic", "The lead in a legendary flop", "A stunt double in an action hit", "A voice in an animated cult favorite"],
+        PARADE,
+    ),
+    entry(
+        "The punctuality curse",
+        "For the rest of your life, you can never arrive exactly on time. Which way are you cursed?",
+        ["Always ten minutes late", "Always twenty minutes early", "A random one each day"],
+        PARADE,
+    ),
+    entry(
+        "Pause or rewind",
+        "You get one remote control button for your life. It works once per day, but only for you.",
+        ["Pause for ten minutes", "Rewind one minute", "Fast-forward one boring hour", "Mute one person for five minutes"],
+        PARADE,
+    ),
+    entry(
+        "Words or whispers",
+        "Choose one social superpower, with no way to turn it off.",
+        ["Take back anything I say", "Hear every conversation about me", "Know whenever someone lies to me"],
+        PARADE,
+    ),
+    entry(
+        "Wear your truth",
+        "Your body must reveal something personal to everyone who sees you. Which version do you choose?",
+        ["Skin color shows my mood", "Temporary tattoos show yesterday's actions", "A subtitle shows my current thought"],
+        PARADE,
+    ),
+    entry(
+        "The unusual talent",
+        "Which career sounds better?",
+        ["World's best at something silly", "Solidly average at something prestigious", "Great at something nobody knows I do"],
+        PARADE,
+    ),
+    entry(
+        "A year away",
+        "You may either travel anywhere for a year with every basic expense covered, or stay home and receive a large cash payment.",
+        ["Travel for free for a year", "Take $50,000", "Split it into six months and $25,000"],
+        PARADE,
+    ),
+    entry(
+        "Daily friction remover",
+        "Which tiny inconvenience disappears from your life forever?",
+        ["Every traffic light is green", "I never wait in a line", "My devices never need charging", "I always find parking"],
+        PARADE,
+    ),
+    entry(
+        "Wishes on delay",
+        "A wish service offers two plans. Which contract do you sign?",
+        ["One wish granted today", "Ten wishes granted in twenty years", "No wishes with hidden fine print"],
+        PARADE,
+    ),
+    entry(
+        "A universal translator",
+        "You can understand and speak with one enormous group. Who gets included?",
+        ["Every human language", "Every animal", "Every computer system", "Every version of myself in the multiverse"],
+        PARADE,
+    ),
+
+    # Community-inspired prompts: new combinations based on the playful,
+    # constraint-heavy style found on r/WouldYouRather.
+    entry(
+        "Your next fictional universe",
+        "You must spend a year inside either the last video game you played or the last movie or series you watched. You keep your real-world abilities.",
+        ["The video-game universe", "The movie or series universe", "Let a coin choose"],
+        reddit_source("Last game or last show universe", "1uy8g4p"),
+    ),
+    entry(
+        "Truth without a voice",
+        "Pick a power: know the truth behind any question but never explain what you learned, or make anyone believe one claim per day even when it is false.",
+        ["Know any truth but stay silent", "Make one claim believed each day", "Refuse both"],
+        reddit_source("Truth or persuasion", "1k9vogw"),
+    ),
+    entry(
+        "A power with baggage",
+        "Choose one impressive power and accept its permanent drawback.",
+        ["Flight, but with enormous visible wings", "Teleportation, but three trips a year go somewhere random", "Super speed, but stopping is difficult", "Strength, but I become unusually fragile"],
+        reddit_source("Balanced superpowers", "16d0jqw"),
+    ),
+    entry(
+        "Overpowered in the past",
+        "You become incredibly strong, fast, and hard to injure, but must live out your life in one historical setting with no trip home.",
+        ["Ancient Egypt", "Ancient Rome", "Medieval Scotland", "Keep my normal life and no powers"],
+        reddit_source("Powers in another era", "nevts5"),
+    ),
+    entry(
+        "The internet becomes real",
+        "Choose your strange new reality.",
+        ["Every hypothetical I answer comes true", "I may borrow one ridiculous minor power each month", "The internet stays fictional"],
+        reddit_source("Would You Rather answers become real", "17cpl47"),
+    ),
+    entry(
+        "Mystery power or safe pick",
+        "A machine offers either a random major superpower or one useful but modest ability you choose in advance.",
+        ["Take the random major power", "Always know when someone is bluffing", "Fix any object I own", "Never need sleep"],
+        REDDIT,
+    ),
+    entry(
+        "Pick a perk",
+        "You may install exactly one upgrade. Which would improve your life the most?",
+        ["Instant repairs", "Perfect social timing", "Change my appearance at will", "Travel to places I have photographed", "Read nearby minds", "Heal much faster"],
+        reddit_source("Choose three perks", "1kj2z3k"),
+    ),
+    entry(
+        "Independent clones",
+        "You can create up to five copies of yourself. They share your memories at creation but immediately gain free will. Do you take the ability?",
+        ["Yes, and treat them as equals", "Yes, but create only one", "Yes, only for emergencies", "No—too complicated"],
+        reddit_source("Minor superpowers", "15o2hmp"),
+    ),
+    entry(
+        "The delayed fortune",
+        "You can receive enough money to change your life now, or an absurd fortune after a long wait. Both are guaranteed and tax-free.",
+        ["$1 million today", "$1 billion in fifteen years", "Give the choice to my future self"],
+        REDDIT,
+    ),
+    entry(
+        "Fast travel rules",
+        "You may teleport only to places where you personally took a photo. One accidental background photo counts. What is your first strategy?",
+        ["Build a worldwide photo map", "Keep it to places I trust", "Sell trips to other people", "Decline the power"],
+        REDDIT,
+    ),
+    entry(
+        "One room knows",
+        "Whenever you enter a room, you may instantly become either its funniest person or its smartest person—but everyone knows you used a power.",
+        ["Always choose funniest", "Always choose smartest", "Choose based on the room", "Never use it"],
+        REDDIT,
+    ),
+    entry(
+        "The tiny luck budget",
+        "Once a day, you can make one unlikely event slightly more likely. The unused luck never carries over. What gets most of your boosts?",
+        ["Money and work", "Friends and relationships", "Travel and adventures", "Helping strangers"],
+        REDDIT,
+    ),
+]
+
+
 def main() -> None:
-    all_entries = CATALOG + COLLEGE_ENTRIES
     seen_themes: set[str] = set()
     seen_texts: set[str] = set()
-    for number, item in enumerate(all_entries, start=1):
-        item["id"] = f"sourced-{number:04d}"
-        options = OPTION_SETS.get(item["theme"])
-        if not options or len(options) < 2 or len(set(options)) != len(options):
+    for number, item in enumerate(CATALOG, start=1):
+        item["id"] = f"dilemma-{number:04d}"
+        if len(item["options"]) < 2 or len(set(item["options"])) != len(item["options"]):
             raise ValueError(f"missing or duplicate options for {item['theme']}")
-        item["options"] = options
         if item["theme"] in seen_themes or item["text"] in seen_texts:
             raise ValueError(f"duplicate dilemma at {number}")
         seen_themes.add(item["theme"])
         seen_texts.add(item["text"])
         if not item["source"].get("url"):
             raise ValueError(f"missing source URL at {number}")
-    OUTPUT.write_text(json.dumps(all_entries, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    print(f"wrote {len(all_entries)} sourced dilemmas to {OUTPUT}")
+    OUTPUT.write_text(json.dumps(CATALOG, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    print(f"wrote {len(CATALOG)} source-inspired dilemmas to {OUTPUT}")
 
 
 if __name__ == "__main__":

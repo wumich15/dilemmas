@@ -21,6 +21,15 @@ test("the catalog has stable ids, text, and source metadata", () => {
   assert.equal(sourced.length, CATALOG.length);
 });
 
+test("the catalog only contains concise prompts from game-question sources", () => {
+  assert.ok(CATALOG.length >= 40);
+  for (const entry of CATALOG) {
+    assert.ok(["inspiration", "community_inspiration"].includes(entry.source.type));
+    assert.ok(entry.text.length <= 260);
+  }
+  assert.equal(CATALOG.some((entry) => /hazing/i.test(entry.theme + entry.text + entry.source.url)), false);
+});
+
 test("singleplayer skips dilemmas this user has already seen", () => {
   const history = new Map(ids.slice(0, 15).map((id, i) => [id, i]));
   const queue = pickSingleplayerQueue(ids, history, 25);

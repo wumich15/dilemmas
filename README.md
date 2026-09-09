@@ -1,6 +1,6 @@
-# moral dilemma
+# dilemmas
 
-A minimal moral-dilemma game: singleplayer prompts, and multiplayer rooms where
+A minimal dilemma game: singleplayer prompts, and multiplayer rooms where
 the host chooses free response or multiple-choice play. Free-response rooms can
 reveal authors or keep them anonymous; multiple-choice rooms show aggregate
 percentages.
@@ -87,10 +87,10 @@ least-seen candidates from that list. Nobody reads anyone's history.
 
 ## Dilemmas
 
-`dilemmas.json` is the 53-entry catalog: `{ id, theme, text, options, source }`. Every
-entry is source-backed and includes a citation URL; the final 14 entries form a
-student-life pack covering roommates, group work, friendships, accessibility,
-privacy, and student employment. Regenerate it with
+`dilemmas.json` is the 40-entry catalog: `{ id, theme, text, options, source }`. Every
+entry is a concise, game-focused adaptation and includes its inspiration URL. The
+mix covers social scenarios, playful tradeoffs, and imaginative hypotheticals.
+Regenerate it with
 `python3 tools/generate_dilemmas.py`, or replace the file — nothing scrapes or
 generates dilemmas at runtime.
 

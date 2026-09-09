@@ -38,7 +38,7 @@ export function playerName(user) {
   return user.displayName || (user.email || "player").split("@")[0];
 }
 
-export async function createRoom(user, mode = "free-response", anonymous = true) {
+export async function createRoom(user, mode = "free-response", anonymous = true, totalRounds = 3) {
   for (let attempt = 0; attempt < 5; attempt += 1) {
     const code = randomCode();
     const existing = await getDoc(roomRef(code));
@@ -46,7 +46,7 @@ export async function createRoom(user, mode = "free-response", anonymous = true)
     await setDoc(roomRef(code), {
       hostUid: user.uid,
       status: "lobby",
-      totalRounds: 3,
+      totalRounds,
       currentRound: 0,
       candidates: [],
       dilemmaIds: [],

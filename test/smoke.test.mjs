@@ -43,7 +43,8 @@ before(async () => {
     if (message.type() === "error" && !/favicon/i.test(url)) consoleErrors.push(message.text() + " " + url);
   });
   page.on("pageerror", (error) => consoleErrors.push(String(error)));
-  await page.goto(origin, { waitUntil: "networkidle0" });
+  await page.goto(origin, { waitUntil: "domcontentloaded" });
+  await page.waitForFunction(() => Boolean(document.documentElement.dataset.theme));
 });
 
 after(async () => {
@@ -53,11 +54,16 @@ after(async () => {
 
 const text = (selector) => page.$eval(selector, (node) => node.textContent.trim());
 
-test("the landing page shows the name and only the three buttons", async () => {
-  assert.equal(await page.title(), "moral dilemma");
-  assert.equal(await text("h1"), "moral dilemma");
+test("the landing page centers the name and play actions with sign-in at the top", async () => {
+  assert.equal(await page.title(), "moral dilemmas");
+  assert.equal(await text("h1"), "moral dilemmas");
   const labels = await page.$$eval("#view-home button", (nodes) => nodes.map((n) => n.textContent.trim()));
-  assert.deepEqual(labels, ["Singleplayer", "Sign in / Sign up", "Create / Join a room"]);
+  assert.deepEqual(labels, ["Singleplayer", "Play"]);
+  assert.equal(await text("#btn-auth"), "Sign in");
+  const alignment = await page.$eval("h1", (node) => getComputedStyle(node).textAlign);
+  assert.equal(alignment, "center");
+  const homeAlignment = await page.$eval("#view-home", (node) => getComputedStyle(node).alignItems);
+  assert.equal(homeAlignment, "center");
   const font = await page.$eval("body", (node) => getComputedStyle(node).fontFamily);
   assert.match(font, /Times New Roman/);
 });
@@ -68,7 +74,8 @@ test("the dark mode toggle switches and persists", async () => {
   assert.equal(await page.$eval("html", (node) => node.dataset.theme), "dark");
   const background = await page.$eval("body", (node) => getComputedStyle(node).backgroundColor);
   assert.equal(background, "rgb(17, 17, 17)");
-  await page.reload({ waitUntil: "networkidle0" });
+  await page.reload({ waitUntil: "domcontentloaded" });
+  await page.waitForFunction(() => Boolean(document.documentElement.dataset.theme));
   assert.equal(await page.$eval("html", (node) => node.dataset.theme), "dark");
   await page.click("#theme-toggle");
 });
@@ -107,6 +114,7 @@ test("singleplayer multiple-choice shows catalog options", async () => {
   const entry = catalog.find((item) => item.text === first);
   const labels = await page.$$eval("#single-options label", (nodes) => nodes.map((node) => node.textContent.trim()));
   assert.deepEqual(labels, entry.options);
+  assert.equal(await page.$eval("#single-options fieldset", (node) => node.className), "choice-list");
   await page.click("#single-options input");
   await page.click("#single-form button");
   assert.notEqual(await text("#single-dilemma"), first);

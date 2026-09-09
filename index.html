@@ -3,21 +3,23 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>moral dilemma</title>
+<title>moral dilemmas</title>
 <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-<button id="theme-toggle" type="button">dark</button>
+<body data-view="home">
+<header class="site-header" aria-label="Site controls">
+  <button id="btn-auth" class="utility-button" type="button">Sign in</button>
+  <button id="theme-toggle" class="utility-button" type="button">Dark</button>
+</header>
 
 <main>
-  <h1>moral dilemma</h1>
+  <h1>moral dilemmas</h1>
   <p id="global-error" class="error" hidden></p>
 
   <!-- home -->
   <section id="view-home" class="view">
     <button id="btn-singleplayer" type="button">Singleplayer</button>
-    <button id="btn-auth" type="button">Sign in / Sign up</button>
-    <button id="btn-rooms" type="button">Create / Join a room</button>
+    <button id="btn-rooms" type="button">Play</button>
   </section>
 
   <!-- auth -->

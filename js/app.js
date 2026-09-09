@@ -20,7 +20,7 @@ const el = (tag, text) => {
 const themeButton = $("theme-toggle");
 function applyTheme(theme) {
   document.documentElement.dataset.theme = theme;
-  themeButton.textContent = theme === "dark" ? "light" : "dark";
+  themeButton.textContent = theme === "dark" ? "Light" : "Dark";
   try { localStorage.setItem("theme", theme); } catch {}
 }
 themeButton.addEventListener("click", () => {
@@ -34,6 +34,7 @@ applyTheme(savedTheme);
 function showView(name) {
   for (const view of document.querySelectorAll(".view")) view.hidden = true;
   $("view-" + name).hidden = false;
+  document.body.dataset.view = name;
 }
 for (const button of document.querySelectorAll("[data-back]")) {
   button.addEventListener("click", () => showView("home"));
@@ -103,6 +104,7 @@ if (catalogError) setError("global-error", "Could not load dilemmas.json: " + ca
 if (isConfigured) {
   onAuthStateChanged(auth, async (user) => {
     state.user = user;
+    $("btn-auth").textContent = user ? "Account" : "Sign in";
     $("auth-signed-out").hidden = !!user;
     $("auth-signed-in").hidden = !user;
     $("auth-who").textContent = user ? "Signed in as " + user.email : "";
@@ -589,15 +591,17 @@ function renderChoiceAnswer(body, round, players) {
   }
   const options = round.options || optionsFor(round.dilemmaId);
   const fieldset = document.createElement("fieldset");
+  fieldset.className = "choice-list";
   fieldset.append(el("legend", "Choose one"));
   options.forEach((option, index) => {
     const label = document.createElement("label");
+    label.className = "choice-option";
     const radio = document.createElement("input");
     radio.type = "radio";
     radio.name = "round-choice";
     radio.value = String(index);
-    label.append(radio, " ", option);
-    fieldset.append(label, document.createElement("br"));
+    label.append(radio, el("span", option));
+    fieldset.append(label);
   });
   const submit = el("button", "Submit choice");
   submit.type = "button";
@@ -751,16 +755,18 @@ function renderSingle() {
     $("single-response").hidden = true;
     $("single-response").required = false;
     const fieldset = document.createElement("fieldset");
+    fieldset.className = "choice-list";
     fieldset.append(el("legend", "Choose one"));
     options.hidden = false;
     optionsFor(id).forEach((option, index) => {
       const label = document.createElement("label");
+      label.className = "choice-option";
       const radio = document.createElement("input");
       radio.type = "radio";
       radio.name = "single-choice";
       radio.value = String(index);
-      label.append(radio, " ", option);
-      fieldset.append(label, document.createElement("br"));
+      label.append(radio, el("span", option));
+      fieldset.append(label);
     });
     options.append(fieldset);
   } else {

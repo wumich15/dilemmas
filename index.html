@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>moral dilemma</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<button id="theme-toggle" type="button">dark</button>
+
+<main>
+  <h1>moral dilemma</h1>
+  <p id="global-error" class="error" hidden></p>
+
+  <!-- home -->
+  <section id="view-home" class="view">
+    <button id="btn-singleplayer" type="button">Singleplayer</button>
+    <button id="btn-auth" type="button">Sign in / Sign up</button>
+    <button id="btn-rooms" type="button">Create / Join a room</button>
+  </section>
+
+  <!-- auth -->
+  <section id="view-auth" class="view" hidden>
+    <div id="auth-signed-out">
+      <form id="auth-form">
+        <input id="auth-name" type="text" placeholder="Name" autocomplete="nickname">
+        <input id="auth-email" type="email" placeholder="Email" autocomplete="email" required>
+        <input id="auth-password" type="password" placeholder="Password" autocomplete="current-password" required>
+        <button id="btn-signin" type="submit">Sign in</button>
+        <button id="btn-signup" type="button">Sign up</button>
+      </form>
+    </div>
+    <div id="auth-signed-in" hidden>
+      <p id="auth-who"></p>
+      <button id="btn-signout" type="button">Sign out</button>
+    </div>
+    <p id="auth-error" class="error" hidden></p>
+    <button class="back" type="button" data-back>Back</button>
+  </section>
+
+  <!-- create / join -->
+  <section id="view-rooms" class="view" hidden>
+    <button id="btn-create-room" type="button">Create a room</button>
+    <form id="join-form">
+      <input id="join-code" type="text" placeholder="Room code" maxlength="4" autocomplete="off">
+      <button type="submit">Join a room</button>
+    </form>
+    <p id="rooms-error" class="error" hidden></p>
+    <button class="back" type="button" data-back>Back</button>
+  </section>
+
+  <!-- room / game -->
+  <section id="view-room" class="view" hidden>
+    <p id="room-header"></p>
+    <div id="room-body"></div>
+    <p id="room-error" class="error" hidden></p>
+    <button id="btn-leave" type="button">Leave room</button>
+  </section>
+
+  <!-- singleplayer -->
+  <section id="view-single" class="view" hidden>
+    <p id="single-dilemma"></p>
+    <p id="single-source"></p>
+    <form id="single-form">
+      <textarea id="single-response" rows="5" required></textarea>
+      <button type="submit">Next dilemma</button>
+    </form>
+    <button class="back" type="button" data-back>Back</button>
+  </section>
+</main>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,44 @@
+:root {
+  --bg: #ffffff;
+  --fg: #111111;
+  --muted: #555555;
+  --line: #bbbbbb;
+}
+html[data-theme="dark"] {
+  --bg: #111111;
+  --fg: #eeeeee;
+  --muted: #aaaaaa;
+  --line: #555555;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: "Times New Roman", Times, serif;
+  background: var(--bg);
+  color: var(--fg);
+  margin: 0;
+  padding: 2rem 1rem;
+}
+main { max-width: 40rem; margin: 0 auto; }
+h1 { font-weight: normal; font-size: 2rem; margin: 0 0 1.5rem; }
+h2 { font-weight: normal; font-size: 1.2rem; margin: 1.5rem 0 0.5rem; }
+button, input, textarea, select {
+  font-family: inherit;
+  font-size: 1rem;
+  color: var(--fg);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  padding: 0.4rem 0.6rem;
+}
+button { cursor: pointer; }
+button:disabled { color: var(--muted); cursor: default; }
+.view > button, .view > form { display: block; margin: 0.5rem 0; }
+input, textarea { width: 100%; max-width: 24rem; display: block; margin: 0.5rem 0; }
+textarea { max-width: 100%; }
+ol, ul { padding-left: 1.5rem; }
+li { margin: 0.5rem 0; }
+.error { color: #b00020; }
+html[data-theme="dark"] .error { color: #ff8a80; }
+.muted { color: var(--muted); }
+.dilemma { border-left: 2px solid var(--line); padding-left: 0.75rem; }
+#theme-toggle { position: absolute; top: 1rem; right: 1rem; }
+.back { margin-top: 1.5rem; }

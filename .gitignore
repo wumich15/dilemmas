@@ -1,0 +1,13 @@
+# Local Firebase config and the file generated from it
+.env
+.env.*
+!.env.example
+js/config.js
+
+# Tooling
+node_modules/
+.firebase/
+*.log
+
+# macOS
+.DS_Store

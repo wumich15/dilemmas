@@ -25,9 +25,27 @@ export const submittedRef = (code, n) => sub(code, n, "submitted");
 const choiceRef = (code, n, uid) => doc(db, "rooms", code, "rounds", String(n), "choices", uid);
 export const poolRef = (code) => collection(db, "rooms", code, "pool");
 export const contribRef = (code) => collection(db, "rooms", code, "contrib");
+const guestCounterRef = (code) => doc(db, "rooms", code, "guestNames", "counter");
 
 export function playerName(user) {
-  return user.displayName || (user.email || "player").split("@")[0];
+  // Guest usernames are display-only and intentionally do not need to be
+  // unique. Anonymous users without one get a simple fallback name.
+  return user.displayName || (user.isAnonymous ? "Guest" : (user.email || "player").split("@")[0]);
+}
+
+async function nextGuestName(code) {
+  const number = await runTransaction(db, async (transaction) => {
+    const ref = guestCounterRef(code);
+    const snap = await transaction.get(ref);
+    if (!snap.exists()) {
+      transaction.set(ref, { next: 2 });
+      return 1;
+    }
+    const next = Number(snap.data().next) || 1;
+    transaction.update(ref, { next: next + 1 });
+    return next;
+  });
+  return `Guest (${number})`;
 }
 
 export async function createRoom(user, totalRounds = 3) {
@@ -51,8 +69,11 @@ export async function createRoom(user, totalRounds = 3) {
 }
 
 export async function addPlayer(code, user) {
+  const name = user.isAnonymous && !user.displayName
+    ? await nextGuestName(code)
+    : playerName(user);
   await setDoc(playerRef(code, user.uid), {
-    name: playerName(user),
+    name,
     score: 0,
     roundScores: {},
     joinedAt: serverTimestamp(),

@@ -7,7 +7,7 @@ import * as mp from "./multiplayer.js";
 import * as history from "./history.js";
 import { catalogIds, catalogError, textFor, optionsFor, sourceFor } from "./catalog.js";
 import { pickSingleplayerQueue } from "./selection.js";
-import { pointsForChoice, tallyChoices } from "./scoring.js";
+import { pointsForChoice } from "./scoring.js";
 import * as globalStats from "./stats.js";
 
 const $ = (id) => document.getElementById(id);
@@ -356,7 +356,14 @@ function enterRoom(code) {
 }
 
 function roomFailed(error) {
-  setError("room-error", error.message);
+  setError("room-error", roomErrorMessage(error));
+}
+
+function roomErrorMessage(error) {
+  if (error?.code === "permission-denied" || /missing or insufficient permissions/i.test(error?.message || "")) {
+    return "Room access was lost. Leave the room and join again.";
+  }
+  return error?.message || "Something went wrong in this room.";
 }
 
 function watchRoundStats(round) {
@@ -384,7 +391,6 @@ function watchRound(code, n) {
         state.choices = choiceSnap.docs.map((d) => ({ player: d.id, ...d.data() }));
         update();
       }, roomFailed);
-      mp.myChoice(code, n, state.user.uid).then((choice) => { state.myChoice = choice; update(); }).catch(() => {});
     }
     update();
   }, roomFailed));
@@ -404,7 +410,7 @@ async function hostTick() {
     if (state.contrib.length < players.length || players.length === 0) return;
     hostBusy = true;
     try { await mp.finalizeSelection(code, room); }
-    catch (error) { setError("room-error", error.message); }
+    catch (error) { setError("room-error", roomErrorMessage(error)); }
     finally { hostBusy = false; }
     return;
   }
@@ -415,23 +421,25 @@ async function hostTick() {
       await mp.showResults(code, roundNumber);
     }
   } catch (error) {
-    setError("room-error", error.message);
+    setError("room-error", roomErrorMessage(error));
   } finally {
     hostBusy = false;
   }
 }
 
 async function scoreTick() {
-  const { code, round, roundNumber, players, choices, myChoice, user } = state;
+  const { code, round, roundNumber, players, choices, user } = state;
   if (!round || round.phase !== "results" || state.scoredRound === roundNumber) return;
   // Wait for every choice to arrive locally before calculating the majority.
-  if (players.length === 0 || choices.length < players.length || !Number.isInteger(myChoice)) return;
+  if (players.length === 0 || choices.length < players.length) return;
+  const myChoice = ownRoundChoice();
+  if (!Number.isInteger(myChoice)) return;
   state.scoredRound = roundNumber;
   try {
     await mp.recordScore(code, user.uid, roundNumber, pointsForChoice(myChoice, choices));
   } catch (error) {
     state.scoredRound = 0;
-    setError("room-error", error.message);
+    setError("room-error", roomErrorMessage(error));
   }
 }
 
@@ -448,7 +456,7 @@ async function contributeTick() {
     await mp.contribute(code, user.uid, room.candidates || [], state.history);
   } catch (error) {
     state.contributedTo = null;
-    setError("room-error", error.message);
+    setError("room-error", roomErrorMessage(error));
   }
 }
 
@@ -457,6 +465,11 @@ function historyTick() {
   if (!round || !round.dilemmaId || state.recordedRound === roundNumber) return;
   state.recordedRound = roundNumber;
   recordSeen(round.dilemmaId);
+}
+
+function ownRoundChoice() {
+  if (Number.isInteger(state.myChoice)) return state.myChoice;
+  return state.choices.find((choice) => choice.player === state.user?.uid)?.optionIndex ?? null;
 }
 
 function update() {
@@ -554,7 +567,7 @@ function renderLobby(body, room, players) {
   start.addEventListener("click", async () => {
     start.disabled = true;
     try { await mp.proposeSelection(state.code, room.totalRounds, catalogIds); }
-    catch (error) { setError("room-error", error.message); start.disabled = false; }
+    catch (error) { setError("room-error", roomErrorMessage(error)); start.disabled = false; }
   });
   body.append(start);
   if (players.length < 2) body.append(el("p", "At least two players are needed."));
@@ -607,13 +620,14 @@ function choiceFieldset(options, {
     radio.value = String(index);
     radio.disabled = disabled;
     radio.checked = index === selectedIndex;
-    label.append(radio, el("span", option));
+    const choiceText = el("span", option);
+    choiceText.className = "choice-label-text";
+    label.append(radio, choiceText);
     if (includePercentages) {
       const percentage = globalPercentage(stats, index);
-      const detail = percentage === null
-        ? "Global percentage unavailable"
-        : `${percentage}% globally (${stats.counts.get(index) || 0} of ${stats.total} responses)`;
-      label.append(el("small", detail));
+      const detail = el("span", percentage === null ? "—" : `${percentage}%`);
+      detail.className = "choice-percentage";
+      label.append(detail);
     }
     fieldset.append(label);
   });
@@ -656,7 +670,7 @@ function renderChoiceAnswer(body, round, players) {
       }
       update();
     } catch (error) {
-      setError("room-error", error.message);
+      setError("room-error", roomErrorMessage(error));
       submit.disabled = false;
     }
   });
@@ -666,28 +680,33 @@ function renderChoiceAnswer(body, round, players) {
 function renderChoiceResults(body, round, players) {
   body.append(dilemmaBlock(round), el("h2", "Results"));
   const options = round.options || optionsFor(round.dilemmaId);
-  const counts = tallyChoices(state.choices);
+  const roundKey = String(state.roundNumber);
+  const scoresReady = players.length > 0 && players.every(
+    (player) => Object.prototype.hasOwnProperty.call(player.roundScores || {}, roundKey),
+  );
   const list = el("ol");
   options.forEach((option, index) => {
-    const count = counts.get(index) || 0;
     const item = el("li");
     item.append(el("span", option));
     const percentage = globalPercentage(state.globalStats, index);
-    const roomSummary = `${count} of ${players.length} in this room`;
-    item.append(el("small", showPercentages
-      ? (percentage === null
-        ? `Global percentage unavailable · ${roomSummary}`
-        : `${percentage}% globally (${state.globalStats.counts.get(index) || 0} of ${state.globalStats.total} responses) · ${roomSummary}`)
-      : roomSummary));
+    if (showPercentages) {
+      const detail = el("span", percentage === null ? "—" : `${percentage}%`);
+      detail.className = "choice-percentage";
+      item.append(detail);
+    }
     list.append(item);
   });
   body.append(list);
-  const points = pointsForChoice(state.myChoice, state.choices);
+  const points = pointsForChoice(ownRoundChoice(), state.choices);
   body.append(el("p", "The most common choice earns one point. If the top choice is tied, everyone earns one point."));
   body.append(el("p", `You earned ${points} point${points === 1 ? "" : "s"} this round.`));
-  renderScoreboard(body, players, "Scores");
+  if (scoresReady) renderScoreboard(body, players, "Scores");
   if (!isHost()) {
-    body.append(el("p", "Waiting for the host."));
+    body.append(el("p", scoresReady ? "Waiting for the host." : "Scoring…"));
+    return;
+  }
+  if (!scoresReady) {
+    body.append(el("p", "Scoring…"));
     return;
   }
   const last = state.roundNumber >= state.room.totalRounds;
@@ -696,7 +715,7 @@ function renderChoiceResults(body, round, players) {
   next.addEventListener("click", async () => {
     next.disabled = true;
     try { await mp.nextRound(state.code, state.room); }
-    catch (error) { setError("room-error", error.message); next.disabled = false; }
+    catch (error) { setError("room-error", roomErrorMessage(error)); next.disabled = false; }
   });
   body.append(next);
 }

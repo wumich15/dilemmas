@@ -20,7 +20,8 @@ Build a minimal website for a moral dilemma game. Focus only on the playable MVP
 
 - Use Firebase as the backend.
 - Support email/password sign up, sign in, and sign out with Firebase Authentication.
-- Support anonymous Firebase Authentication so players can choose **Play as guest** for multiplayer. An optional name may be attached to the guest account for the room scoreboard.
+- Support anonymous Firebase Authentication so players can choose **Play as guest** for multiplayer. Guests may enter any optional username for the room scoreboard; usernames are display-only and do not need to be unique.
+- Guests who leave the username blank receive sequential display names such as **Guest (1)** and **Guest (2)** within a room.
 - Also support passwordless email-link sign in. Send a link using the app's current URL, remember only the pending email address in local storage, and complete sign-in when the link returns to the app. If the email is not remembered, ask the user to enter it before completing the link. Clear the remembered address after success or an invalid or expired link.
 - Use Cloud Firestore for rooms, players, rounds, multiple-choice selections, and scores, with live updates for multiplayer.
 - Protect room data and player actions with Firebase Security Rules. Players must not be able to edit other players' choices or scores.

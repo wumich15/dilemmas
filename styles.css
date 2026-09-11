@@ -140,7 +140,7 @@ fieldset label { display: block; margin: 0.5rem 0; }
   margin: -1px;
   opacity: 0;
 }
-.choice-option span {
+.choice-option .choice-label-text {
   display: block;
   width: 100%;
   padding: 0.75rem 0.85rem;
@@ -149,14 +149,14 @@ fieldset label { display: block; margin: 0.5rem 0; }
   background: var(--bg);
   transition: background-color 120ms ease, border-color 120ms ease;
 }
-.choice-option small {
-  display: block;
-  margin: 0.35rem 0.85rem 0;
+.choice-percentage {
+  display: inline-block;
+  margin-left: 0.5rem;
   color: var(--muted);
 }
-.choice-option:hover span { background: var(--soft); border-color: var(--muted); }
-.choice-option input:checked + span { background: var(--soft); border-color: var(--fg); }
-.choice-option input:focus-visible + span { outline: 2px solid var(--fg); outline-offset: 2px; }
+.choice-option:hover .choice-label-text { background: var(--soft); border-color: var(--muted); }
+.choice-option input:checked + .choice-label-text { background: var(--soft); border-color: var(--fg); }
+.choice-option input:focus-visible + .choice-label-text { outline: 2px solid var(--fg); outline-offset: 2px; }
 ol, ul { padding-left: 1.5rem; }
 li { margin: 0.5rem 0; }
 .error { color: #b00020; }
@@ -174,5 +174,5 @@ html[data-theme="dark"] .error { color: #ff8a80; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  button, .choice-option span { transition: none; }
+  button, .choice-label-text { transition: none; }
 }

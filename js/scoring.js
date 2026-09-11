@@ -15,6 +15,7 @@ export function pointsForChoice(optionIndex, choices) {
   const counts = tallyChoices(choices);
   if (counts.size === 0) return 0;
   const highest = Math.max(...counts.values());
-  const winners = [...counts.values()].filter((count) => count === highest).length;
-  return winners > 1 || counts.get(optionIndex) === highest ? 1 : 0;
+  const winners = [...counts.entries()].filter(([, count]) => count === highest);
+  if (winners.length > 1) return 1;
+  return counts.get(optionIndex) === highest ? 1 : 0;
 }

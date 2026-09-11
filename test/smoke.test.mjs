@@ -104,9 +104,9 @@ test("singleplayer shows global percentages after submitting and then moves on",
   );
   assert.equal(await text("#single-dilemma"), first);
   assert.equal(await page.$eval("#single-form button", (node) => node.textContent.trim()), "Next dilemma");
-  const optionDetails = await page.$$eval("#single-options .choice-option small", (nodes) => nodes.map((node) => node.textContent.trim()));
+  const optionDetails = await page.$$eval("#single-options .choice-percentage", (nodes) => nodes.map((node) => node.textContent.trim()));
   assert.equal(optionDetails.length > 0, true);
-  assert.equal(optionDetails.every((detail) => /% globally|unavailable/.test(detail)), true);
+  assert.equal(optionDetails.every((detail) => /%|—/.test(detail)), true);
 
   await page.click("#single-form button");
   const second = await text("#single-dilemma");
@@ -172,6 +172,7 @@ test("rooms need Firebase, and the sign-in view is reachable", async () => {
   assert.equal(await page.$eval("#view-auth", (node) => node.hidden), false);
   assert.equal(await page.$eval("#auth-signed-out", (node) => node.hidden), false);
   assert.equal(await text("#btn-guest"), "Play as guest");
+  assert.match(await page.$eval("#auth-name", (node) => node.placeholder), /Username/);
   assert.equal(await page.$eval("#btn-email-link", (node) => node.textContent.trim()), "Email me a sign-in link");
   assert.equal(await page.$eval("#btn-email-complete", (node) => node.hidden), true);
   await page.click("#view-auth [data-back]");

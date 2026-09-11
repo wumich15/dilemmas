@@ -133,6 +133,23 @@ service cloud.firestore {
         allow update, delete: if false;
       }
 
+      // Anonymous players receive an atomic display-only number. Named
+      // players never use this counter, so duplicate usernames are allowed.
+      match /guestNames/{counterId} {
+        allow read: if signedIn();
+        allow create: if signedIn()
+          && exists(/databases/$(database)/documents/rooms/$(roomId))
+          && counterId == 'counter'
+          && request.resource.data.keys().hasOnly(['next'])
+          && request.resource.data.next == 2;
+        allow update: if signedIn()
+          && exists(/databases/$(database)/documents/rooms/$(roomId))
+          && counterId == 'counter'
+          && request.resource.data.keys().hasOnly(['next'])
+          && request.resource.data.next == resource.data.next + 1;
+        allow delete: if false;
+      }
+
       match /rounds/{roundId} {
         allow read: if isPlayer(roomId);
         allow create, update: if isHost(roomId);

@@ -1,35 +1,20 @@
-// Points per round, by player count.
-export function pointsTable(playerCount) {
-  return playerCount >= 5 ? [3, 2, 1] : [2, 1, 0];
-}
-
-// votes: array of { responseId }. Returns Map responseId -> vote count.
-export function tallyVotes(votes) {
+// Count how many players selected each option.
+export function tallyChoices(choices) {
   const counts = new Map();
-  for (const vote of votes) {
-    if (!vote || !vote.responseId) continue;
-    counts.set(vote.responseId, (counts.get(vote.responseId) || 0) + 1);
+  for (const choice of choices) {
+    if (!choice || !Number.isInteger(choice.optionIndex)) continue;
+    counts.set(choice.optionIndex, (counts.get(choice.optionIndex) || 0) + 1);
   }
   return counts;
 }
 
-// Standard competition ranking: tied answers share a placement and the
-// placements they consume are skipped. Answers with zero votes score nothing.
-export function scoreRound(votes, playerCount) {
-  const counts = tallyVotes(votes);
-  const table = pointsTable(playerCount);
-  const result = new Map();
-  for (const [responseId, count] of counts) {
-    if (count <= 0) continue;
-    let better = 0;
-    for (const other of counts.values()) if (other > count) better += 1;
-    const place = better + 1;
-    result.set(responseId, table[place - 1] ?? 0);
-  }
-  return result;
-}
-
-export function pointsFor(responseId, votes, playerCount) {
-  if (!responseId) return 0;
-  return scoreRound(votes, playerCount).get(responseId) ?? 0;
+// A player gets one point for choosing the unique most common option. If the
+// most common choice is tied, everyone gets one point.
+export function pointsForChoice(optionIndex, choices) {
+  if (!Number.isInteger(optionIndex)) return 0;
+  const counts = tallyChoices(choices);
+  if (counts.size === 0) return 0;
+  const highest = Math.max(...counts.values());
+  const winners = [...counts.values()].filter((count) => count === highest).length;
+  return winners > 1 || counts.get(optionIndex) === highest ? 1 : 0;
 }

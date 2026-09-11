@@ -7,7 +7,7 @@ import * as mp from "./multiplayer.js";
 import * as history from "./history.js";
 import { catalogIds, catalogError, textFor, optionsFor, sourceFor } from "./catalog.js";
 import { pickSingleplayerQueue } from "./selection.js";
-import { pointsFor, tallyVotes } from "./scoring.js";
+import { pointsForChoice, tallyChoices } from "./scoring.js";
 
 const $ = (id) => document.getElementById(id);
 const el = (tag, text) => {
@@ -53,14 +53,10 @@ const state = {
   players: [],
   roundNumber: 0,
   round: null,
-  answers: [],
-  votes: [],
   choices: [],
   submitted: [],
-  myResponseId: null,
   myChoice: null,
   contrib: [],
-  draft: "",
   scoredRound: 0,
   recordedRound: 0,
   contributedTo: null,
@@ -69,19 +65,16 @@ const state = {
 };
 let roomUnsubs = [];
 let roundUnsubs = [];
-let answersUnsub = null;
 let choicesUnsub = null;
 
 function stopRound() {
   roundUnsubs.forEach((fn) => fn());
   roundUnsubs = [];
-  if (answersUnsub) answersUnsub();
-  answersUnsub = null;
   if (choicesUnsub) choicesUnsub();
   choicesUnsub = null;
   Object.assign(state, {
-    round: null, answers: [], votes: [], choices: [], submitted: [],
-    myResponseId: null, myChoice: null, draft: "", scoredRound: 0, recordedRound: 0,
+    round: null, choices: [], submitted: [],
+    myChoice: null, scoredRound: 0, recordedRound: 0,
   });
 }
 function stopRoom() {
@@ -243,9 +236,7 @@ $("btn-rooms").addEventListener("click", () => {
   setError("rooms-error", "");
   if (requireAuth()) showView("rooms");
 });
-$("btn-singleplayer").addEventListener("click", () => showView("single-setup"));
-$("btn-single-free").addEventListener("click", () => { startSingleplayer("free-response"); showView("single"); });
-$("btn-single-choice").addEventListener("click", () => { startSingleplayer("multiple-choice"); showView("single"); });
+$("btn-singleplayer").addEventListener("click", () => { startSingleplayer(); showView("single"); });
 
 /* ---------- create / join ---------- */
 $("btn-create-room").addEventListener("click", async () => {
@@ -256,12 +247,7 @@ $("btn-create-room").addEventListener("click", async () => {
     return setError("rooms-error", "Rounds must be a whole number from 1 to 20.");
   }
   try {
-    enterRoom(await mp.createRoom(
-      state.user,
-      $("create-mode").value,
-      $("create-anonymous").value === "on",
-      totalRounds,
-    ));
+    enterRoom(await mp.createRoom(state.user, totalRounds));
   } catch (error) { setError("rooms-error", error.message); }
 });
 $("join-form").addEventListener("submit", async (event) => {
@@ -315,16 +301,9 @@ function roomFailed(error) {
 function watchRound(code, n) {
   roundUnsubs.push(mp.onSnapshot(mp.roundRef(code, n), (snap) => {
     state.round = snap.exists() ? snap.data() : null;
-    // Answers are only readable once the answering phase is over.
-    if (state.round && state.round.phase !== "answer" && !answersUnsub) {
-      answersUnsub = mp.onSnapshot(mp.answersRef(code, n), (answerSnap) => {
-        state.answers = answerSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
-        update();
-      }, roomFailed);
-    }
     if (state.round && state.round.phase !== "answer" && !choicesUnsub) {
       choicesUnsub = mp.onSnapshot(mp.choicesRef(code, n), (choiceSnap) => {
-        state.choices = choiceSnap.docs.map((d) => ({ voter: d.id, ...d.data() }));
+        state.choices = choiceSnap.docs.map((d) => ({ player: d.id, ...d.data() }));
         update();
       }, roomFailed);
       mp.myChoice(code, n, state.user.uid).then((choice) => { state.myChoice = choice; update(); }).catch(() => {});
@@ -335,18 +314,13 @@ function watchRound(code, n) {
     state.submitted = snap.docs.map((d) => d.id);
     update();
   }, roomFailed));
-  roundUnsubs.push(mp.onSnapshot(mp.votesRef(code, n), (snap) => {
-    state.votes = snap.docs.map((d) => ({ voter: d.id, ...d.data() }));
-    update();
-  }, roomFailed));
-  mp.myResponseId(code, n, state.user.uid).then((id) => { state.myResponseId = id; update(); }).catch(() => {});
 }
 
 let hostBusy = false;
 const isHost = () => state.room && state.user && state.room.hostUid === state.user.uid;
 
 async function hostTick() {
-  const { code, room, round, roundNumber, players, submitted, votes } = state;
+  const { code, room, round, roundNumber, players, submitted } = state;
   if (!isHost() || !room || hostBusy) return;
   if (room.status === "selecting") {
     if (state.contrib.length < players.length || players.length === 0) return;
@@ -360,11 +334,6 @@ async function hostTick() {
   hostBusy = true;
   try {
     if (round.phase === "answer" && players.length > 0 && submitted.length >= players.length) {
-      if (room.mode === "multiple-choice") await mp.showResults(code, roundNumber);
-      else await mp.closeAnswering(code, roundNumber);
-    } else if (room.mode !== "multiple-choice" && round.phase === "reveal") {
-      await mp.revealAnswers(code, roundNumber);
-    } else if (room.mode !== "multiple-choice" && round.phase === "vote" && players.length > 0 && votes.length >= players.length) {
       await mp.showResults(code, roundNumber);
     }
   } catch (error) {
@@ -375,15 +344,13 @@ async function hostTick() {
 }
 
 async function scoreTick() {
-  const { code, round, roundNumber, players, votes, myResponseId, user } = state;
-  if (state.room?.mode === "multiple-choice") return;
+  const { code, round, roundNumber, players, choices, myChoice, user } = state;
   if (!round || round.phase !== "results" || state.scoredRound === roundNumber) return;
-  // Wait for every vote to arrive locally, so the score is not computed from a
-  // partial tally that happened to reach this client first.
-  if (players.length === 0 || votes.length < players.length) return;
+  // Wait for every choice to arrive locally before calculating the majority.
+  if (players.length === 0 || choices.length < players.length || !Number.isInteger(myChoice)) return;
   state.scoredRound = roundNumber;
   try {
-    await mp.recordScore(code, user.uid, roundNumber, pointsFor(myResponseId, votes, players.length));
+    await mp.recordScore(code, user.uid, roundNumber, pointsForChoice(myChoice, choices));
   } catch (error) {
     state.scoredRound = 0;
     setError("room-error", error.message);
@@ -420,30 +387,18 @@ function update() {
   historyTick();
   scoreTick();
   const signature = JSON.stringify([
-    state.room, state.roundNumber, state.contrib.length, state.round, state.myResponseId,
+    state.room, state.roundNumber, state.contrib.length, state.round, state.myChoice,
     state.players.map((p) => [p.uid, p.name, p.score]),
-    state.submitted.length, state.votes.map((v) => [v.voter, v.responseId]),
-    state.choices.map((v) => [v.voter, v.optionIndex]),
-    state.answers.map((a) => a.id),
+    state.submitted.length,
+    state.choices.map((v) => [v.player, v.optionIndex]),
   ]);
   if (signature === state.signature) return;
   state.signature = signature;
   renderRoom();
 }
 
-// Live updates rebuild the room body, so keep the caret where the player left
-// it if they are part-way through typing a response.
 function renderRoom() {
-  const body = $("room-body");
-  const active = document.activeElement;
-  const typing = active && active.tagName === "TEXTAREA" && body.contains(active);
-  const caret = typing ? active.selectionStart : 0;
   renderRoomBody();
-  if (!typing) return;
-  const box = body.querySelector("textarea");
-  if (!box) return;
-  box.focus();
-  box.setSelectionRange(caret, caret);
 }
 
 function renderRoomBody() {
@@ -465,24 +420,13 @@ function renderRoomBody() {
     return void body.append(el("p", `Choosing dilemmas… (${state.contrib.length} of ${players.length})`));
   }
   if (room.status === "finished") {
-    if (room.mode === "multiple-choice") {
-      body.append(el("h2", "Game complete"));
-      const list = el("ul");
-      players.forEach((player) => list.append(el("li", player.name)));
-      return void body.append(list);
-    }
     return renderScoreboard(body, players, "Final scoreboard");
   }
   if (!round) return void body.append(el("p", "Loading round…"));
   if (round.phase === "answer") {
-    return room.mode === "multiple-choice"
-      ? renderChoiceAnswer(body, round, players)
-      : renderAnswer(body, round, players);
+    return renderChoiceAnswer(body, round, players);
   }
-  if (room.mode === "multiple-choice" && round.phase === "results") return renderChoiceResults(body, round, players);
-  if (round.phase === "reveal") return void body.append(dilemmaBlock(round), el("p", "Revealing responses…"));
-  if (round.phase === "vote") return renderVote(body, round, players);
-  return renderResults(body, round, players);
+  return renderChoiceResults(body, round, players);
 }
 
 function renderLobby(body, room, players) {
@@ -492,9 +436,7 @@ function renderLobby(body, room, players) {
   body.append(list);
   if (!isHost()) {
     body.append(
-      el("p", `Game type: ${room.mode === "multiple-choice" ? "Multiple-choice" : "Free response"}`),
       el("p", `Rounds: ${room.totalRounds}`),
-      el("p", `Anonymous responses: ${room.anonymous === false ? "off" : "on"}`),
       el("p", "Waiting for the host to start."),
     );
     return;
@@ -510,24 +452,6 @@ function renderLobby(body, room, players) {
     if (Number.isInteger(value) && value >= 1 && value <= 20) mp.setTotalRounds(state.code, value);
     else setError("room-error", "Rounds must be a whole number from 1 to 20.");
   });
-  const mode = document.createElement("select");
-  mode.id = "lobby-mode";
-  for (const [value, label] of [["free-response", "Free response"], ["multiple-choice", "Multiple-choice"]]) {
-    const option = el("option", label);
-    option.value = value;
-    option.selected = (room.mode || "free-response") === value;
-    mode.append(option);
-  }
-  mode.addEventListener("change", () => mp.setGameSettings(state.code, mode.value, anonymous.value === "on"));
-  const anonymous = document.createElement("select");
-  anonymous.id = "lobby-anonymous";
-  for (const [value, label] of [["on", "Anonymous on"], ["off", "Anonymous off"]]) {
-    const option = el("option", label);
-    option.value = value;
-    option.selected = (room.anonymous !== false) === (value === "on");
-    anonymous.append(option);
-  }
-  anonymous.addEventListener("change", () => mp.setGameSettings(state.code, mode.value, anonymous.value === "on"));
   const settings = el("div");
   settings.className = "settings-panel";
   const setting = (labelText, control) => {
@@ -538,11 +462,7 @@ function renderLobby(body, room, players) {
     row.append(label, control);
     return row;
   };
-  settings.append(
-    setting("Game type", mode),
-    setting("Number of rounds", input),
-    setting("Response identity", anonymous),
-  );
+  settings.append(setting("Number of rounds", input));
   body.append(el("h2", "Game options"), settings);
   const start = el("button", "Start game");
   start.type = "button";
@@ -576,38 +496,6 @@ function sourceLine(source) {
   const prefix = String(source.type).includes("inspiration") ? "Inspired by: " : "Source: ";
   line.append(prefix, link);
   return line;
-}
-
-function renderAnswer(body, round, players) {
-  body.append(dilemmaBlock(round));
-  const done = state.submitted.includes(state.user.uid);
-  if (done) {
-    body.append(el("p", `Submitted. Waiting for everyone (${state.submitted.length} of ${players.length}).`));
-    return;
-  }
-  const box = el("textarea");
-  box.rows = 5;
-  box.value = state.draft;
-  box.addEventListener("input", () => { state.draft = box.value; });
-  const submit = el("button", "Submit response");
-  submit.type = "button";
-  submit.addEventListener("click", async () => {
-    const text = box.value.trim();
-    if (!text) return setError("room-error", "Write a response first.");
-    submit.disabled = true;
-    setError("room-error", "");
-    try {
-      state.myResponseId = await mp.submitAnswer(
-        state.code,
-        state.roundNumber,
-        state.user.uid,
-        text,
-        state.room.anonymous === false ? (state.players.find((p) => p.uid === state.user.uid)?.name || "player") : null,
-      );
-      state.draft = "";
-    } catch (error) { setError("room-error", error.message); submit.disabled = false; }
-  });
-  body.append(box, submit);
 }
 
 function renderChoiceAnswer(body, round, players) {
@@ -644,48 +532,10 @@ function renderChoiceAnswer(body, round, players) {
   body.append(fieldset, submit);
 }
 
-function orderedAnswers(round) {
-  const byId = new Map(state.answers.map((a) => [a.id, a]));
-  const ordered = (round.order || []).map((id) => byId.get(id)).filter(Boolean);
-  return ordered.length ? ordered : state.answers;
-}
-
-function renderVote(body, round, players) {
-  body.append(dilemmaBlock(round), el("h2", "Responses"));
-  const myVote = state.votes.find((v) => v.voter === state.user.uid);
-  const list = el("ol");
-  for (const answer of orderedAnswers(round)) {
-    const item = el("li");
-    item.append(el("span", answer.text));
-    if (state.room?.anonymous === false && answer.author) item.append(el("span", ` — ${answer.author}`));
-    if (answer.id === state.myResponseId) {
-      item.append(el("span", " (your response)"));
-    } else if (!myVote) {
-      const button = el("button", "Vote");
-      button.type = "button";
-      button.addEventListener("click", async () => {
-        try { await mp.castVote(state.code, state.roundNumber, state.user.uid, answer.id); }
-        catch (error) { setError("room-error", error.message); }
-      });
-      item.append(" ", button);
-    }
-    list.append(item);
-  }
-  body.append(list);
-  body.append(el("p", myVote
-    ? `Vote cast. Waiting for everyone (${state.votes.length} of ${players.length}).`
-    : "Vote for the best response."));
-}
-
 function renderChoiceResults(body, round, players) {
   body.append(dilemmaBlock(round), el("h2", "Results"));
   const options = round.options || optionsFor(round.dilemmaId);
-  const counts = new Map(options.map((_, index) => [index, 0]));
-  for (const choice of state.choices) {
-    if (Number.isInteger(choice.optionIndex) && counts.has(choice.optionIndex)) {
-      counts.set(choice.optionIndex, counts.get(choice.optionIndex) + 1);
-    }
-  }
+  const counts = tallyChoices(state.choices);
   const list = el("ol");
   options.forEach((option, index) => {
     const count = counts.get(index) || 0;
@@ -693,45 +543,16 @@ function renderChoiceResults(body, round, players) {
     list.append(el("li", `${option} — ${percent}% (${count} of ${players.length})`));
   });
   body.append(list);
-  if (!isHost()) {
-    body.append(el("p", "Waiting for the host."));
-    return;
-  }
-  const last = state.roundNumber >= state.room.totalRounds;
-  const next = el("button", last ? "Finish game" : "Next round");
-  next.type = "button";
-  next.addEventListener("click", async () => {
-    next.disabled = true;
-    try { await mp.nextRound(state.code, state.room); }
-    catch (error) { setError("room-error", error.message); next.disabled = false; }
-  });
-  body.append(next);
-}
-
-function renderResults(body, round, players) {
-  body.append(dilemmaBlock(round), el("h2", "Results"));
-  const counts = tallyVotes(state.votes);
-  const list = el("ol");
-  for (const answer of orderedAnswers(round)) {
-    const votes = counts.get(answer.id) || 0;
-    const points = pointsFor(answer.id, state.votes, players.length);
-    const item = el("li");
-    item.append(el("span", answer.text));
-    if (state.room?.anonymous === false && answer.author) item.append(el("span", ` — ${answer.author}`));
-    const detail = el("span", ` — ${votes} vote${votes === 1 ? "" : "s"}, ${points} point${points === 1 ? "" : "s"}`);
-    detail.className = "muted";
-    item.append(detail);
-    if (answer.id === state.myResponseId) item.append(el("span", " (yours)"));
-    list.append(item);
-  }
-  body.append(list);
+  const points = pointsForChoice(state.myChoice, state.choices);
+  body.append(el("p", "The most common choice earns one point. If the top choice is tied, everyone earns one point."));
+  body.append(el("p", `You earned ${points} point${points === 1 ? "" : "s"} this round.`));
   renderScoreboard(body, players, "Scores");
   if (!isHost()) {
     body.append(el("p", "Waiting for the host."));
     return;
   }
   const last = state.roundNumber >= state.room.totalRounds;
-  const next = el("button", last ? "Final scoreboard" : "Next round");
+  const next = el("button", last ? "Finish game" : "Next round");
   next.type = "button";
   next.addEventListener("click", async () => {
     next.disabled = true;
@@ -753,24 +574,24 @@ function renderScoreboard(body, players, title) {
 /* ---------- singleplayer ---------- */
 let queue = [];
 let queueIndex = 0;
-let singleMode = "free-response";
 
-function startSingleplayer(mode = "free-response") {
-  singleMode = mode;
+function startSingleplayer() {
   // Unseen dilemmas first; the queue is rebuilt whenever it runs out.
-  queue = pickSingleplayerQueue(catalogIds, state.history, 25);
+  queue = pickSingleplayerQueue(catalogIds, state.history, catalogIds.length);
   queueIndex = 0;
   renderSingle();
 }
 
 function renderSingle() {
-  if (queueIndex >= queue.length) queue = pickSingleplayerQueue(catalogIds, state.history, 25);
+  if (queueIndex >= queue.length) {
+    queue = pickSingleplayerQueue(catalogIds, state.history, catalogIds.length);
+    queueIndex = 0;
+  }
   const id = queue[queueIndex];
   const source = $("single-source");
   const options = $("single-options");
   source.replaceChildren();
   options.replaceChildren();
-  $("single-response").value = "";
   if (!id) {
     $("single-dilemma").textContent = "No dilemmas available.";
     return;
@@ -779,35 +600,27 @@ function renderSingle() {
   $("single-dilemma").className = "dilemma";
   const meta = sourceFor(id);
   if (meta && meta.url) source.append(sourceLine(meta));
-  if (singleMode === "multiple-choice") {
-    $("single-response").hidden = true;
-    $("single-response").required = false;
-    const fieldset = document.createElement("fieldset");
-    fieldset.className = "choice-list";
-    fieldset.append(el("legend", "Choose one"));
-    options.hidden = false;
-    optionsFor(id).forEach((option, index) => {
-      const label = document.createElement("label");
-      label.className = "choice-option";
-      const radio = document.createElement("input");
-      radio.type = "radio";
-      radio.name = "single-choice";
-      radio.value = String(index);
-      label.append(radio, el("span", option));
-      fieldset.append(label);
-    });
-    options.append(fieldset);
-  } else {
-    options.hidden = true;
-    $("single-response").hidden = false;
-    $("single-response").required = true;
-  }
+  const fieldset = document.createElement("fieldset");
+  fieldset.className = "choice-list";
+  fieldset.append(el("legend", "Choose one"));
+  options.hidden = false;
+  optionsFor(id).forEach((option, index) => {
+    const label = document.createElement("label");
+    label.className = "choice-option";
+    const radio = document.createElement("input");
+    radio.type = "radio";
+    radio.name = "single-choice";
+    radio.value = String(index);
+    label.append(radio, el("span", option));
+    fieldset.append(label);
+  });
+  options.append(fieldset);
   recordSeen(id);
 }
 
 $("single-form").addEventListener("submit", (event) => {
   event.preventDefault();
-  if (singleMode === "multiple-choice" && !document.querySelector("#single-options input:checked")) return;
+  if (!document.querySelector("#single-options input:checked")) return;
   queueIndex += 1;
   renderSingle();
 });

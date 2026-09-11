@@ -4,7 +4,7 @@ import {
   onSnapshot, serverTimestamp, writeBatch, runTransaction, increment,
 } from "./firebase.js";
 import { textFor, optionsFor } from "./catalog.js";
-import { pickCandidates, chooseDilemmaIds, shuffle } from "./selection.js";
+import { pickCandidates, chooseDilemmaIds } from "./selection.js";
 
 const CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 
@@ -15,21 +15,13 @@ function randomCode() {
   return code;
 }
 
-function randomId() {
-  const bytes = crypto.getRandomValues(new Uint8Array(12));
-  return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
-}
-
 export const roomRef = (code) => doc(db, "rooms", code);
 export const playersRef = (code) => collection(db, "rooms", code, "players");
 export const playerRef = (code, uid) => doc(db, "rooms", code, "players", uid);
 export const roundRef = (code, n) => doc(db, "rooms", code, "rounds", String(n));
 const sub = (code, n, name) => collection(db, "rooms", code, "rounds", String(n), name);
-export const answersRef = (code, n) => sub(code, n, "answers");
-export const votesRef = (code, n) => sub(code, n, "votes");
 export const choicesRef = (code, n) => sub(code, n, "choices");
 export const submittedRef = (code, n) => sub(code, n, "submitted");
-const authorRef = (code, n, uid) => doc(db, "rooms", code, "rounds", String(n), "authors", uid);
 const choiceRef = (code, n, uid) => doc(db, "rooms", code, "rounds", String(n), "choices", uid);
 export const poolRef = (code) => collection(db, "rooms", code, "pool");
 export const contribRef = (code) => collection(db, "rooms", code, "contrib");
@@ -38,7 +30,7 @@ export function playerName(user) {
   return user.displayName || (user.email || "player").split("@")[0];
 }
 
-export async function createRoom(user, mode = "free-response", anonymous = true, totalRounds = 3) {
+export async function createRoom(user, totalRounds = 3) {
   for (let attempt = 0; attempt < 5; attempt += 1) {
     const code = randomCode();
     const existing = await getDoc(roomRef(code));
@@ -50,8 +42,6 @@ export async function createRoom(user, mode = "free-response", anonymous = true,
       currentRound: 0,
       candidates: [],
       dilemmaIds: [],
-      mode,
-      anonymous,
       createdAt: serverTimestamp(),
     });
     await addPlayer(code, user);
@@ -84,10 +74,6 @@ export async function setTotalRounds(code, totalRounds) {
   await updateDoc(roomRef(code), { totalRounds });
 }
 
-export async function setGameSettings(code, mode, anonymous) {
-  await updateDoc(roomRef(code), { mode, anonymous });
-}
-
 function startRound(code, room, n) {
   const dilemmaId = room.dilemmaIds[n - 1];
   return setDoc(roundRef(code, n), {
@@ -95,7 +81,6 @@ function startRound(code, room, n) {
     dilemma: textFor(dilemmaId),
     options: optionsFor(dilemmaId),
     phase: "answer",
-    order: [],
   });
 }
 
@@ -143,28 +128,9 @@ export async function nextRound(code, room) {
   await updateDoc(roomRef(code), { currentRound: next });
 }
 
-// The author document maps a player to their response id. It is readable only
-// by that player, so nobody else can connect a player to an answer.
-export async function myResponseId(code, n, uid) {
-  const snap = await getDoc(authorRef(code, n, uid));
-  return snap.exists() ? snap.data().responseId : null;
-}
-
 export async function myChoice(code, n, uid) {
   const snap = await getDoc(choiceRef(code, n, uid));
   return snap.exists() ? snap.data().optionIndex : null;
-}
-
-export async function submitAnswer(code, n, uid, text, author = null) {
-  const existing = await myResponseId(code, n, uid);
-  if (existing) return existing;
-  const responseId = randomId();
-  const batch = writeBatch(db);
-  batch.set(authorRef(code, n, uid), { responseId });
-  batch.set(doc(answersRef(code, n), responseId), { text, author });
-  batch.set(doc(submittedRef(code, n), uid), { at: serverTimestamp() });
-  await batch.commit();
-  return responseId;
 }
 
 export async function submitChoice(code, n, uid, optionIndex) {
@@ -177,26 +143,11 @@ export async function submitChoice(code, n, uid, optionIndex) {
   return optionIndex;
 }
 
-export async function castVote(code, n, uid, responseId) {
-  await setDoc(doc(votesRef(code, n), uid), { responseId });
-}
-
-// Two steps: close answering first, because answers stay unreadable — for the
-// host too — while the round is still in the "answer" phase.
-export async function closeAnswering(code, n) {
-  await updateDoc(roundRef(code, n), { phase: "reveal" });
-}
-
-export async function revealAnswers(code, n) {
-  const snap = await getDocs(answersRef(code, n));
-  await updateDoc(roundRef(code, n), { order: shuffle(snap.docs.map((d) => d.id)), phase: "vote" });
-}
-
 export async function showResults(code, n) {
   await updateDoc(roundRef(code, n), { phase: "results" });
 }
 
-// Each player writes only their own score, for their own answer.
+// Each player writes only their own score.
 export async function recordScore(code, uid, roundNumber, points) {
   await runTransaction(db, async (tx) => {
     const ref = playerRef(code, uid);

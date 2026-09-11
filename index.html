@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>dilemmas</title>
+<title>dilemma</title>
 <link rel="stylesheet" href="styles.css">
 </head>
 <body data-view="home">
@@ -13,7 +13,7 @@
 </header>
 
 <main>
-  <h1>dilemmas</h1>
+  <h1>dilemma</h1>
   <p id="global-error" class="error" hidden></p>
 
   <!-- home -->
@@ -52,22 +52,8 @@
     <h2>Game options</h2>
     <div class="settings-panel">
       <div class="setting-row">
-        <label for="create-mode">Game type</label>
-        <select id="create-mode">
-          <option value="free-response">Free response</option>
-          <option value="multiple-choice">Multiple-choice</option>
-        </select>
-      </div>
-      <div class="setting-row">
         <label for="create-rounds">Number of rounds</label>
         <input id="create-rounds" type="number" min="1" max="20" value="3" inputmode="numeric">
-      </div>
-      <div class="setting-row">
-        <label for="create-anonymous">Response identity</label>
-        <select id="create-anonymous">
-          <option value="on">Anonymous</option>
-          <option value="off">Show names</option>
-        </select>
       </div>
     </div>
     <button id="btn-create-room" type="button">Create a room</button>
@@ -77,14 +63,6 @@
       <button type="submit">Join a room</button>
     </form>
     <p id="rooms-error" class="error" hidden></p>
-    <button class="back" type="button" data-back>Back</button>
-  </section>
-
-  <!-- singleplayer setup -->
-  <section id="view-single-setup" class="view" hidden>
-    <p>Choose a game type.</p>
-    <button id="btn-single-free" type="button">Free response</button>
-    <button id="btn-single-choice" type="button">Multiple-choice</button>
     <button class="back" type="button" data-back>Back</button>
   </section>
 
@@ -102,7 +80,6 @@
     <p id="single-source"></p>
     <form id="single-form">
       <div id="single-options"></div>
-      <textarea id="single-response" rows="5" required></textarea>
       <button type="submit">Next dilemma</button>
     </form>
     <button class="back" type="button" data-back>Back</button>

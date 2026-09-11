@@ -5,6 +5,6 @@
 A simple game about difficult choices.
 
 - Play solo or with friends in multiplayer rooms.
-- Answer moral dilemmas and vote on free-response answers.
-- Try multiple-choice rounds and compare the group’s choices.
-- Earn points and see who has the best answers.
+- Choose from multiple responses and see which one is most common.
+- Earn a point for choosing the group’s most common response; ties award everyone a point.
+- See the final scoreboard.

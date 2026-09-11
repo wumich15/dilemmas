@@ -55,8 +55,8 @@ after(async () => {
 const text = (selector) => page.$eval(selector, (node) => node.textContent.trim());
 
 test("the landing page centers the name and play actions with sign-in at the top", async () => {
-  assert.equal(await page.title(), "dilemmas");
-  assert.equal(await text("h1"), "dilemmas");
+  assert.equal(await page.title(), "dilemma");
+  assert.equal(await text("h1"), "dilemma");
   const labels = await page.$$eval("#view-home button", (nodes) => nodes.map((n) => n.textContent.trim()));
   assert.deepEqual(labels, ["Singleplayer", "Play"]);
   assert.equal(await text("#btn-auth"), "Sign in");
@@ -70,7 +70,7 @@ test("the landing page centers the name and play actions with sign-in at the top
 
 test("room creation settings use one clearly labeled row per option", async () => {
   const labels = await page.$$eval("#view-rooms .setting-row > label", (nodes) => nodes.map((node) => node.textContent.trim()));
-  assert.deepEqual(labels, ["Game type", "Number of rounds", "Response identity"]);
+  assert.deepEqual(labels, ["Number of rounds"]);
   assert.equal(await page.$eval("#create-rounds", (node) => node.value), "3");
   const layout = await page.$eval("#view-rooms .settings-panel", (node) => getComputedStyle(node).display);
   assert.equal(layout, "grid");
@@ -88,23 +88,20 @@ test("the dark mode toggle switches and persists", async () => {
   await page.click("#theme-toggle");
 });
 
-test("singleplayer shows one catalog dilemma at a time and moves on", async () => {
+test("singleplayer shows choice options and moves through questions", async () => {
   const catalog = JSON.parse(await readFile(new URL("../dilemmas.json", import.meta.url), "utf8"));
   const texts = new Set(catalog.map((entry) => entry.text));
 
   await page.click("#btn-singleplayer");
-  assert.equal(await page.$eval("#view-single-setup", (node) => node.hidden), false);
-  await page.click("#btn-single-free");
   assert.equal(await page.$eval("#view-single", (node) => node.hidden), false);
   const first = await text("#single-dilemma");
   assert.ok(texts.has(first), "dilemma comes from the catalog");
 
-  await page.type("#single-response", "a response");
+  await page.click("#single-options input");
   await page.click("#single-form button");
   const second = await text("#single-dilemma");
   assert.ok(texts.has(second));
   assert.notEqual(second, first);
-  assert.equal(await page.$eval("#single-response", (node) => node.value), "");
 
   // Seen dilemmas are remembered privately for a signed-out player.
   const seen = await page.evaluate(() => Object.keys(JSON.parse(localStorage.getItem("moral-dilemma:history") || "{}")));
@@ -113,10 +110,7 @@ test("singleplayer shows one catalog dilemma at a time and moves on", async () =
   assert.deepEqual(seen.map((id) => byId.get(id)), [first, second]);
 });
 
-test("singleplayer multiple-choice shows catalog options", async () => {
-  await page.click("#view-single [data-back]");
-  await page.click("#btn-singleplayer");
-  await page.click("#btn-single-choice");
+test("singleplayer shows all choices from the catalog", async () => {
   const first = await text("#single-dilemma");
   const catalog = JSON.parse(await readFile(new URL("../dilemmas.json", import.meta.url), "utf8"));
   const entry = catalog.find((item) => item.text === first);

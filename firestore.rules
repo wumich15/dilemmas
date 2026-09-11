@@ -20,26 +20,11 @@ service cloud.firestore {
         exists(/databases/$(database)/documents/rooms/$(roomId)/players/$(request.auth.uid));
     }
 
-    function playerData(roomId, uid) {
-      return get(/databases/$(database)/documents/rooms/$(roomId)/players/$(uid)).data;
-    }
-
     function roundPhase(roomId, roundId) {
       return get(/databases/$(database)/documents/rooms/$(roomId)/rounds/$(roundId)).data.phase;
     }
 
-    function authorPath(roomId, roundId) {
-      return /databases/$(database)/documents/rooms/$(roomId)/rounds/$(roundId)/authors/$(request.auth.uid);
-    }
-
-    function myResponseId(roomId, roundId) {
-      return exists(authorPath(roomId, roundId))
-        ? get(authorPath(roomId, roundId)).data.responseId
-        : '';
-    }
-
-    // A dilemma history is private to its owner. Nobody else — including a
-    // room's host — can read or write it.
+    // A dilemma history is private to its owner.
     match /users/{uid} {
       allow read, write: if false;
       match /history/{dilemmaId} {
@@ -52,7 +37,6 @@ service cloud.firestore {
     }
 
     match /rooms/{roomId} {
-      // Rooms are reached by code, never listed.
       allow get: if signedIn();
       allow list: if false;
       allow create: if signedIn()
@@ -60,20 +44,14 @@ service cloud.firestore {
         && request.resource.data.status == 'lobby'
         && request.resource.data.currentRound == 0
         && request.resource.data.totalRounds is int
-        && request.resource.data.totalRounds > 0
-        && request.resource.data.mode in ['free-response', 'multiple-choice']
-        && request.resource.data.anonymous is bool;
-      // Only the host drives the room, and the host cannot hand itself off.
+        && request.resource.data.totalRounds > 0;
       allow update: if isHost(roomId)
         && request.resource.data.hostUid == resource.data.hostUid
         && request.resource.data.totalRounds is int
-        && request.resource.data.totalRounds > 0
-        && request.resource.data.mode in ['free-response', 'multiple-choice']
-        && request.resource.data.anonymous is bool;
+        && request.resource.data.totalRounds > 0;
       allow delete: if false;
 
-      // A player may only write their own player document, so nobody can edit
-      // another player's name or score.
+      // Players may only write their own player document.
       match /players/{uid} {
         allow read: if signedIn();
         allow create: if signedIn() && uid == request.auth.uid
@@ -81,8 +59,7 @@ service cloud.firestore {
         allow update, delete: if signedIn() && uid == request.auth.uid;
       }
 
-      // Per-dilemma counts of how many players in this room have already seen a
-      // candidate. Counts only — never which player.
+      // Per-dilemma counts used to avoid repeating questions for everyone.
       match /pool/{dilemmaId} {
         allow read: if isPlayer(roomId);
         allow create: if isPlayer(roomId)
@@ -96,8 +73,6 @@ service cloud.firestore {
         allow delete: if false;
       }
 
-      // Marks that a player has already contributed to the counts above, so a
-      // reconnect cannot count the same player twice.
       match /contrib/{uid} {
         allow read: if isPlayer(roomId);
         allow create: if isPlayer(roomId) && uid == request.auth.uid;
@@ -109,66 +84,25 @@ service cloud.firestore {
         allow create, update: if isHost(roomId);
         allow delete: if false;
 
-        // Response text. Unreadable — by everyone, including the host — until
-        // the answering phase is over, and never editable by anyone else.
-        match /answers/{responseId} {
-          allow read: if isPlayer(roomId) && roundPhase(roomId, roundId) != 'answer';
-          allow create: if isPlayer(roomId)
-            && roundPhase(roomId, roundId) == 'answer'
-            && roomData(roomId).mode == 'free-response'
-            && request.resource.data.keys().hasOnly(['text', 'author'])
-            && request.resource.data.text is string
-            && (request.resource.data.author == null || request.resource.data.author is string)
-            && ((roomData(roomId).anonymous == false
-              && request.resource.data.author == playerData(roomId, request.auth.uid).name)
-              || (roomData(roomId).anonymous == true && request.resource.data.author == null))
-            && !exists(/databases/$(database)/documents/rooms/$(roomId)/rounds/$(roundId)/submitted/$(request.auth.uid));
-          allow update: if isPlayer(roomId)
-            && roundPhase(roomId, roundId) == 'answer'
-            && roomData(roomId).mode == 'free-response'
-            && myResponseId(roomId, roundId) == responseId;
-          allow delete: if false;
-        }
-
-        // A multiple-choice selection is private until results, while the
-        // submitted marker remains public so the host can advance the round.
+        // Choices are private while players are answering, then readable for
+        // the majority result.
         match /choices/{uid} {
           allow read: if isPlayer(roomId) && roundPhase(roomId, roundId) != 'answer';
           allow create: if isPlayer(roomId) && uid == request.auth.uid
-            && roomData(roomId).mode == 'multiple-choice'
             && roundPhase(roomId, roundId) == 'answer'
             && request.resource.data.keys().hasOnly(['optionIndex'])
             && request.resource.data.optionIndex is int
+            && request.resource.data.optionIndex >= 0
+            && request.resource.data.optionIndex < get(/databases/$(database)/documents/rooms/$(roomId)/rounds/$(roundId)).data.options.size()
             && !exists(/databases/$(database)/documents/rooms/$(roomId)/rounds/$(roundId)/submitted/$(request.auth.uid));
           allow update, delete: if false;
         }
 
-        // Maps a player to their response id. Readable only by that player, so
-        // ownership stays private while remaining available for scoring.
-        match /authors/{uid} {
-          allow read: if signedIn() && uid == request.auth.uid;
-          allow create: if isPlayer(roomId) && uid == request.auth.uid
-            && roomData(roomId).mode == 'free-response'
-            && request.resource.data.responseId is string;
-          allow update, delete: if false;
-        }
-
-        // Public "this player has answered" marker: a count with no content.
+        // Public marker used by the host to know when every player has chosen.
         match /submitted/{uid} {
           allow read: if isPlayer(roomId);
           allow create: if isPlayer(roomId) && uid == request.auth.uid
             && roundPhase(roomId, roundId) == 'answer';
-          allow update, delete: if false;
-        }
-
-        // One vote per player (the document id is the voter) and no self-voting.
-        match /votes/{uid} {
-          allow read: if isPlayer(roomId);
-          allow create: if isPlayer(roomId) && uid == request.auth.uid
-            && roomData(roomId).mode == 'free-response'
-            && roundPhase(roomId, roundId) == 'vote'
-            && request.resource.data.keys().hasOnly(['responseId'])
-            && myResponseId(roomId, roundId) != request.resource.data.responseId;
           allow update, delete: if false;
         }
       }

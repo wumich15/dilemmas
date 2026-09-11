@@ -11,8 +11,10 @@ Build a minimal website for a moral dilemma game. Focus only on the playable MVP
 - Keep the design as simplistic as possible.
 - Show the website name and the primary play actions:
   - **Singleplayer**
+  - **Multiplayer**
   - **Sign in / Sign up**
   - **Create / Join a room**
+- **Multiplayer** asks a signed-out player to **Make an account** or **Continue as guest** rather than showing a sign-in form or telling them to sign in first. The sign-in form appears only from the utility header's **Sign in** button.
 - Keep a simple utility header for theme, percentage visibility, and returning Home from any non-home view.
 - Avoid subtitles, taglines, descriptions, and filler text. Elsewhere, show only necessary controls, game content, status, and errors.
 
@@ -20,7 +22,7 @@ Build a minimal website for a moral dilemma game. Focus only on the playable MVP
 
 - Use Firebase as the backend.
 - Support email/password sign up, sign in, and sign out with Firebase Authentication.
-- Support anonymous Firebase Authentication so players can choose **Play as guest** for multiplayer. Guests may enter any optional username for the room scoreboard; usernames are display-only and do not need to be unique.
+- Support anonymous Firebase Authentication so players can choose **Continue as guest** for multiplayer. Choosing it asks immediately for an optional username for the room scoreboard; usernames are display-only and do not need to be unique. A guest keeps the header's **Sign in** button, never an **Account** button, so they can still create an account.
 - Guests who leave the username blank receive sequential display names such as **Guest (1)** and **Guest (2)** within a room.
 - Also support passwordless email-link sign in. Send a link using the app's current URL, remember only the pending email address in local storage, and complete sign-in when the link returns to the app. If the email is not remembered, ask the user to enter it before completing the link. Clear the remembered address after success or an invalid or expired link.
 - Use Cloud Firestore for rooms, players, rounds, multiple-choice selections, and scores, with live updates for multiplayer.

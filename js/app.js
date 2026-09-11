@@ -133,14 +133,12 @@ if (catalogError) setError("global-error", "Could not load dilemmas.json: " + ca
 if (isConfigured) {
   onAuthStateChanged(auth, async (user) => {
     state.user = user;
-    $("btn-auth").textContent = user ? "Account" : "Sign in";
-    $("auth-signed-out").hidden = !!user;
-    $("auth-signed-in").hidden = !user;
-    $("auth-who").textContent = user
-      ? (user.isAnonymous
-        ? `Playing as guest${user.displayName ? ` (${user.displayName})` : ""}`
-        : "Signed in as " + user.email)
-      : "";
+    // A guest keeps the "Sign in" button so they can upgrade to a real account.
+    const hasAccount = !!user && !user.isAnonymous;
+    $("btn-auth").textContent = hasAccount ? "Account" : "Sign in";
+    $("auth-signed-out").hidden = hasAccount;
+    $("auth-signed-in").hidden = !hasAccount;
+    $("auth-who").textContent = hasAccount ? "Signed in as " + user.email : "";
     if (!user) {
       state.history = history.localHistory();
       return;
@@ -174,8 +172,7 @@ function requireAuth() {
     return false;
   }
   if (!state.user) {
-    setError("auth-error", "Sign in first.");
-    showView("auth");
+    showView("choose");
     return false;
   }
   return true;
@@ -264,21 +261,19 @@ $("btn-signup").addEventListener("click", async () => {
     if (name) await updateProfile(credential.user, { displayName: name });
   } catch (error) { setError("auth-error", error.message); }
 });
-$("btn-guest").addEventListener("click", async () => {
-  setError("auth-error", "");
-  if (!isConfigured) return setError("auth-error", "Firebase is not configured yet — see README.md.");
-  const button = $("btn-guest");
+$("guest-form").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  setError("guest-error", "");
+  if (!isConfigured) return setError("guest-error", "Firebase is not configured yet — see README.md.");
+  const button = $("guest-form").querySelector("button");
   button.disabled = true;
   try {
     const credential = await signInAnonymously(auth);
-    const name = $("auth-name").value.trim();
-    if (name) {
-      await updateProfile(credential.user, { displayName: name });
-      $("auth-who").textContent = `Playing as guest (${name})`;
-    }
+    const name = $("guest-name").value.trim();
+    if (name) await updateProfile(credential.user, { displayName: name });
     showView("rooms");
   } catch (error) {
-    setError("auth-error", error?.code === "auth/operation-not-allowed"
+    setError("guest-error", error?.code === "auth/operation-not-allowed"
       ? "Guest play is not enabled yet. Enable Anonymous sign-in in Firebase."
       : error.message);
   } finally {
@@ -296,6 +291,13 @@ $("btn-auth").addEventListener("click", () => { setError("auth-error", ""); show
 $("btn-rooms").addEventListener("click", () => {
   setError("rooms-error", "");
   if (requireAuth()) showView("rooms");
+});
+$("btn-choose-account").addEventListener("click", () => { setError("auth-error", ""); showView("auth"); });
+$("btn-choose-guest").addEventListener("click", () => {
+  setError("guest-error", "");
+  $("guest-name").value = "";
+  showView("guest");
+  $("guest-name").focus();
 });
 $("btn-singleplayer").addEventListener("click", () => { startSingleplayer(); showView("single"); });
 
@@ -359,8 +361,13 @@ function roomFailed(error) {
   setError("room-error", roomErrorMessage(error));
 }
 
+function isPermissionDenied(error) {
+  return error?.code === "permission-denied"
+    || /missing or insufficient permissions/i.test(error?.message || "");
+}
+
 function roomErrorMessage(error) {
-  if (error?.code === "permission-denied" || /missing or insufficient permissions/i.test(error?.message || "")) {
+  if (isPermissionDenied(error)) {
     return "Room access was lost. Leave the room and join again.";
   }
   return error?.message || "Something went wrong in this room.";
@@ -382,15 +389,39 @@ function watchRoundStats(round) {
   ));
 }
 
+// Every player's choice becomes readable only once the round is in results, so
+// the rules check the round's phase on the server. The host sees its own phase
+// change locally before the server acknowledges it, so subscribe from the
+// server-confirmed snapshot and retry a denial instead of treating it as fatal.
+function watchChoices(code, n) {
+  if (choicesUnsub) return;
+  let attempts = 0;
+  const attach = () => {
+    choicesUnsub = mp.onSnapshot(mp.choicesRef(code, n), (choiceSnap) => {
+      attempts = 0;
+      state.choices = choiceSnap.docs.map((d) => ({ player: d.id, ...d.data() }));
+      update();
+    }, (error) => {
+      choicesUnsub = null;
+      if (isPermissionDenied(error) && state.roundNumber === n && attempts < 5) {
+        attempts += 1;
+        setTimeout(() => {
+          if (state.roundNumber === n && state.round?.phase !== "answer") attach();
+        }, 300 * attempts);
+        return;
+      }
+      roomFailed(error);
+    });
+  };
+  attach();
+}
+
 function watchRound(code, n) {
-  roundUnsubs.push(mp.onSnapshot(mp.roundRef(code, n), (snap) => {
+  roundUnsubs.push(mp.onSnapshot(mp.roundRef(code, n), { includeMetadataChanges: true }, (snap) => {
     state.round = snap.exists() ? snap.data() : null;
     watchRoundStats(state.round);
-    if (state.round && state.round.phase !== "answer" && !choicesUnsub) {
-      choicesUnsub = mp.onSnapshot(mp.choicesRef(code, n), (choiceSnap) => {
-        state.choices = choiceSnap.docs.map((d) => ({ player: d.id, ...d.data() }));
-        update();
-      }, roomFailed);
+    if (state.round && state.round.phase !== "answer" && !snap.metadata.hasPendingWrites) {
+      watchChoices(code, n);
     }
     update();
   }, roomFailed));

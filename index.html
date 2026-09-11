@@ -21,7 +21,24 @@
   <!-- home -->
   <section id="view-home" class="view">
     <button id="btn-singleplayer" type="button">Singleplayer</button>
-    <button id="btn-rooms" type="button">Play</button>
+    <button id="btn-rooms" type="button">Multiplayer</button>
+  </section>
+
+  <!-- multiplayer: account or guest -->
+  <section id="view-choose" class="view" hidden>
+    <button id="btn-choose-account" type="button">Make an account</button>
+    <button id="btn-choose-guest" type="button">Continue as guest</button>
+    <button class="back" type="button" data-back>Back</button>
+  </section>
+
+  <!-- guest username -->
+  <section id="view-guest" class="view" hidden>
+    <form id="guest-form">
+      <input id="guest-name" type="text" placeholder="Username (optional)" maxlength="32" autocomplete="nickname">
+      <button type="submit">Continue</button>
+    </form>
+    <p id="guest-error" class="error" hidden></p>
+    <button class="back" type="button" data-back>Back</button>
   </section>
 
   <!-- auth -->
@@ -33,7 +50,6 @@
         <input id="auth-password" type="password" placeholder="Password" autocomplete="current-password" required>
         <button id="btn-signin" type="submit">Sign in</button>
         <button id="btn-signup" type="button">Sign up</button>
-        <button id="btn-guest" type="button">Play as guest</button>
       </form>
       <form id="auth-link-form">
         <input id="auth-link-email" type="email" placeholder="Email for sign-in link" autocomplete="email" required>

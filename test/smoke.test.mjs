@@ -58,7 +58,7 @@ test("the landing page centers the name and play actions with sign-in at the top
   assert.equal(await page.title(), "dilemma");
   assert.equal(await text("h1"), "dilemma");
   const labels = await page.$$eval("#view-home button", (nodes) => nodes.map((n) => n.textContent.trim()));
-  assert.deepEqual(labels, ["Singleplayer", "Play"]);
+  assert.deepEqual(labels, ["Singleplayer", "Multiplayer"]);
   assert.equal(await text("#btn-auth"), "Sign in");
   const alignment = await page.$eval("h1", (node) => getComputedStyle(node).textAlign);
   assert.equal(alignment, "center");
@@ -147,19 +147,36 @@ test("percentage visibility can be toggled and Home is available outside the lan
   await page.click("#stats-toggle");
   assert.equal(await text("#stats-toggle"), "Hide percentages");
 
+  // The previous test left the singleplayer view open.
+  await page.click("#view-single [data-back]");
   await page.click("#btn-singleplayer");
   assert.equal(await page.$eval("#home-button", (node) => node.hidden), false);
   await page.click("#home-button");
   assert.equal(await page.$eval("#view-home", (node) => node.hidden), false);
 });
 
-test("rooms need Firebase, and the sign-in view is reachable", async () => {
-  await page.click("#view-single [data-back]");
+test("multiplayer offers an account or guest play, and the sign-in view is reachable", async () => {
   await page.click("#btn-rooms");
   if (isConfigured) {
-    // A signed-out player is sent to sign in first.
+    // Multiplayer asks how to play instead of showing a sign-in form or an
+    // error telling the player to sign in first.
+    assert.equal(await page.$eval("#view-choose", (node) => node.hidden), false);
+    assert.equal(await page.$eval("#view-auth", (node) => node.hidden), true);
+    assert.equal(await text("#auth-error"), "");
+    const choices = await page.$$eval("#view-choose button:not(.back)", (nodes) => nodes.map((n) => n.textContent.trim()));
+    assert.deepEqual(choices, ["Make an account", "Continue as guest"]);
+
+    // Guest play asks for a username right away, with no sign-in form.
+    await page.click("#btn-choose-guest");
+    assert.equal(await page.$eval("#view-guest", (node) => node.hidden), false);
+    assert.match(await page.$eval("#guest-name", (node) => node.placeholder), /Username/);
+    assert.equal(await page.evaluate(() => document.activeElement.id), "guest-name");
+    assert.equal((await page.$$("#view-guest input[type=password]")).length, 0);
+    await page.click("#view-guest [data-back]");
+
+    await page.click("#btn-rooms");
+    await page.click("#btn-choose-account");
     assert.equal(await page.$eval("#view-auth", (node) => node.hidden), false);
-    assert.match(await text("#auth-error"), /Sign in first/);
     await page.click("#view-auth [data-back]");
   } else {
     // Placeholder config: the app says so plainly instead of pretending a room
@@ -171,7 +188,7 @@ test("rooms need Firebase, and the sign-in view is reachable", async () => {
   await page.click("#btn-auth");
   assert.equal(await page.$eval("#view-auth", (node) => node.hidden), false);
   assert.equal(await page.$eval("#auth-signed-out", (node) => node.hidden), false);
-  assert.equal(await text("#btn-guest"), "Play as guest");
+  assert.equal((await page.$$("#btn-guest")).length, 0);
   assert.match(await page.$eval("#auth-name", (node) => node.placeholder), /Username/);
   assert.equal(await page.$eval("#btn-email-link", (node) => node.textContent.trim()), "Email me a sign-in link");
   assert.equal(await page.$eval("#btn-email-complete", (node) => node.hidden), true);

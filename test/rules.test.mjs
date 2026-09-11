@@ -123,6 +123,9 @@ test("multiple-choice selections stay private until results", async () => {
   await assertSucceeds(getDocs(collection(bob, "rooms", CODE, "rounds", "1", "submitted")));
   await assertSucceeds(updateDoc(round(alice, 1), { phase: "results" }));
   await assertSucceeds(getDoc(choice(bob, 1, "alice")));
+  // Results make the whole collection listenable, which is what the round view
+  // subscribes to once the server has confirmed the phase change.
+  await assertSucceeds(getDocs(collection(bob, "rooms", CODE, "rounds", "1", "choices")));
   await assertFails(setDoc(choice(bob, 1, "bob"), { optionIndex: 0 }));
 });
 

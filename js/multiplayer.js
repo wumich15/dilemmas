@@ -134,8 +134,9 @@ export async function myChoice(code, n, uid) {
 }
 
 export async function submitChoice(code, n, uid, optionIndex) {
-  const existing = await myChoice(code, n, uid);
-  if (existing !== null && existing !== undefined) return existing;
+  // Do not pre-read the choice here: choices are intentionally hidden from
+  // everyone else while answering. The rules reject a duplicate create, and
+  // the UI disables the button after the first submission.
   const batch = writeBatch(db);
   batch.set(choiceRef(code, n, uid), { optionIndex });
   batch.set(doc(submittedRef(code, n), uid), { at: serverTimestamp() });

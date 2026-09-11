@@ -23,6 +23,7 @@ body {
 .site-header {
   min-height: 2.25rem;
   display: flex;
+  flex-wrap: wrap;
   justify-content: flex-end;
   align-items: center;
   gap: 0.5rem;
@@ -48,7 +49,7 @@ h1 {
   margin: 0 0 2.5rem;
 }
 h2 { font-weight: normal; font-size: 1.2rem; margin: 1.5rem 0 0.5rem; }
-button, input, textarea, select {
+button, input, select {
   font-family: inherit;
   font-size: 1rem;
   color: var(--fg);
@@ -62,7 +63,7 @@ button {
   transition: background-color 120ms ease, border-color 120ms ease;
 }
 button:hover:not(:disabled) { background: var(--soft); border-color: var(--muted); }
-button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible {
+button:focus-visible, input:focus-visible, select:focus-visible {
   outline: 2px solid var(--fg);
   outline-offset: 2px;
 }
@@ -84,8 +85,7 @@ button:disabled { color: var(--muted); cursor: default; }
   border-color: transparent;
   padding: 0.4rem 0.55rem;
 }
-input, textarea { width: 100%; max-width: 24rem; display: block; margin: 0.5rem 0; }
-textarea { max-width: 100%; }
+input { width: 100%; max-width: 24rem; display: block; margin: 0.5rem 0; }
 .settings-panel {
   display: grid;
   gap: 1rem;
@@ -148,6 +148,11 @@ fieldset label { display: block; margin: 0.5rem 0; }
   border-radius: 0.2rem;
   background: var(--bg);
   transition: background-color 120ms ease, border-color 120ms ease;
+}
+.choice-option small {
+  display: block;
+  margin: 0.35rem 0.85rem 0;
+  color: var(--muted);
 }
 .choice-option:hover span { background: var(--soft); border-color: var(--muted); }
 .choice-option input:checked + span { background: var(--soft); border-color: var(--fg); }

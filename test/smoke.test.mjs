@@ -88,7 +88,7 @@ test("the dark mode toggle switches and persists", async () => {
   await page.click("#theme-toggle");
 });
 
-test("singleplayer shows choice options and moves through questions", async () => {
+test("singleplayer shows global percentages after submitting and then moves on", async () => {
   const catalog = JSON.parse(await readFile(new URL("../dilemmas.json", import.meta.url), "utf8"));
   const texts = new Set(catalog.map((entry) => entry.text));
 
@@ -98,6 +98,16 @@ test("singleplayer shows choice options and moves through questions", async () =
   assert.ok(texts.has(first), "dilemma comes from the catalog");
 
   await page.click("#single-options input");
+  await page.click("#single-form button");
+  await page.waitForFunction(
+    () => document.querySelector("#single-form button")?.textContent.trim() === "Next dilemma",
+  );
+  assert.equal(await text("#single-dilemma"), first);
+  assert.equal(await page.$eval("#single-form button", (node) => node.textContent.trim()), "Next dilemma");
+  const optionDetails = await page.$$eval("#single-options .choice-option small", (nodes) => nodes.map((node) => node.textContent.trim()));
+  assert.equal(optionDetails.length > 0, true);
+  assert.equal(optionDetails.every((detail) => /% globally|unavailable/.test(detail)), true);
+
   await page.click("#single-form button");
   const second = await text("#single-dilemma");
   assert.ok(texts.has(second));
@@ -119,7 +129,28 @@ test("singleplayer shows all choices from the catalog", async () => {
   assert.equal(await page.$eval("#single-options fieldset", (node) => node.className), "choice-list");
   await page.click("#single-options input");
   await page.click("#single-form button");
+  await page.waitForFunction(
+    () => document.querySelector("#single-form button")?.textContent.trim() === "Next dilemma",
+  );
+  await page.click("#single-form button");
   assert.notEqual(await text("#single-dilemma"), first);
+});
+
+test("the game exposes multiple-choice controls only", async () => {
+  assert.equal((await page.$$("textarea")).length, 0);
+  assert.equal(await page.$$eval("#single-options input[type=radio]", (nodes) => nodes.length > 1), true);
+});
+
+test("percentage visibility can be toggled and Home is available outside the landing page", async () => {
+  await page.click("#stats-toggle");
+  assert.equal(await text("#stats-toggle"), "Show percentages");
+  await page.click("#stats-toggle");
+  assert.equal(await text("#stats-toggle"), "Hide percentages");
+
+  await page.click("#btn-singleplayer");
+  assert.equal(await page.$eval("#home-button", (node) => node.hidden), false);
+  await page.click("#home-button");
+  assert.equal(await page.$eval("#view-home", (node) => node.hidden), false);
 });
 
 test("rooms need Firebase, and the sign-in view is reachable", async () => {
@@ -140,6 +171,7 @@ test("rooms need Firebase, and the sign-in view is reachable", async () => {
   await page.click("#btn-auth");
   assert.equal(await page.$eval("#view-auth", (node) => node.hidden), false);
   assert.equal(await page.$eval("#auth-signed-out", (node) => node.hidden), false);
+  assert.equal(await text("#btn-guest"), "Play as guest");
   assert.equal(await page.$eval("#btn-email-link", (node) => node.textContent.trim()), "Email me a sign-in link");
   assert.equal(await page.$eval("#btn-email-complete", (node) => node.hidden), true);
   await page.click("#view-auth [data-back]");

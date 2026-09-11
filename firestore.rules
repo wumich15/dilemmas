@@ -24,6 +24,60 @@ service cloud.firestore {
       return get(/databases/$(database)/documents/rooms/$(roomId)/rounds/$(roundId)).data.phase;
     }
 
+    // Global response totals contain no user identity. They are public so
+    // signed-out singleplayer sessions can contribute too. Each write may
+    // increase the total and exactly one option count by one.
+    match /globalStats/{dilemmaId} {
+      allow read: if true;
+      allow create: if request.resource.data.keys().hasOnly([
+        'total', 'optionCount', 'option0', 'option1', 'option2', 'option3', 'option4', 'option5'
+      ])
+        && request.resource.data.total == 1
+        && request.resource.data.optionCount is int
+        && request.resource.data.optionCount >= 2
+        && request.resource.data.optionCount <= 6
+        && request.resource.data.option0 is int
+        && request.resource.data.option1 is int
+        && request.resource.data.option2 is int
+        && request.resource.data.option3 is int
+        && request.resource.data.option4 is int
+        && request.resource.data.option5 is int
+        && request.resource.data.option0 >= 0
+        && request.resource.data.option1 >= 0
+        && request.resource.data.option2 >= 0
+        && request.resource.data.option3 >= 0
+        && request.resource.data.option4 >= 0
+        && request.resource.data.option5 >= 0
+        && request.resource.data.option0 + request.resource.data.option1
+          + request.resource.data.option2 + request.resource.data.option3
+          + request.resource.data.option4 + request.resource.data.option5 == 1;
+      allow update: if request.resource.data.keys().hasOnly([
+        'total', 'optionCount', 'option0', 'option1', 'option2', 'option3', 'option4', 'option5'
+      ])
+        && request.resource.data.optionCount == resource.data.optionCount
+        && request.resource.data.total == resource.data.total + 1
+        && request.resource.data.diff(resource.data).affectedKeys().size() == 2
+        && request.resource.data.option0 is int
+        && request.resource.data.option1 is int
+        && request.resource.data.option2 is int
+        && request.resource.data.option3 is int
+        && request.resource.data.option4 is int
+        && request.resource.data.option5 is int
+        && request.resource.data.option0 >= resource.data.option0
+        && request.resource.data.option0 <= resource.data.option0 + 1
+        && request.resource.data.option1 >= resource.data.option1
+        && request.resource.data.option1 <= resource.data.option1 + 1
+        && request.resource.data.option2 >= resource.data.option2
+        && request.resource.data.option2 <= resource.data.option2 + 1
+        && request.resource.data.option3 >= resource.data.option3
+        && request.resource.data.option3 <= resource.data.option3 + 1
+        && request.resource.data.option4 >= resource.data.option4
+        && request.resource.data.option4 <= resource.data.option4 + 1
+        && request.resource.data.option5 >= resource.data.option5
+        && request.resource.data.option5 <= resource.data.option5 + 1;
+      allow delete: if false;
+    }
+
     // A dilemma history is private to its owner.
     match /users/{uid} {
       allow read, write: if false;
@@ -85,9 +139,11 @@ service cloud.firestore {
         allow delete: if false;
 
         // Choices are private while players are answering, then readable for
-        // the majority result.
+        // the majority result. A player may read their own choice while the
+        // round is still open so retries are idempotent.
         match /choices/{uid} {
-          allow read: if isPlayer(roomId) && roundPhase(roomId, roundId) != 'answer';
+          allow read: if isPlayer(roomId)
+            && (roundPhase(roomId, roundId) != 'answer' || uid == request.auth.uid);
           allow create: if isPlayer(roomId) && uid == request.auth.uid
             && roundPhase(roomId, roundId) == 'answer'
             && request.resource.data.keys().hasOnly(['optionIndex'])

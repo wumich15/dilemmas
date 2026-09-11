@@ -1,6 +1,6 @@
 import {
   auth, isConfigured, onAuthStateChanged, createUserWithEmailAndPassword,
-  signInWithEmailAndPassword, sendSignInLinkToEmail, isSignInWithEmailLink,
+  signInWithEmailAndPassword, signInAnonymously, sendSignInLinkToEmail, isSignInWithEmailLink,
   signInWithEmailLink, signOut, updateProfile,
 } from "./firebase.js";
 import * as mp from "./multiplayer.js";
@@ -8,6 +8,7 @@ import * as history from "./history.js";
 import { catalogIds, catalogError, textFor, optionsFor, sourceFor } from "./catalog.js";
 import { pickSingleplayerQueue } from "./selection.js";
 import { pointsForChoice, tallyChoices } from "./scoring.js";
+import * as globalStats from "./stats.js";
 
 const $ = (id) => document.getElementById(id);
 const el = (tag, text) => {
@@ -30,11 +31,26 @@ let savedTheme = "light";
 try { savedTheme = localStorage.getItem("theme") || "light"; } catch {}
 applyTheme(savedTheme);
 
+/* ---------- global percentage preference ---------- */
+const statsToggle = $("stats-toggle");
+const STATS_PREFERENCE_KEY = "moral-dilemma:show-percentages";
+let showPercentages = true;
+try { showPercentages = localStorage.getItem(STATS_PREFERENCE_KEY) !== "false"; } catch {}
+
+function applyStatsPreference(value) {
+  showPercentages = value;
+  statsToggle.textContent = value ? "Hide percentages" : "Show percentages";
+  statsToggle.setAttribute("aria-pressed", String(value));
+  try { localStorage.setItem(STATS_PREFERENCE_KEY, String(value)); } catch {}
+}
+applyStatsPreference(showPercentages);
+
 /* ---------- views ---------- */
 function showView(name) {
   for (const view of document.querySelectorAll(".view")) view.hidden = true;
   $("view-" + name).hidden = false;
   document.body.dataset.view = name;
+  $("home-button").hidden = name === "home";
 }
 for (const button of document.querySelectorAll("[data-back]")) {
   button.addEventListener("click", () => showView("home"));
@@ -60,6 +76,9 @@ const state = {
   scoredRound: 0,
   recordedRound: 0,
   contributedTo: null,
+  globalStats: null,
+  globalStatsId: null,
+  globalStatsError: "",
   history: new Map(),
   signature: "",
 };
@@ -75,6 +94,7 @@ function stopRound() {
   Object.assign(state, {
     round: null, choices: [], submitted: [],
     myChoice: null, scoredRound: 0, recordedRound: 0,
+    globalStats: null, globalStatsId: null, globalStatsError: "",
   });
 }
 function stopRoom() {
@@ -86,6 +106,22 @@ function stopRoom() {
     scoredRound: 0, recordedRound: 0, contributedTo: null, signature: "",
   });
 }
+
+async function goHome() {
+  const { code, user } = state;
+  stopRoom();
+  showView("home");
+  if (code && user) {
+    try { await mp.leaveRoom(code, user.uid); } catch {}
+  }
+}
+
+$("home-button").addEventListener("click", () => { void goHome(); });
+statsToggle.addEventListener("click", () => {
+  applyStatsPreference(!showPercentages);
+  if (!$("view-single").hidden) renderSingle();
+  if (!$("view-room").hidden) update();
+});
 
 /* ---------- auth ---------- */
 state.history = history.localHistory();
@@ -100,7 +136,11 @@ if (isConfigured) {
     $("btn-auth").textContent = user ? "Account" : "Sign in";
     $("auth-signed-out").hidden = !!user;
     $("auth-signed-in").hidden = !user;
-    $("auth-who").textContent = user ? "Signed in as " + user.email : "";
+    $("auth-who").textContent = user
+      ? (user.isAnonymous
+        ? `Playing as guest${user.displayName ? ` (${user.displayName})` : ""}`
+        : "Signed in as " + user.email)
+      : "";
     if (!user) {
       state.history = history.localHistory();
       return;
@@ -224,6 +264,27 @@ $("btn-signup").addEventListener("click", async () => {
     if (name) await updateProfile(credential.user, { displayName: name });
   } catch (error) { setError("auth-error", error.message); }
 });
+$("btn-guest").addEventListener("click", async () => {
+  setError("auth-error", "");
+  if (!isConfigured) return setError("auth-error", "Firebase is not configured yet — see README.md.");
+  const button = $("btn-guest");
+  button.disabled = true;
+  try {
+    const credential = await signInAnonymously(auth);
+    const name = $("auth-name").value.trim();
+    if (name) {
+      await updateProfile(credential.user, { displayName: name });
+      $("auth-who").textContent = `Playing as guest (${name})`;
+    }
+    showView("rooms");
+  } catch (error) {
+    setError("auth-error", error?.code === "auth/operation-not-allowed"
+      ? "Guest play is not enabled yet. Enable Anonymous sign-in in Firebase."
+      : error.message);
+  } finally {
+    button.disabled = false;
+  }
+});
 $("btn-signout").addEventListener("click", async () => {
   stopRoom();
   await signOut(auth);
@@ -298,9 +359,26 @@ function roomFailed(error) {
   setError("room-error", error.message);
 }
 
+function watchRoundStats(round) {
+  const dilemmaId = round?.dilemmaId;
+  if (!dilemmaId || state.globalStatsId === dilemmaId) return;
+  state.globalStatsId = dilemmaId;
+  state.globalStats = null;
+  state.globalStatsError = "";
+  const optionCount = (round.options || optionsFor(dilemmaId)).length;
+  if (!isConfigured) return;
+  roundUnsubs.push(globalStats.watchGlobalStats(
+    dilemmaId,
+    optionCount,
+    (value) => { state.globalStats = value; state.globalStatsError = ""; update(); },
+    () => { state.globalStatsError = "Global percentages are unavailable right now."; update(); },
+  ));
+}
+
 function watchRound(code, n) {
   roundUnsubs.push(mp.onSnapshot(mp.roundRef(code, n), (snap) => {
     state.round = snap.exists() ? snap.data() : null;
+    watchRoundStats(state.round);
     if (state.round && state.round.phase !== "answer" && !choicesUnsub) {
       choicesUnsub = mp.onSnapshot(mp.choicesRef(code, n), (choiceSnap) => {
         state.choices = choiceSnap.docs.map((d) => ({ player: d.id, ...d.data() }));
@@ -391,6 +469,12 @@ function update() {
     state.players.map((p) => [p.uid, p.name, p.score]),
     state.submitted.length,
     state.choices.map((v) => [v.player, v.optionIndex]),
+    state.globalStats && [
+      state.globalStats.total,
+      [...state.globalStats.counts.entries()],
+    ],
+    state.globalStatsError,
+    showPercentages,
   ]);
   if (signature === state.signature) return;
   state.signature = signature;
@@ -498,27 +582,62 @@ function sourceLine(source) {
   return line;
 }
 
-function renderChoiceAnswer(body, round, players) {
-  body.append(dilemmaBlock(round));
-  const done = state.submitted.includes(state.user.uid);
-  if (done) {
-    body.append(el("p", `Choice submitted. Waiting for everyone (${state.submitted.length} of ${players.length}).`));
-    return;
-  }
-  const options = round.options || optionsFor(round.dilemmaId);
+function globalPercentage(stats, index) {
+  if (!stats || !stats.total) return null;
+  return Math.round(((stats.counts.get(index) || 0) / stats.total) * 100);
+}
+
+function choiceFieldset(options, {
+  name,
+  legend = "Choose one",
+  disabled = false,
+  selectedIndex = null,
+  stats = null,
+  includePercentages = false,
+} = {}) {
   const fieldset = document.createElement("fieldset");
   fieldset.className = "choice-list";
-  fieldset.append(el("legend", "Choose one"));
+  fieldset.append(el("legend", legend));
   options.forEach((option, index) => {
     const label = document.createElement("label");
     label.className = "choice-option";
     const radio = document.createElement("input");
     radio.type = "radio";
-    radio.name = "round-choice";
+    radio.name = name;
     radio.value = String(index);
+    radio.disabled = disabled;
+    radio.checked = index === selectedIndex;
     label.append(radio, el("span", option));
+    if (includePercentages) {
+      const percentage = globalPercentage(stats, index);
+      const detail = percentage === null
+        ? "Global percentage unavailable"
+        : `${percentage}% globally (${stats.counts.get(index) || 0} of ${stats.total} responses)`;
+      label.append(el("small", detail));
+    }
     fieldset.append(label);
   });
+  return fieldset;
+}
+
+function renderChoiceAnswer(body, round, players) {
+  body.append(dilemmaBlock(round));
+  const done = state.submitted.includes(state.user.uid) || Number.isInteger(state.myChoice);
+  const options = round.options || optionsFor(round.dilemmaId);
+  if (done) {
+    body.append(choiceFieldset(options, {
+      name: "round-choice",
+      legend: "Your choice",
+      disabled: true,
+      selectedIndex: state.myChoice,
+      stats: state.globalStats,
+      includePercentages: showPercentages,
+    }));
+    if (state.globalStatsError && showPercentages) body.append(el("p", state.globalStatsError));
+    body.append(el("p", `Choice submitted. Waiting for everyone (${state.submitted.length} of ${players.length}).`));
+    return;
+  }
+  const fieldset = choiceFieldset(options, { name: "round-choice" });
   const submit = el("button", "Submit choice");
   submit.type = "button";
   submit.addEventListener("click", async () => {
@@ -526,8 +645,20 @@ function renderChoiceAnswer(body, round, players) {
     if (!selected) return setError("room-error", "Choose an option first.");
     submit.disabled = true;
     setError("room-error", "");
-    try { state.myChoice = await mp.submitChoice(state.code, state.roundNumber, state.user.uid, Number(selected.value)); }
-    catch (error) { setError("room-error", error.message); submit.disabled = false; }
+    const optionIndex = Number(selected.value);
+    try {
+      state.myChoice = await mp.submitChoice(state.code, state.roundNumber, state.user.uid, optionIndex);
+      try {
+        state.globalStats = await globalStats.recordGlobalResponse(
+          state.round.dilemmaId, optionIndex, options.length);
+      } catch {
+        state.globalStatsError = "Your choice was submitted, but global percentages are unavailable right now.";
+      }
+      update();
+    } catch (error) {
+      setError("room-error", error.message);
+      submit.disabled = false;
+    }
   });
   body.append(fieldset, submit);
 }
@@ -539,8 +670,16 @@ function renderChoiceResults(body, round, players) {
   const list = el("ol");
   options.forEach((option, index) => {
     const count = counts.get(index) || 0;
-    const percent = players.length ? Math.round((count / players.length) * 100) : 0;
-    list.append(el("li", `${option} — ${percent}% (${count} of ${players.length})`));
+    const item = el("li");
+    item.append(el("span", option));
+    const percentage = globalPercentage(state.globalStats, index);
+    const roomSummary = `${count} of ${players.length} in this room`;
+    item.append(el("small", showPercentages
+      ? (percentage === null
+        ? `Global percentage unavailable · ${roomSummary}`
+        : `${percentage}% globally (${state.globalStats.counts.get(index) || 0} of ${state.globalStats.total} responses) · ${roomSummary}`)
+      : roomSummary));
+    list.append(item);
   });
   body.append(list);
   const points = pointsForChoice(state.myChoice, state.choices);
@@ -574,11 +713,19 @@ function renderScoreboard(body, players, title) {
 /* ---------- singleplayer ---------- */
 let queue = [];
 let queueIndex = 0;
+let singleSubmitted = false;
+let singleSubmittedChoice = null;
+let singleStats = null;
+let singleStatsError = "";
 
 function startSingleplayer() {
   // Unseen dilemmas first; the queue is rebuilt whenever it runs out.
   queue = pickSingleplayerQueue(catalogIds, state.history, catalogIds.length);
   queueIndex = 0;
+  singleSubmitted = false;
+  singleSubmittedChoice = null;
+  singleStats = null;
+  singleStatsError = "";
   renderSingle();
 }
 
@@ -600,27 +747,49 @@ function renderSingle() {
   $("single-dilemma").className = "dilemma";
   const meta = sourceFor(id);
   if (meta && meta.url) source.append(sourceLine(meta));
-  const fieldset = document.createElement("fieldset");
-  fieldset.className = "choice-list";
-  fieldset.append(el("legend", "Choose one"));
   options.hidden = false;
-  optionsFor(id).forEach((option, index) => {
-    const label = document.createElement("label");
-    label.className = "choice-option";
-    const radio = document.createElement("input");
-    radio.type = "radio";
-    radio.name = "single-choice";
-    radio.value = String(index);
-    label.append(radio, el("span", option));
-    fieldset.append(label);
-  });
-  options.append(fieldset);
+  const dilemmaOptions = optionsFor(id);
+  options.append(choiceFieldset(dilemmaOptions, {
+    name: "single-choice",
+    legend: singleSubmitted ? "Your choice" : "Choose one",
+    disabled: singleSubmitted,
+    selectedIndex: singleSubmittedChoice,
+    stats: singleStats,
+    includePercentages: singleSubmitted && showPercentages,
+  }));
+  const submit = $("single-form").querySelector("button[type=submit]");
+  submit.textContent = singleSubmitted ? "Next dilemma" : "Submit choice";
+  submit.disabled = false;
+  if (singleStatsError && showPercentages) options.append(el("p", singleStatsError));
   recordSeen(id);
 }
 
-$("single-form").addEventListener("submit", (event) => {
+$("single-form").addEventListener("submit", async (event) => {
   event.preventDefault();
-  if (!document.querySelector("#single-options input:checked")) return;
-  queueIndex += 1;
+  if (singleSubmitted) {
+    queueIndex += 1;
+    singleSubmitted = false;
+    singleSubmittedChoice = null;
+    singleStats = null;
+    singleStatsError = "";
+    renderSingle();
+    return;
+  }
+  const selected = document.querySelector("#single-options input:checked");
+  if (!selected) return;
+  const id = queue[queueIndex];
+  const optionIndex = Number(selected.value);
+  const optionCount = optionsFor(id).length;
+  const submit = $("single-form").querySelector("button[type=submit]");
+  submit.disabled = true;
+  singleStatsError = "";
+  try {
+    singleStats = await globalStats.recordGlobalResponse(id, optionIndex, optionCount);
+  } catch {
+    singleStats = null;
+    singleStatsError = "Your choice was submitted, but global percentages are unavailable right now.";
+  }
+  singleSubmittedChoice = optionIndex;
+  singleSubmitted = true;
   renderSingle();
 });

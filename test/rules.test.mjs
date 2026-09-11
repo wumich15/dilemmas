@@ -32,6 +32,7 @@ const round = (db, n) => doc(db, "rooms", CODE, "rounds", String(n));
 const submitted = (db, n, uid) => doc(db, "rooms", CODE, "rounds", String(n), "submitted", uid);
 const choice = (db, n, uid) => doc(db, "rooms", CODE, "rounds", String(n), "choices", uid);
 const vote = (db, n, uid) => doc(db, "rooms", CODE, "rounds", String(n), "votes", uid);
+const globalStats = (db, dilemmaId) => doc(db, "globalStats", dilemmaId);
 
 const newRoom = (overrides = {}) => ({
   hostUid: "alice", status: "lobby", totalRounds: 3, currentRound: 0,
@@ -83,6 +84,20 @@ test("dilemma history is private to its owner", async () => {
   await assertSucceeds(getDocs(collection(alice, "users", "alice", "history")));
 });
 
+test("global stats allow one new response at a time", async () => {
+  const first = {
+    total: 1, optionCount: 3,
+    option0: 1, option1: 0, option2: 0, option3: 0, option4: 0, option5: 0,
+  };
+  await assertSucceeds(setDoc(globalStats(alice, "wikipedia-0001"), first));
+  await assertSucceeds(updateDoc(globalStats(alice, "wikipedia-0001"), {
+    total: 2, option1: 1,
+  }));
+  await assertFails(updateDoc(globalStats(alice, "wikipedia-0001"), {
+    total: 4, option0: 2, option1: 2,
+  }));
+});
+
 test("players report only counts into the room's candidate pool", async () => {
   await seedRoom({ status: "selecting", candidates: ["a", "b"] });
   const pool = (db, id) => doc(db, "rooms", CODE, "pool", id);
@@ -102,6 +117,7 @@ test("multiple-choice selections stay private until results", async () => {
   batch.set(choice(alice, 1, "alice"), { optionIndex: 1 });
   batch.set(submitted(alice, 1, "alice"), { at: new Date() });
   await assertSucceeds(batch.commit());
+  await assertSucceeds(getDoc(choice(alice, 1, "alice")));
   await assertFails(getDoc(choice(bob, 1, "alice")));
   await assertFails(getDocs(collection(bob, "rooms", CODE, "rounds", "1", "choices")));
   await assertSucceeds(getDocs(collection(bob, "rooms", CODE, "rounds", "1", "submitted")));

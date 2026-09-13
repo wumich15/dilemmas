@@ -12,3 +12,5 @@ A simple game about difficult choices.
 - See the final scoreboard.
 
 For guest multiplayer, enable the Anonymous provider in Firebase Authentication → Sign-in method.
+
+Running `npm run test:rules` starts the Firestore emulator, which needs Java on your `PATH`.

@@ -24,6 +24,13 @@ service cloud.firestore {
       return get(/databases/$(database)/documents/rooms/$(roomId)/rounds/$(roundId)).data.phase;
     }
 
+    // Total of every option counter. `get` with a default keeps the sum working
+    // on documents written before an option key existed.
+    function optionTotal(data) {
+      return data.get('option0', 0) + data.get('option1', 0) + data.get('option2', 0)
+        + data.get('option3', 0) + data.get('option4', 0) + data.get('option5', 0);
+    }
+
     // Global response totals contain no user identity. They are public so
     // signed-out singleplayer sessions can contribute too. Each write may
     // increase the total and exactly one option count by one.
@@ -48,33 +55,33 @@ service cloud.firestore {
         && request.resource.data.option3 >= 0
         && request.resource.data.option4 >= 0
         && request.resource.data.option5 >= 0
-        && request.resource.data.option0 + request.resource.data.option1
-          + request.resource.data.option2 + request.resource.data.option3
-          + request.resource.data.option4 + request.resource.data.option5 == 1;
+        && optionTotal(request.resource.data) == 1;
+      // Non-decreasing option counters plus a total that rises by exactly one
+      // means precisely one option gained a single vote. Stating it that way
+      // (rather than counting changed keys) lets a document written before a
+      // key existed be backfilled by the same write.
       allow update: if request.resource.data.keys().hasOnly([
         'total', 'optionCount', 'option0', 'option1', 'option2', 'option3', 'option4', 'option5'
       ])
-        && request.resource.data.optionCount == resource.data.optionCount
-        && request.resource.data.total == resource.data.total + 1
-        && request.resource.data.diff(resource.data).affectedKeys().size() == 2
+        && request.resource.data.optionCount is int
+        && request.resource.data.optionCount >= 2
+        && request.resource.data.optionCount <= 6
+        && request.resource.data.optionCount
+          == resource.data.get('optionCount', request.resource.data.optionCount)
+        && request.resource.data.total == resource.data.get('total', 0) + 1
         && request.resource.data.option0 is int
         && request.resource.data.option1 is int
         && request.resource.data.option2 is int
         && request.resource.data.option3 is int
         && request.resource.data.option4 is int
         && request.resource.data.option5 is int
-        && request.resource.data.option0 >= resource.data.option0
-        && request.resource.data.option0 <= resource.data.option0 + 1
-        && request.resource.data.option1 >= resource.data.option1
-        && request.resource.data.option1 <= resource.data.option1 + 1
-        && request.resource.data.option2 >= resource.data.option2
-        && request.resource.data.option2 <= resource.data.option2 + 1
-        && request.resource.data.option3 >= resource.data.option3
-        && request.resource.data.option3 <= resource.data.option3 + 1
-        && request.resource.data.option4 >= resource.data.option4
-        && request.resource.data.option4 <= resource.data.option4 + 1
-        && request.resource.data.option5 >= resource.data.option5
-        && request.resource.data.option5 <= resource.data.option5 + 1;
+        && request.resource.data.option0 >= resource.data.get('option0', 0)
+        && request.resource.data.option1 >= resource.data.get('option1', 0)
+        && request.resource.data.option2 >= resource.data.get('option2', 0)
+        && request.resource.data.option3 >= resource.data.get('option3', 0)
+        && request.resource.data.option4 >= resource.data.get('option4', 0)
+        && request.resource.data.option5 >= resource.data.get('option5', 0)
+        && optionTotal(request.resource.data) == optionTotal(resource.data) + 1;
       allow delete: if false;
     }
 
@@ -99,18 +106,45 @@ service cloud.firestore {
         && request.resource.data.currentRound == 0
         && request.resource.data.totalRounds is int
         && request.resource.data.totalRounds > 0;
-      allow update: if isHost(roomId)
-        && request.resource.data.hostUid == resource.data.hostUid
-        && request.resource.data.totalRounds is int
-        && request.resource.data.totalRounds > 0;
+      // The host drives the room. Separately, a remaining player may take over
+      // hosting once the host has left, so a room is never left unplayable —
+      // that claim may change nothing but hostUid.
+      allow update: if (isHost(roomId)
+          && request.resource.data.hostUid == resource.data.hostUid
+          && request.resource.data.totalRounds is int
+          && request.resource.data.totalRounds > 0)
+        || (isPlayer(roomId)
+          && request.resource.data.hostUid == request.auth.uid
+          && resource.data.hostUid != request.auth.uid
+          && !exists(/databases/$(database)/documents/rooms/$(roomId)/players/$(resource.data.hostUid))
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['hostUid']));
       allow delete: if false;
 
-      // Players may only write their own player document.
+      // Players may only write their own player document. The host may remove a
+      // player who has dropped out, so an abandoned seat cannot stall a round.
       match /players/{uid} {
-        allow read: if signedIn();
+        allow get: if signedIn() && (uid == request.auth.uid || isPlayer(roomId));
+        allow list: if isPlayer(roomId);
         allow create: if signedIn() && uid == request.auth.uid
-          && request.resource.data.score == 0;
-        allow update, delete: if signedIn() && uid == request.auth.uid;
+          && roomData(roomId).status == 'lobby'
+          && request.resource.data.keys().hasOnly(['name', 'score', 'roundScores', 'joinedAt'])
+          && request.resource.data.name is string
+          && request.resource.data.name.size() > 0
+          && request.resource.data.name.size() <= 40
+          && request.resource.data.score == 0
+          && request.resource.data.roundScores.size() == 0;
+        // A player reports only their own round scores: at most one point per
+        // round, never more rounds than the game has, and never by rewriting a
+        // round already recorded, their name, or when they joined.
+        allow update: if signedIn() && uid == request.auth.uid
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['score', 'roundScores'])
+          && request.resource.data.score is int
+          && request.resource.data.score >= resource.data.score
+          && request.resource.data.score <= roomData(roomId).totalRounds
+          && request.resource.data.roundScores.size() <= roomData(roomId).totalRounds
+          && request.resource.data.roundScores.values().hasOnly([0, 1])
+          && resource.data.roundScores.keys().hasOnly(request.resource.data.roundScores.keys());
+        allow delete: if signedIn() && (uid == request.auth.uid || isHost(roomId));
       }
 
       // Per-dilemma counts used to avoid repeating questions for everyone.
@@ -138,12 +172,12 @@ service cloud.firestore {
       match /guestNames/{counterId} {
         allow read: if signedIn();
         allow create: if signedIn()
-          && exists(/databases/$(database)/documents/rooms/$(roomId))
+          && roomData(roomId).status == 'lobby'
           && counterId == 'counter'
           && request.resource.data.keys().hasOnly(['next'])
           && request.resource.data.next == 2;
         allow update: if signedIn()
-          && exists(/databases/$(database)/documents/rooms/$(roomId))
+          && roomData(roomId).status == 'lobby'
           && counterId == 'counter'
           && request.resource.data.keys().hasOnly(['next'])
           && request.resource.data.next == resource.data.next + 1;
@@ -171,7 +205,8 @@ service cloud.firestore {
           allow update, delete: if false;
         }
 
-        // Public marker used by the host to know when every player has chosen.
+        // Public marker used by the host to know when every player has chosen,
+        // and the fixed record of who is being scored this round.
         match /submitted/{uid} {
           allow read: if isPlayer(roomId);
           allow create: if isPlayer(roomId) && uid == request.auth.uid

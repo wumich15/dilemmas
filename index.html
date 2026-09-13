@@ -78,7 +78,8 @@
     <button id="btn-create-room" type="button">Create a room</button>
     <h2>Join a room</h2>
     <form id="join-form">
-      <input id="join-code" type="text" placeholder="Room code" maxlength="4" autocomplete="off">
+      <input id="join-code" type="text" placeholder="Room code" maxlength="4" minlength="4"
+             pattern="[A-Za-z0-9]{4}" autocomplete="off" required>
       <button type="submit">Join a room</button>
     </form>
     <p id="rooms-error" class="error" hidden></p>

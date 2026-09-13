@@ -7,7 +7,7 @@ import * as mp from "./multiplayer.js";
 import * as history from "./history.js";
 import { catalogIds, catalogError, textFor, optionsFor, sourceFor } from "./catalog.js";
 import { pickSingleplayerQueue } from "./selection.js";
-import { pointsForChoice } from "./scoring.js";
+import { pointsForChoice, tallyChoices } from "./scoring.js";
 import * as globalStats from "./stats.js";
 
 const $ = (id) => document.getElementById(id);
@@ -82,6 +82,8 @@ const state = {
   history: new Map(),
   signature: "",
 };
+let scoreRetries = 0;
+let claimingHost = false;
 let roomUnsubs = [];
 let roundUnsubs = [];
 let choicesUnsub = null;
@@ -91,6 +93,7 @@ function stopRound() {
   roundUnsubs = [];
   if (choicesUnsub) choicesUnsub();
   choicesUnsub = null;
+  scoreRetries = 0;
   Object.assign(state, {
     round: null, choices: [], submitted: [],
     myChoice: null, scoredRound: 0, recordedRound: 0,
@@ -107,13 +110,18 @@ function stopRoom() {
   });
 }
 
-async function goHome() {
+// Detaches the room's listeners before removing the player document, so the
+// closing listeners never see the permission loss their own delete causes.
+async function leaveCurrentRoom() {
   const { code, user } = state;
   stopRoom();
+  if (!code || !user) return;
+  try { await mp.leaveRoom(code, user.uid); } catch {}
+}
+
+async function goHome() {
   showView("home");
-  if (code && user) {
-    try { await mp.leaveRoom(code, user.uid); } catch {}
-  }
+  await leaveCurrentRoom();
 }
 
 $("home-button").addEventListener("click", () => { void goHome(); });
@@ -155,14 +163,17 @@ if (isConfigured) {
 // Records that this user has seen a dilemma. Writing the same dilemma twice is
 // a no-op, so reconnects cannot duplicate history.
 async function recordSeen(dilemmaId) {
-  if (!dilemmaId || state.history.has(dilemmaId)) return;
+  if (!dilemmaId) return false;
+  if (state.history.has(dilemmaId)) return true;
   const seenAt = Date.now();
   state.history.set(dilemmaId, seenAt);
   try {
     if (state.user) await history.recordRemote(state.user.uid, dilemmaId, null);
     else history.recordLocal(dilemmaId);
+    return true;
   } catch (error) {
     state.history.delete(dilemmaId);
+    return false;
   }
 }
 
@@ -176,6 +187,14 @@ function requireAuth() {
     return false;
   }
   return true;
+}
+
+// A room with no dilemmas to serve cannot start a round, so refuse at the door
+// rather than failing part-way through starting a game.
+function requireCatalog(errorId) {
+  if (catalogIds.length) return true;
+  setError(errorId, "No dilemmas are loaded, so multiplayer is unavailable.");
+  return false;
 }
 
 const EMAIL_LINK_KEY = "moral-dilemma:email-link";
@@ -212,10 +231,16 @@ async function completeEmailLink(email) {
     setEmailLinkStatus("Signed in with your email link.");
     showView("home");
   } catch (error) {
-    if (["auth/invalid-action-code", "auth/expired-action-code", "auth/invalid-email"].includes(error?.code)) {
+    const spent = ["auth/invalid-action-code", "auth/expired-action-code", "auth/invalid-email"]
+      .includes(error?.code);
+    if (spent) {
       try { localStorage.removeItem(EMAIL_LINK_KEY); } catch {}
     }
-    setError("auth-error", "That sign-in link is invalid or expired. Request a new one.");
+    // Only a spent link is worth requesting a new one for; anything else (a
+    // dropped connection, a disabled account) needs its own message.
+    setError("auth-error", spent
+      ? "That sign-in link is invalid or expired. Request a new one."
+      : error?.message || "Could not complete the sign-in link.");
   }
 }
 
@@ -281,7 +306,9 @@ $("guest-form").addEventListener("submit", async (event) => {
   }
 });
 $("btn-signout").addEventListener("click", async () => {
-  stopRoom();
+  // Leave first: once signed out, nobody may delete this player document, and an
+  // abandoned seat stalls the room everyone else is still playing in.
+  await leaveCurrentRoom();
   await signOut(auth);
   showView("home");
 });
@@ -290,6 +317,7 @@ $("btn-signout").addEventListener("click", async () => {
 $("btn-auth").addEventListener("click", () => { setError("auth-error", ""); showView("auth"); });
 $("btn-rooms").addEventListener("click", () => {
   setError("rooms-error", "");
+  if (!requireCatalog("global-error")) return;
   if (requireAuth()) showView("rooms");
 });
 $("btn-choose-account").addEventListener("click", () => { setError("auth-error", ""); showView("auth"); });
@@ -305,6 +333,7 @@ $("btn-singleplayer").addEventListener("click", () => { startSingleplayer(); sho
 $("btn-create-room").addEventListener("click", async () => {
   if (!requireAuth()) return;
   setError("rooms-error", "");
+  if (!requireCatalog("rooms-error")) return;
   const totalRounds = Number($("create-rounds").value);
   if (!Number.isInteger(totalRounds) || totalRounds < 1 || totalRounds > 20) {
     return setError("rooms-error", "Rounds must be a whole number from 1 to 20.");
@@ -317,17 +346,21 @@ $("join-form").addEventListener("submit", async (event) => {
   event.preventDefault();
   if (!requireAuth()) return;
   setError("rooms-error", "");
+  if (!requireCatalog("rooms-error")) return;
   const code = $("join-code").value.trim().toUpperCase();
+  // An empty or malformed code would reach the SDK as an invalid document path
+  // and surface as an internal Firestore error.
+  if (!/^[A-Z0-9]{4}$/.test(code)) {
+    return setError("rooms-error", "Enter the four-character room code.");
+  }
   try {
     await mp.joinRoom(code, state.user);
     enterRoom(code);
   } catch (error) { setError("rooms-error", error.message); }
 });
 $("btn-leave").addEventListener("click", async () => {
-  const { code, user } = state;
-  stopRoom();
   showView("home");
-  try { await mp.leaveRoom(code, user.uid); } catch {}
+  await leaveCurrentRoom();
 });
 
 /* ---------- room subscriptions ---------- */
@@ -416,7 +449,22 @@ function watchChoices(code, n) {
   attach();
 }
 
+// A re-subscribe leaves state.myChoice empty even though the submission stands,
+// so the "Your choice" list would render with nothing selected. The rules let a
+// player read their own choice while the round is still open.
+async function loadOwnChoice(code, n) {
+  if (!state.user || Number.isInteger(state.myChoice)) return;
+  try {
+    const value = await mp.myChoice(code, n, state.user.uid);
+    if (state.code !== code || state.roundNumber !== n) return;
+    if (!Number.isInteger(value) || Number.isInteger(state.myChoice)) return;
+    state.myChoice = value;
+    update();
+  } catch { /* the choice is optional context; the submitted marker still gates the form */ }
+}
+
 function watchRound(code, n) {
+  void loadOwnChoice(code, n);
   roundUnsubs.push(mp.onSnapshot(mp.roundRef(code, n), { includeMetadataChanges: true }, (snap) => {
     state.round = snap.exists() ? snap.data() : null;
     watchRoundStats(state.round);
@@ -433,6 +481,19 @@ function watchRound(code, n) {
 
 let hostBusy = false;
 const isHost = () => state.room && state.user && state.room.hostUid === state.user.uid;
+
+// Only the host can advance a room, so a room whose host has left would be stuck
+// forever. The longest-present remaining player takes over.
+async function claimHostTick() {
+  const { code, room, players, user } = state;
+  if (!room || !user || claimingHost || room.status === "finished") return;
+  if (players.length === 0 || players.some((player) => player.uid === room.hostUid)) return;
+  if (players[0].uid !== user.uid) return;
+  claimingHost = true;
+  try { await mp.claimHost(code, user.uid); }
+  catch (error) { setError("room-error", roomErrorMessage(error)); }
+  finally { claimingHost = false; }
+}
 
 async function hostTick() {
   const { code, room, round, roundNumber, players, submitted } = state;
@@ -458,19 +519,34 @@ async function hostTick() {
   }
 }
 
+// Submitted markers can never be deleted, so every client eventually agrees on
+// exactly which choices belong to this round. Comparing against the live player
+// roster instead would let clients tally different sets — and score differently —
+// whenever someone leaves after submitting.
+function choicesComplete() {
+  return state.submitted.length > 0 && state.choices.length >= state.submitted.length;
+}
+
 async function scoreTick() {
-  const { code, round, roundNumber, players, choices, user } = state;
+  const { code, round, roundNumber, choices, user } = state;
   if (!round || round.phase !== "results" || state.scoredRound === roundNumber) return;
-  // Wait for every choice to arrive locally before calculating the majority.
-  if (players.length === 0 || choices.length < players.length) return;
+  if (!choicesComplete()) return;
   const myChoice = ownRoundChoice();
   if (!Number.isInteger(myChoice)) return;
   state.scoredRound = roundNumber;
   try {
     await mp.recordScore(code, user.uid, roundNumber, pointsForChoice(myChoice, choices));
+    scoreRetries = 0;
   } catch (error) {
     state.scoredRound = 0;
     setError("room-error", roomErrorMessage(error));
+    // Nothing else will necessarily arrive to re-run this, so retry rather than
+    // leaving the round unscored.
+    if (scoreRetries < 3) {
+      scoreRetries += 1;
+      const delay = 500 * scoreRetries;
+      setTimeout(() => { if (state.roundNumber === roundNumber) update(); }, delay);
+    }
   }
 }
 
@@ -495,7 +571,10 @@ function historyTick() {
   const { round, roundNumber } = state;
   if (!round || !round.dilemmaId || state.recordedRound === roundNumber) return;
   state.recordedRound = roundNumber;
-  recordSeen(round.dilemmaId);
+  void recordSeen(round.dilemmaId).then((recorded) => {
+    // Clear the marker on failure so the next snapshot tries again.
+    if (!recorded && state.roundNumber === roundNumber) state.recordedRound = 0;
+  });
 }
 
 function ownRoundChoice() {
@@ -504,14 +583,15 @@ function ownRoundChoice() {
 }
 
 function update() {
+  claimHostTick();
   hostTick();
   contributeTick();
   historyTick();
   scoreTick();
   const signature = JSON.stringify([
     state.room, state.roundNumber, state.contrib.length, state.round, state.myChoice,
-    state.players.map((p) => [p.uid, p.name, p.score]),
-    state.submitted.length,
+    state.players.map((p) => [p.uid, p.name, p.score, p.roundScores]),
+    state.submitted,
     state.choices.map((v) => [v.player, v.optionIndex]),
     state.globalStats && [
       state.globalStats.total,
@@ -680,6 +760,7 @@ function renderChoiceAnswer(body, round, players) {
     }));
     if (state.globalStatsError && showPercentages) body.append(el("p", state.globalStatsError));
     body.append(el("p", `Choice submitted. Waiting for everyone (${state.submitted.length} of ${players.length}).`));
+    body.append(...waitingOnControls(players));
     return;
   }
   const fieldset = choiceFieldset(options, { name: "round-choice" });
@@ -706,21 +787,56 @@ function renderChoiceAnswer(body, round, players) {
     }
   });
   body.append(fieldset, submit);
+  body.append(...waitingOnControls(players));
+}
+
+// A player who closed their tab still holds a seat, and the round only advances
+// once everyone has submitted, so the host needs a way to clear that seat.
+function waitingOnControls(players) {
+  if (!isHost()) return [];
+  const waiting = players.filter(
+    (player) => player.uid !== state.user.uid && !state.submitted.includes(player.uid));
+  if (waiting.length === 0) return [];
+  const list = el("ul");
+  for (const player of waiting) {
+    const item = el("li");
+    item.append(el("span", player.name));
+    const remove = el("button", "Remove");
+    remove.type = "button";
+    remove.className = "inline-button";
+    remove.addEventListener("click", async () => {
+      remove.disabled = true;
+      try { await mp.leaveRoom(state.code, player.uid); }
+      catch (error) { setError("room-error", roomErrorMessage(error)); remove.disabled = false; }
+    });
+    item.append(remove);
+    list.append(item);
+  }
+  return [el("h2", "Still choosing"), list];
 }
 
 function renderChoiceResults(body, round, players) {
   body.append(dilemmaBlock(round), el("h2", "Results"));
   const options = round.options || optionsFor(round.dilemmaId);
   const roundKey = String(state.roundNumber);
-  const scoresReady = players.length > 0 && players.every(
+  const complete = choicesComplete();
+  const scoresReady = complete && players.length > 0 && players.every(
     (player) => Object.prototype.hasOwnProperty.call(player.roundScores || {}, roundKey),
   );
+  const tally = tallyChoices(state.choices);
   const list = el("ol");
   options.forEach((option, index) => {
     const item = el("li");
     item.append(el("span", option));
-    const percentage = globalPercentage(state.globalStats, index);
+    // The room counts are what scoring used; the percentages are site-wide.
+    if (complete) {
+      const count = tally.get(index) || 0;
+      const inRoom = el("span", `${count} in room`);
+      inRoom.className = "room-count";
+      item.append(inRoom);
+    }
     if (showPercentages) {
+      const percentage = globalPercentage(state.globalStats, index);
       const detail = el("span", percentage === null ? "—" : `${percentage}%`);
       detail.className = "choice-percentage";
       item.append(detail);
@@ -728,18 +844,21 @@ function renderChoiceResults(body, round, players) {
     list.append(item);
   });
   body.append(list);
-  const points = pointsForChoice(ownRoundChoice(), state.choices);
   body.append(el("p", "The most common choice earns one point. If the top choice is tied, everyone earns one point."));
+  if (!complete) {
+    body.append(el("p", "Collecting choices…"));
+    return;
+  }
+  const points = pointsForChoice(ownRoundChoice(), state.choices);
   body.append(el("p", `You earned ${points} point${points === 1 ? "" : "s"} this round.`));
   if (scoresReady) renderScoreboard(body, players, "Scores");
   if (!isHost()) {
     body.append(el("p", scoresReady ? "Waiting for the host." : "Scoring…"));
     return;
   }
-  if (!scoresReady) {
-    body.append(el("p", "Scoring…"));
-    return;
-  }
+  // Advancing waits on the choices, not on every player having written their own
+  // score: one player who has gone offline must not strand the whole room.
+  if (!scoresReady) body.append(el("p", "Scoring…"));
   const last = state.roundNumber >= state.room.totalRounds;
   const next = el("button", last ? "Finish game" : "Next round");
   next.type = "button";

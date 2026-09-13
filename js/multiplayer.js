@@ -29,8 +29,10 @@ const guestCounterRef = (code) => doc(db, "rooms", code, "guestNames", "counter"
 
 export function playerName(user) {
   // Guest usernames are display-only and intentionally do not need to be
-  // unique. Anonymous users without one get a simple fallback name.
-  return user.displayName || (user.isAnonymous ? "Guest" : (user.email || "player").split("@")[0]);
+  // unique. Anonymous users without one get a simple fallback name. The rules
+  // cap a name at 40 characters, which a long email address can exceed.
+  const name = user.displayName || (user.isAnonymous ? "Guest" : (user.email || "player").split("@")[0]);
+  return name.slice(0, 40) || "player";
 }
 
 async function nextGuestName(code) {
@@ -68,11 +70,16 @@ export async function createRoom(user, totalRounds = 3) {
   throw new Error("Could not create a room. Try again.");
 }
 
+// Idempotent: a player who is already in the room keeps the seat they have, so
+// rejoining never resets a score or consumes another guest number.
 export async function addPlayer(code, user) {
+  const ref = playerRef(code, user.uid);
+  const existing = await getDoc(ref);
+  if (existing.exists()) return;
   const name = user.isAnonymous && !user.displayName
     ? await nextGuestName(code)
     : playerName(user);
-  await setDoc(playerRef(code, user.uid), {
+  await setDoc(ref, {
     name,
     score: 0,
     roundScores: {},
@@ -87,8 +94,15 @@ export async function joinRoom(code, user) {
   await addPlayer(code, user);
 }
 
+// Also used by the host to clear a seat that has been abandoned, so a player
+// who closed their tab cannot stall the round everyone else is waiting on.
 export async function leaveRoom(code, uid) {
   await deleteDoc(playerRef(code, uid));
+}
+
+// Taken by a remaining player when the host has left, so the room stays playable.
+export async function claimHost(code, uid) {
+  await updateDoc(roomRef(code), { hostUid: uid });
 }
 
 export async function setTotalRounds(code, totalRounds) {
@@ -108,6 +122,7 @@ function startRound(code, room, n) {
 // Step one of starting: publish a candidate list the players can rate against
 // their own history without revealing it.
 export async function proposeSelection(code, totalRounds, catalogIds) {
+  if (!catalogIds.length) throw new Error("No dilemmas are loaded, so a game cannot start.");
   const size = Math.max(20, totalRounds * 4);
   await updateDoc(roomRef(code), {
     status: "selecting",
@@ -120,12 +135,16 @@ export async function proposeSelection(code, totalRounds, catalogIds) {
 // Step two: each player privately marks which candidates they have seen. Only
 // the counts are shared, never who has seen what.
 export async function contribute(code, uid, candidates, history) {
+  // A reconnect can call this again before the contrib snapshot has arrived, and
+  // the pool counters are increments, so check the marker before touching them.
+  const marker = doc(contribRef(code), uid);
+  if ((await getDoc(marker)).exists()) return;
   // One write per count rather than a batch: every write costs two rule lookups,
   // and a batch shares one budget for all of them.
   const seen = candidates.filter((id) => history.has(id));
   await Promise.all(seen.map((id) => setDoc(doc(poolRef(code), id), { count: increment(1) }, { merge: true })));
   // Written last, so a failure above is retried rather than silently skipped.
-  await setDoc(doc(contribRef(code), uid), { at: serverTimestamp() });
+  await setDoc(marker, { at: serverTimestamp() });
 }
 
 // Step three: the host picks the least-seen candidates and starts round one.
@@ -133,6 +152,9 @@ export async function finalizeSelection(code, room) {
   const snap = await getDocs(poolRef(code));
   const counts = new Map(snap.docs.map((d) => [d.id, d.data().count || 0]));
   const dilemmaIds = chooseDilemmaIds(room.candidates || [], counts, room.totalRounds);
+  if (dilemmaIds.length < room.totalRounds) {
+    throw new Error("No dilemmas are loaded, so a game cannot start.");
+  }
   const started = { ...room, dilemmaIds };
   await updateDoc(roomRef(code), { dilemmaIds });
   await startRound(code, started, 1);

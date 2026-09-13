@@ -3,7 +3,7 @@ import { after, before, beforeEach, test } from "node:test";
 import assert from "node:assert/strict";
 import { initializeTestEnvironment, assertSucceeds, assertFails } from "@firebase/rules-unit-testing";
 import {
-  doc, setDoc, getDoc, getDocs, updateDoc, collection, writeBatch, increment,
+  doc, setDoc, getDoc, getDocs, updateDoc, deleteDoc, collection, writeBatch, increment,
 } from "firebase/firestore";
 
 const CODE = "ABCD";
@@ -58,14 +58,87 @@ test("a signed-in player can create a room and be its host; nobody else can driv
 
 test("another player joins by code but cannot touch anyone else's player document", async () => {
   await env.withSecurityRulesDisabled(async (context) => {
-    await setDoc(room(context.firestore()), newRoom());
-    await setDoc(player(context.firestore(), "alice"), newPlayer("alice"));
+    const db = context.firestore();
+    await setDoc(room(db), newRoom());
+    await setDoc(player(db, "alice"), newPlayer("alice"));
   });
   await assertSucceeds(getDoc(room(bob)));
   await assertSucceeds(setDoc(player(bob, "bob"), newPlayer("bob")));
   await assertFails(setDoc(player(bob, "carol"), newPlayer("carol")));
   await assertFails(updateDoc(player(bob, "alice"), { score: 99 }));
   await assertSucceeds(updateDoc(player(bob, "bob"), { score: 2 }));
+});
+
+test("a player may check their own seat before taking one", async () => {
+  // addPlayer reads its own document first so rejoining cannot reset a score.
+  await env.withSecurityRulesDisabled(async (context) => {
+    await setDoc(room(context.firestore()), newRoom());
+  });
+  await assertSucceeds(getDoc(player(bob, "bob")));
+  await assertFails(getDoc(player(bob, "alice")));
+});
+
+test("a player cannot join a room that has already started", async () => {
+  await env.withSecurityRulesDisabled(async (context) => {
+    await setDoc(room(context.firestore()), newRoom({ status: "playing", currentRound: 1 }));
+  });
+  await assertFails(setDoc(player(bob, "bob"), newPlayer("bob")));
+});
+
+test("a player cannot seat themselves in a room that does not exist", async () => {
+  await assertFails(setDoc(doc(bob, "rooms", "ZZZZ", "players", "bob"), newPlayer("bob")));
+});
+
+test("the room roster is readable only from inside the room", async () => {
+  await env.withSecurityRulesDisabled(async (context) => {
+    const db = context.firestore();
+    await setDoc(room(db), newRoom());
+    await setDoc(player(db, "alice"), newPlayer("alice"));
+  });
+  await assertFails(getDocs(collection(bob, "rooms", CODE, "players")));
+  await assertSucceeds(getDocs(collection(alice, "rooms", CODE, "players")));
+});
+
+test("a player cannot award themselves more than one point per round", async () => {
+  await seedRoom();
+  await assertSucceeds(updateDoc(player(bob, "bob"), { roundScores: { 1: 1 }, score: 1 }));
+  await assertFails(updateDoc(player(bob, "bob"), { roundScores: { 1: 1, 2: 5 }, score: 6 }));
+  await assertFails(updateDoc(player(bob, "bob"), { score: 99 }));
+  // Four rounds of points in a three-round game.
+  await assertFails(updateDoc(player(bob, "bob"), {
+    roundScores: { 1: 1, 2: 1, 3: 1, 4: 1 }, score: 4,
+  }));
+  // A round already recorded cannot be dropped, and a name cannot be changed.
+  await assertFails(updateDoc(player(bob, "bob"), { roundScores: {}, score: 1 }));
+  await assertFails(updateDoc(player(bob, "bob"), { name: "alice" }));
+});
+
+test("hosting passes to a remaining player once the host has left", async () => {
+  await seedRoom({ status: "playing", currentRound: 1 });
+  // While the host is still seated, nobody may take the room from them.
+  await assertFails(updateDoc(room(bob), { hostUid: "bob" }));
+  await env.withSecurityRulesDisabled(async (context) => {
+    await deleteDoc(player(context.firestore(), "alice"));
+  });
+  await assertFails(updateDoc(room(bob), { hostUid: "bob", totalRounds: 9 }));
+  await assertSucceeds(updateDoc(room(bob), { hostUid: "bob" }));
+});
+
+test("the host may clear a seat that has been abandoned", async () => {
+  await seedRoom({ status: "playing", currentRound: 1 });
+  await assertFails(deleteDoc(player(bob, "alice")));
+  await assertSucceeds(deleteDoc(player(alice, "bob")));
+});
+
+test("guest numbers are only handed out while a room is in its lobby", async () => {
+  const counter = (db) => doc(db, "rooms", CODE, "guestNames", "counter");
+  await seedRoom();
+  await assertSucceeds(setDoc(counter(bob), { next: 2 }));
+  await assertSucceeds(updateDoc(counter(bob), { next: 3 }));
+  await env.withSecurityRulesDisabled(async (context) => {
+    await updateDoc(room(context.firestore()), { status: "playing" });
+  });
+  await assertFails(updateDoc(counter(bob), { next: 4 }));
 });
 
 test("only the host sets the round count, and it must be positive", async () => {
@@ -95,6 +168,19 @@ test("global stats allow one new response at a time", async () => {
   }));
   await assertFails(updateDoc(globalStats(alice, "wikipedia-0001"), {
     total: 4, option0: 2, option1: 2,
+  }));
+  await assertFails(updateDoc(globalStats(alice, "wikipedia-0001"), {
+    total: 3, option0: 0, option1: 2,
+  }));
+});
+
+test("a global stats document missing option keys can still take a response", async () => {
+  await env.withSecurityRulesDisabled(async (context) => {
+    await setDoc(globalStats(context.firestore(), "legacy-0001"), { total: 4, option0: 4 });
+  });
+  await assertSucceeds(updateDoc(globalStats(alice, "legacy-0001"), {
+    total: 5, optionCount: 3,
+    option0: 4, option1: 1, option2: 0, option3: 0, option4: 0, option5: 0,
   }));
 });
 

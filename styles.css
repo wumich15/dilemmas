@@ -149,10 +149,15 @@ fieldset label { display: block; margin: 0.5rem 0; }
   background: var(--bg);
   transition: background-color 120ms ease, border-color 120ms ease;
 }
-.choice-percentage {
+.choice-percentage,
+.room-count {
   display: inline-block;
   margin-left: 0.5rem;
   color: var(--muted);
+}
+.inline-button {
+  margin-left: 0.5rem;
+  padding: 0.1rem 0.5rem;
 }
 .choice-option:hover .choice-label-text { background: var(--soft); border-color: var(--muted); }
 .choice-option input:checked + .choice-label-text { background: var(--soft); border-color: var(--fg); }

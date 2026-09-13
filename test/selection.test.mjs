@@ -21,6 +21,14 @@ test("the catalog has stable ids, text, and source metadata", () => {
   assert.equal(sourced.length, CATALOG.length);
 });
 
+// firestore.rules enumerates option0..option5 and stats.js caps MAX_OPTIONS at
+// six. A seventh option would silently stop being counted, so fail here instead.
+test("no catalog entry has more options than the global counters can hold", () => {
+  for (const entry of CATALOG) {
+    assert.ok(entry.options.length <= 6, `${entry.id} has ${entry.options.length} options`);
+  }
+});
+
 test("the catalog only contains concise prompts from game-question sources", () => {
   assert.ok(CATALOG.length >= 40);
   for (const entry of CATALOG) {

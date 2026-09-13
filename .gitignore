@@ -12,6 +12,7 @@ node_modules/
 .firebase/
 dist/
 build/
+tmp/
 coverage/
 .cache/
 

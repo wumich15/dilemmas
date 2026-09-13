@@ -1,7 +1,7 @@
 // Anonymous, global response totals. A single aggregate document per dilemma
 // keeps reads small and lets every mode share the same percentages.
 import {
-  db, isConfigured, doc, getDoc, onSnapshot, runTransaction,
+  db, isConfigured, doc, onSnapshot, runTransaction,
 } from "./firebase.js";
 
 const MAX_OPTIONS = 6;
@@ -32,12 +32,6 @@ function dataForStats(total, optionCount, counts) {
     data[`option${index}`] = counts.get(index) || 0;
   }
   return data;
-}
-
-export async function getGlobalStats(dilemmaId, optionCount = MAX_OPTIONS) {
-  if (!isConfigured || !dilemmaId) return null;
-  const snap = await getDoc(globalStatsRef(dilemmaId));
-  return parseStats(snap.exists() ? snap.data() : null, optionCount);
 }
 
 // The transaction is safe when several people answer at the same time. The
